@@ -10,7 +10,7 @@
         }
 
         public int Id { get; set; }
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
         public int TimeSlotId { get; set; }
         public int SubjectId { get; set; }
         public BookingStatus Status { get; set; }

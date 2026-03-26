@@ -15,6 +15,7 @@ public class User : IdentityUser
     public string Phone { get; set; }
     public string Email { get; set; }
     public DateOnly BirthDate { get; set; }
+    public string Password { get; set; }
     public string? Blurb { get; set; }
     public bool IsTutor { get; set; }
     public bool IsAdmin { get; set; }
