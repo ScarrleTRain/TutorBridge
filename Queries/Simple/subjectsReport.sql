@@ -1,1 +1,1 @@
-﻿SELECT * FROM Subject
+﻿SELECT subjectId [Id], Name, Description FROM Subject
