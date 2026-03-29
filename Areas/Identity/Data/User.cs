@@ -13,17 +13,20 @@ public class User : IdentityUser
     // Id inherited
     [Required(ErrorMessage = "First name is required")]
     [StringLength(30, ErrorMessage = "Max 30 Characters")]
+    [RegularExpression(@"^[a-zA-Z\s-]+$", ErrorMessage = "First name can only contain letters")]
     public required string NameFirst { get; set; }
 
     [Required(ErrorMessage = "Last name is required")]
     [StringLength(30, ErrorMessage = "Max 30 Characters")]
+    [RegularExpression(@"^[a-zA-Z\s-]+$", ErrorMessage = "First name can only contain letters")]
     public required string NameLast { get; set; }
 
     [Phone(ErrorMessage = "Invalid phone number")]
+    [RegularExpression(@"^02\d{7,9}$", ErrorMessage = "Enter a valid NZ mobile number")]
     public string? Phone { get; set; }
-    //public string Email { get; set; } Inherited from IdentityUser
 
     [Required(ErrorMessage = "Birth Date is required")]
+    [DataType(DataType.Date)]
     public DateOnly BirthDate { get; set; }
     //public string Password { get; set; } UserManager.CreateAsync(user, password) use identity functions
     [StringLength(500, ErrorMessage = "Max 500 characters")]
