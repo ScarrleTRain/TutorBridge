@@ -97,7 +97,7 @@ namespace TutorBridge.Migrations
                 name: "Timeslot",
                 columns: table => new
                 {
-                    TimeslotId = table.Column<int>(type: "int", nullable: false)
+                    TimeSlotId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TutorId = table.Column<int>(type: "int", nullable: false),
                     DateTimeStart = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -105,7 +105,7 @@ namespace TutorBridge.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Timeslot", x => x.TimeslotId);
+                    table.PrimaryKey("PK_Timeslot", x => x.TimeSlotId);
                 });
 
             migrationBuilder.CreateTable(

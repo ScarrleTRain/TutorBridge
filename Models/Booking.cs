@@ -12,10 +12,10 @@ namespace TutorBridge.Models
         }
 
         public int Id { get; set; }
-        public int? UserId { get; set; }
+        public string? UserId { get; set; }
         public int TimeSlotId { get; set; }
         public int SubjectId { get; set; }
-        public BookingStatus Status { get; set; }
+        public Booking.BookingStatus Status { get; set; }
 
         [StringLength(30, ErrorMessage = "Max 30 Characters")]
         public string? NameFirst { get; set; }

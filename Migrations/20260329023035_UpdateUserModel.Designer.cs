@@ -311,11 +311,11 @@ namespace TutorBridge.Migrations
 
             modelBuilder.Entity("TutorBridge.Models.Timeslot", b =>
                 {
-                    b.Property<int>("TimeslotId")
+                    b.Property<int>("TimeSlotId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TimeslotId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TimeSlotId"));
 
                     b.Property<DateTime>("DateTimeEnd")
                         .HasColumnType("datetime2");
@@ -326,7 +326,7 @@ namespace TutorBridge.Migrations
                     b.Property<int>("TutorId")
                         .HasColumnType("int");
 
-                    b.HasKey("TimeslotId");
+                    b.HasKey("TimeSlotId");
 
                     b.ToTable("Timeslot");
                 });

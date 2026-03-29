@@ -2,8 +2,8 @@
 {
     public class Timeslot
     {
-        public int TimeslotId { get; set; }
-        public int TutorId { get; set; }
+        public int TimeSlotId { get; set; }
+        public string TutorId { get; set; }
         public DateTime DateTimeStart { get; set; }
         public DateTime DateTimeEnd { get; set; }
     }
