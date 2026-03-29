@@ -34,7 +34,7 @@ namespace TutorBridge
             }
 
             var subject = await _context.Subject
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.SubjectId == id);
             if (subject == null)
             {
                 return NotFound();
@@ -54,7 +54,7 @@ namespace TutorBridge
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description")] Subject subject)
+        public async Task<IActionResult> Create([Bind("SubjectId,Name,Description")] Subject subject)
         {
             if (ModelState.IsValid)
             {
@@ -86,9 +86,9 @@ namespace TutorBridge
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Subject subject)
+        public async Task<IActionResult> Edit(int id, [Bind("SubjectId,Name,Description")] Subject subject)
         {
-            if (id != subject.Id)
+            if (id != subject.SubjectId)
             {
                 return NotFound();
             }
@@ -102,7 +102,7 @@ namespace TutorBridge
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!SubjectExists(subject.Id))
+                    if (!SubjectExists(subject.SubjectId))
                     {
                         return NotFound();
                     }
@@ -125,7 +125,7 @@ namespace TutorBridge
             }
 
             var subject = await _context.Subject
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.SubjectId == id);
             if (subject == null)
             {
                 return NotFound();
@@ -151,7 +151,7 @@ namespace TutorBridge
 
         private bool SubjectExists(int id)
         {
-            return _context.Subject.Any(e => e.Id == id);
+            return _context.Subject.Any(e => e.SubjectId == id);
         }
     }
 }

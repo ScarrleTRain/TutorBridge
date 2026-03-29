@@ -34,7 +34,7 @@ namespace TutorBridge
             }
 
             var tutorSubject = await _context.TutorSubject
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.TutorSubjectId == id);
             if (tutorSubject == null)
             {
                 return NotFound();
@@ -54,7 +54,7 @@ namespace TutorBridge
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,TutorId,SubjectId")] TutorSubject tutorSubject)
+        public async Task<IActionResult> Create([Bind("TutorSubjectId,TutorId,SubjectId")] TutorSubject tutorSubject)
         {
             if (ModelState.IsValid)
             {
@@ -86,9 +86,9 @@ namespace TutorBridge
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,TutorId,SubjectId")] TutorSubject tutorSubject)
+        public async Task<IActionResult> Edit(int id, [Bind("TutorSubjectId,TutorId,SubjectId")] TutorSubject tutorSubject)
         {
-            if (id != tutorSubject.Id)
+            if (id != tutorSubject.TutorSubjectId)
             {
                 return NotFound();
             }
@@ -102,7 +102,7 @@ namespace TutorBridge
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TutorSubjectExists(tutorSubject.Id))
+                    if (!TutorSubjectExists(tutorSubject.TutorSubjectId))
                     {
                         return NotFound();
                     }
@@ -125,7 +125,7 @@ namespace TutorBridge
             }
 
             var tutorSubject = await _context.TutorSubject
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.TutorSubjectId == id);
             if (tutorSubject == null)
             {
                 return NotFound();
@@ -151,7 +151,7 @@ namespace TutorBridge
 
         private bool TutorSubjectExists(int id)
         {
-            return _context.TutorSubject.Any(e => e.Id == id);
+            return _context.TutorSubject.Any(e => e.TutorSubjectId == id);
         }
     }
 }

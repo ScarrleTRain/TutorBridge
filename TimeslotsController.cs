@@ -34,7 +34,7 @@ namespace TutorBridge
             }
 
             var timeslot = await _context.Timeslot
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.TimeslotId == id);
             if (timeslot == null)
             {
                 return NotFound();
@@ -54,7 +54,7 @@ namespace TutorBridge
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,TutorId,DateTimeStart,DateTimeEnd")] Timeslot timeslot)
+        public async Task<IActionResult> Create([Bind("TimeslotId,TutorId,DateTimeStart,DateTimeEnd")] Timeslot timeslot)
         {
             if (ModelState.IsValid)
             {
@@ -86,9 +86,9 @@ namespace TutorBridge
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,TutorId,DateTimeStart,DateTimeEnd")] Timeslot timeslot)
+        public async Task<IActionResult> Edit(int id, [Bind("TimeslotId,TutorId,DateTimeStart,DateTimeEnd")] Timeslot timeslot)
         {
-            if (id != timeslot.Id)
+            if (id != timeslot.TimeslotId)
             {
                 return NotFound();
             }
@@ -102,7 +102,7 @@ namespace TutorBridge
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TimeslotExists(timeslot.Id))
+                    if (!TimeslotExists(timeslot.TimeslotId))
                     {
                         return NotFound();
                     }
@@ -125,7 +125,7 @@ namespace TutorBridge
             }
 
             var timeslot = await _context.Timeslot
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.TimeslotId == id);
             if (timeslot == null)
             {
                 return NotFound();
@@ -151,7 +151,7 @@ namespace TutorBridge
 
         private bool TimeslotExists(int id)
         {
-            return _context.Timeslot.Any(e => e.Id == id);
+            return _context.Timeslot.Any(e => e.TimeslotId == id);
         }
     }
 }
