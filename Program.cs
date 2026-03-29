@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TutorBridge.Areas.Identity.Data;
+using TutorBridge.Data;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("TutorBridgeContextConnection") ?? throw new InvalidOperationException("Connection string 'TutorBridgeContextConnection' not found.");;
 
@@ -35,5 +36,11 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<TutorBridgeContext>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+    await DbSeeder.SeedAsync(context, userManager);
+}
 
 app.Run();
