@@ -1,1 +1,2 @@
-﻿SELECT * FROM AspNetUsers
+﻿SELECT *
+FROM   AspNetUsers;

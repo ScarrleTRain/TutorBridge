@@ -1,3 +1,8 @@
-select u.NameFirst + ' ' + u.NameLast Student, count(b.Id) [Total Bookings] from AspNetUsers u join Booking b on u.Id = b.UserId
-group by u.Id, u.NameFirst, u.NameLast
-order by [Total Bookings] desc
+SELECT   u.NameFirst + ' ' + u.NameLast AS Student,
+         count(b.Id) AS [Total Bookings]
+FROM     AspNetUsers AS u
+         INNER JOIN
+         Booking AS b
+         ON u.Id = b.UserId
+GROUP BY u.Id, u.NameFirst, u.NameLast
+ORDER BY [Total Bookings] DESC;

@@ -1,1 +1,4 @@
-﻿SELECT subjectId [Id], Name, Description FROM Subject
+﻿SELECT subjectId AS [Id],
+       Name,
+       Description
+FROM   Subject;

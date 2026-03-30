@@ -1,1 +1,2 @@
-﻿SELECT * FROM TutorSubject
+﻿SELECT *
+FROM   TutorSubject;

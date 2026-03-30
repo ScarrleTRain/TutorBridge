@@ -1,4 +1,12 @@
-select u.NameFirst + ' ' + u.NameLast [Student], s.Name [Subject], count(b.Id) [x Booked]
-from Booking b join AspNetUsers u on b.UserId = u.Id join Subject s on b.SubjectId = s.SubjectId
-group by u.Id, u.NameFirst, u.NameLast, s.SubjectId, s.Name
-order by [x Booked] desc, [Student]
+SELECT   u.NameFirst + ' ' + u.NameLast AS [Student],
+         s.Name AS [Subject],
+         count(b.Id) AS [x Booked]
+FROM     Booking AS b
+         INNER JOIN
+         AspNetUsers AS u
+         ON b.UserId = u.Id
+         INNER JOIN
+         Subject AS s
+         ON b.SubjectId = s.SubjectId
+GROUP BY u.Id, u.NameFirst, u.NameLast, s.SubjectId, s.Name
+ORDER BY [x Booked] DESC, [Student];

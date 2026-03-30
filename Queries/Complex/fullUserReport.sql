@@ -1,3 +1,10 @@
-select Id, Concat(NameFirst, ' ', NameLast) [Full Name], Email, Phone, BirthDate [Birth Date], Blurb, 
-CONCAT((Case When IsAdmin = 1 then 'Admin' else '' END ), (Case when IsAdmin = 1 and IsTutor = 1 then ', ' else '' end), (Case when IsTutor = 1 then 'Tutor' else '' end)) [Elevation]
-from AspNetUsers
+SELECT Id,
+       Concat(NameFirst, ' ', NameLast) AS [Full Name],
+       Email,
+       Phone,
+       BirthDate AS [Birth Date],
+       Blurb,
+       CONCAT((CASE WHEN IsAdmin = 1 THEN 'Admin' ELSE '' END), 
+              (CASE WHEN IsAdmin = 1 AND IsTutor = 1 THEN ', ' ELSE '' END), 
+              (CASE WHEN IsTutor = 1 THEN 'Tutor' ELSE '' END)) AS [Elevation]
+FROM   AspNetUsers;
