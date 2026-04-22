@@ -26,7 +26,7 @@ namespace TutorBridge
         }
 
         // GET: TutorSubjects/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(string id)
         {
             if (id == null)
             {
@@ -34,7 +34,7 @@ namespace TutorBridge
             }
 
             var tutorSubject = await _context.TutorSubject
-                .FirstOrDefaultAsync(m => m.TutorSubjectId == id);
+                .FirstOrDefaultAsync(m => m.TutorId == id);
             if (tutorSubject == null)
             {
                 return NotFound();
@@ -54,7 +54,7 @@ namespace TutorBridge
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TutorSubjectId,TutorId,SubjectId")] TutorSubject tutorSubject)
+        public async Task<IActionResult> Create([Bind("TutorId,SubjectId")] TutorSubject tutorSubject)
         {
             if (ModelState.IsValid)
             {
@@ -66,7 +66,7 @@ namespace TutorBridge
         }
 
         // GET: TutorSubjects/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
             {
@@ -86,9 +86,9 @@ namespace TutorBridge
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TutorSubjectId,TutorId,SubjectId")] TutorSubject tutorSubject)
+        public async Task<IActionResult> Edit(string id, [Bind("TutorId,SubjectId")] TutorSubject tutorSubject)
         {
-            if (id != tutorSubject.TutorSubjectId)
+            if (id != tutorSubject.TutorId)
             {
                 return NotFound();
             }
@@ -102,7 +102,7 @@ namespace TutorBridge
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TutorSubjectExists(tutorSubject.TutorSubjectId))
+                    if (!TutorSubjectExists(tutorSubject.TutorId))
                     {
                         return NotFound();
                     }
@@ -117,7 +117,7 @@ namespace TutorBridge
         }
 
         // GET: TutorSubjects/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
             {
@@ -125,7 +125,7 @@ namespace TutorBridge
             }
 
             var tutorSubject = await _context.TutorSubject
-                .FirstOrDefaultAsync(m => m.TutorSubjectId == id);
+                .FirstOrDefaultAsync(m => m.TutorId == id);
             if (tutorSubject == null)
             {
                 return NotFound();
@@ -137,7 +137,7 @@ namespace TutorBridge
         // POST: TutorSubjects/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var tutorSubject = await _context.TutorSubject.FindAsync(id);
             if (tutorSubject != null)
@@ -149,9 +149,9 @@ namespace TutorBridge
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TutorSubjectExists(int id)
+        private bool TutorSubjectExists(string id)
         {
-            return _context.TutorSubject.Any(e => e.TutorSubjectId == id);
+            return _context.TutorSubject.Any(e => e.TutorId == id);
         }
     }
 }

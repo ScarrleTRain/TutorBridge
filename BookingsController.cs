@@ -54,7 +54,7 @@ namespace TutorBridge
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UserId,TimeSlotId,SubjectId,Status,NameFirst,NameLast,Phone,Email")] Booking booking)
+        public async Task<IActionResult> Create([Bind("Id,UserId,TimeSlotId,SubjectId,Status")] Booking booking)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +86,7 @@ namespace TutorBridge
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,TimeSlotId,SubjectId,Status,NameFirst,NameLast,Phone,Email")] Booking booking)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,TimeSlotId,SubjectId,Status")] Booking booking)
         {
             if (id != booking.Id)
             {

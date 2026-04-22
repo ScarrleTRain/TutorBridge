@@ -1,10 +1,13 @@
-﻿namespace TutorBridge.Models
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace TutorBridge.Models
 {
+    [PrimaryKey(nameof(TutorId), nameof(SubjectId))]
     public class TutorSubject
     {
-        public int TutorSubjectId { get; set; }
-
         public required string TutorId { get; set; }
-        public int SubjectId { get; set; }
+        public required int SubjectId { get; set; }
     }
 }

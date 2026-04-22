@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TutorBridge.Areas.Identity.Data;
 
@@ -11,9 +12,11 @@ using TutorBridge.Areas.Identity.Data;
 namespace TutorBridge.Migrations
 {
     [DbContext(typeof(TutorBridgeContext))]
-    partial class TutorBridgeContextModelSnapshot : ModelSnapshot
+    [Migration("20260422212542_CompositePK")]
+    partial class CompositePK
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
