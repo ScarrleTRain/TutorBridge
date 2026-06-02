@@ -6,8 +6,18 @@ namespace TutorBridge.Data
 {
     public static class DbSeeder
     {
-        public static async Task SeedAsync(TutorBridgeContext context, UserManager<User> userManager)
+        public static async Task SeedAsync(
+            TutorBridgeContext context,
+            UserManager<User> userManager,
+            RoleManager<IdentityRole> roleManager)
         {
+            string[] roles = { "Admin", "Tutor", "Student" };
+            foreach (var role in roles)
+            {
+                if (!await roleManager.RoleExistsAsync(role))
+                    await roleManager.CreateAsync(new IdentityRole(role));
+            }
+
             // =====================
             // Subject (20)
             // =====================
@@ -52,11 +62,10 @@ namespace TutorBridge.Data
                     NameLast = "Smith",
                     Phone = "0211234567",
                     BirthDate = new DateOnly(1985, 3, 12),
-                    IsAdmin = true,
-                    IsTutor = false,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(admin1, "Admin@1234");
+                await userManager.AddToRoleAsync(admin1, "Admin");
 
                 var admin2 = new User
                 {
@@ -66,11 +75,10 @@ namespace TutorBridge.Data
                     NameLast = "Johnson",
                     Phone = "0219876543",
                     BirthDate = new DateOnly(1990, 7, 22),
-                    IsAdmin = true,
-                    IsTutor = false,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(admin2, "Admin@1234");
+                await userManager.AddToRoleAsync(admin2, "Admin");
 
                 // --- TUTORS (8) ---
                 var tutor1 = new User
@@ -82,11 +90,10 @@ namespace TutorBridge.Data
                     Phone = "0213456789",
                     BirthDate = new DateOnly(1992, 1, 5),
                     Blurb = "Passionate about helping students reach their potential.",
-                    IsTutor = true,
-                    IsAdmin = false,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor1, "Tutor@1234");
+                await userManager.AddToRoleAsync(tutor1, "Tutor");
 
                 var tutor2 = new User
                 {
@@ -97,11 +104,10 @@ namespace TutorBridge.Data
                     Phone = "0214567890",
                     BirthDate = new DateOnly(1988, 11, 30),
                     Blurb = "5 years of tutoring experience across multiple Subject.",
-                    IsTutor = true,
-                    IsAdmin = false,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor2, "Tutor@1234");
+                await userManager.AddToRoleAsync(tutor2, "Tutor");
 
                 var tutor3 = new User
                 {
@@ -112,11 +118,10 @@ namespace TutorBridge.Data
                     Phone = "0215678901",
                     BirthDate = new DateOnly(1995, 4, 18),
                     Blurb = "Patient and encouraging tutor with a love for teaching.",
-                    IsTutor = true,
-                    IsAdmin = false,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor3, "Tutor@1234");
+                await userManager.AddToRoleAsync(tutor3, "Tutor");
 
                 var tutor4 = new User
                 {
@@ -127,11 +132,10 @@ namespace TutorBridge.Data
                     Phone = "0216789012",
                     BirthDate = new DateOnly(1993, 9, 25),
                     Blurb = "Former teacher with a focus on exam preparation.",
-                    IsTutor = true,
-                    IsAdmin = false,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor4, "Tutor@1234");
+                await userManager.AddToRoleAsync(tutor4, "Tutor");
 
                 var tutor5 = new User
                 {
@@ -142,11 +146,10 @@ namespace TutorBridge.Data
                     Phone = "0217890123",
                     BirthDate = new DateOnly(1987, 6, 14),
                     Blurb = "Specialising in making difficult concepts easy to understand.",
-                    IsTutor = true,
-                    IsAdmin = false,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor5, "Tutor@1234");
+                await userManager.AddToRoleAsync(tutor5, "Tutor");
 
                 var tutor6 = new User
                 {
@@ -157,11 +160,10 @@ namespace TutorBridge.Data
                     Phone = "0218901234",
                     BirthDate = new DateOnly(1996, 2, 8),
                     Blurb = "Passionate about helping students reach their potential.",
-                    IsTutor = true,
-                    IsAdmin = false,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor6, "Tutor@1234");
+                await userManager.AddToRoleAsync(tutor6, "Tutor");
 
                 var tutor7 = new User
                 {
@@ -172,11 +174,10 @@ namespace TutorBridge.Data
                     Phone = "0219012345",
                     BirthDate = new DateOnly(1991, 8, 3),
                     Blurb = "5 years of tutoring experience across multiple Subject.",
-                    IsTutor = true,
-                    IsAdmin = false,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor7, "Tutor@1234");
+                await userManager.AddToRoleAsync(tutor7, "Tutor");
 
                 var tutor8 = new User
                 {
@@ -187,11 +188,10 @@ namespace TutorBridge.Data
                     Phone = "0210123456",
                     BirthDate = new DateOnly(1994, 12, 19),
                     Blurb = "Former teacher with a focus on exam preparation.",
-                    IsTutor = true,
-                    IsAdmin = false,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor8, "Tutor@1234");
+                await userManager.AddToRoleAsync(tutor8, "Tutor");
 
                 // --- STUDENTS (10) ---
                 var student1 = new User
@@ -202,11 +202,10 @@ namespace TutorBridge.Data
                     NameLast = "Anderson",
                     Phone = "0211122334",
                     BirthDate = new DateOnly(2005, 3, 10),
-                    IsTutor = false,
-                    IsAdmin = false,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(student1, "Student@1234");
+                await userManager.AddToRoleAsync(student1, "Student");
 
                 var student2 = new User
                 {
@@ -216,11 +215,10 @@ namespace TutorBridge.Data
                     NameLast = "Thomas",
                     Phone = "0212233445",
                     BirthDate = new DateOnly(2006, 7, 21),
-                    IsTutor = false,
-                    IsAdmin = false,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(student2, "Student@1234");
+                await userManager.AddToRoleAsync(student2, "Student");
 
                 var student3 = new User
                 {
@@ -230,11 +228,10 @@ namespace TutorBridge.Data
                     NameLast = "Jackson",
                     Phone = "0213344556",
                     BirthDate = new DateOnly(2004, 11, 5),
-                    IsTutor = false,
-                    IsAdmin = false,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(student3, "Student@1234");
+                await userManager.AddToRoleAsync(student3, "Student");
 
                 var student4 = new User
                 {
@@ -244,11 +241,10 @@ namespace TutorBridge.Data
                     NameLast = "White",
                     Phone = "0214455667",
                     BirthDate = new DateOnly(2005, 9, 15),
-                    IsTutor = false,
-                    IsAdmin = false,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(student4, "Student@1234");
+                await userManager.AddToRoleAsync(student4, "Student");
 
                 var student5 = new User
                 {
@@ -258,11 +254,10 @@ namespace TutorBridge.Data
                     NameLast = "Harris",
                     Phone = "0215566778",
                     BirthDate = new DateOnly(2006, 1, 28),
-                    IsTutor = false,
-                    IsAdmin = false,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(student5, "Student@1234");
+                await userManager.AddToRoleAsync(student5, "Student");
 
                 var student6 = new User
                 {
@@ -272,11 +267,10 @@ namespace TutorBridge.Data
                     NameLast = "Martin",
                     Phone = "0216677889",
                     BirthDate = new DateOnly(2004, 6, 3),
-                    IsTutor = false,
-                    IsAdmin = false,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(student6, "Student@1234");
+                await userManager.AddToRoleAsync(student6, "Student");
 
                 var student7 = new User
                 {
@@ -286,11 +280,10 @@ namespace TutorBridge.Data
                     NameLast = "Thompson",
                     Phone = "0217788990",
                     BirthDate = new DateOnly(2005, 4, 17),
-                    IsTutor = false,
-                    IsAdmin = false,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(student7, "Student@1234");
+                await userManager.AddToRoleAsync(student7, "Student");
 
                 var student8 = new User
                 {
@@ -300,11 +293,10 @@ namespace TutorBridge.Data
                     NameLast = "Robinson",
                     Phone = "0218899001",
                     BirthDate = new DateOnly(2006, 10, 9),
-                    IsTutor = false,
-                    IsAdmin = false,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(student8, "Student@1234");
+                await userManager.AddToRoleAsync(student8, "Student");
 
                 var student9 = new User
                 {
@@ -314,11 +306,10 @@ namespace TutorBridge.Data
                     NameLast = "Clark",
                     Phone = "0219900112",
                     BirthDate = new DateOnly(2004, 2, 22),
-                    IsTutor = false,
-                    IsAdmin = false,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(student9, "Student@1234");
+                await userManager.AddToRoleAsync(student9, "Student");
 
                 var student10 = new User
                 {
@@ -328,11 +319,10 @@ namespace TutorBridge.Data
                     NameLast = "Lewis",
                     Phone = "0210011223",
                     BirthDate = new DateOnly(2005, 8, 14),
-                    IsTutor = false,
-                    IsAdmin = false,
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(student10, "Student@1234");
+                await userManager.AddToRoleAsync(student10, "Student");
 
                 await context.SaveChangesAsync();
             }
@@ -342,7 +332,8 @@ namespace TutorBridge.Data
             // =====================
             if (!context.TutorSubject.Any())
             {
-                var tutors = context.Users.Where(u => u.IsTutor).ToList();
+                //var tutors = context.Users.Where(u => u.IsTutor).ToList();
+                var tutors = (await userManager.GetUsersInRoleAsync("Tutor")).ToList();
                 var Subject = context.Subject.ToList();
 
                 Subject S(string name) => Subject.First(s => s.Name == name);
@@ -378,7 +369,8 @@ namespace TutorBridge.Data
             // =====================
             if (!context.Timeslot.Any())
             {
-                var tutors = context.Users.Where(u => u.IsTutor).ToList();
+                //var tutors = context.Users.Where(u => u.IsTutor).ToList();
+                var tutors = (await userManager.GetUsersInRoleAsync("Tutor")).ToList();
                 User T(string email) => tutors.First(t => t.Email == email);
 
                 var now = DateTime.Now.Date;
@@ -413,7 +405,8 @@ namespace TutorBridge.Data
             // =====================
             if (!context.Booking.Any())
             {
-                var students = context.Users.Where(u => !u.IsTutor && !u.IsAdmin).ToList();
+                //var students = context.Users.Where(u => !u.IsTutor && !u.IsAdmin).ToList();
+                var students = (await userManager.GetUsersInRoleAsync("Student")).ToList();
                 var Timeslot = context.Timeslot.ToList();
                 var Subject = context.Subject.ToList();
 

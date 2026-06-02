@@ -7,7 +7,10 @@ var connectionString = builder.Configuration.GetConnectionString("TutorBridgeCon
 
 builder.Services.AddDbContext<TutorBridgeContext>(options => options.UseSqlServer(connectionString));
 
-builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<TutorBridgeContext>();
+builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<TutorBridgeContext>()
+    .AddDefaultTokenProviders()
+    .AddDefaultUI();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -40,7 +43,8 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<TutorBridgeContext>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-    await DbSeeder.SeedAsync(context, userManager);
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    await DbSeeder.SeedAsync(context, userManager, roleManager);
 }
 
 app.Run();
