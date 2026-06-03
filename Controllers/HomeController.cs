@@ -1,14 +1,24 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using TutorBridge.Areas.Identity.Data;
 using TutorBridge.Models;
 
 namespace TutorBridge.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly UserManager<User> _userManager;
+
+        public HomeController(UserManager<User> userManager)
         {
-            return View();
+            _userManager = userManager;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var tutors = await _userManager.GetUsersInRoleAsync("Tutor");
+            return View(tutors);
         }
 
         public IActionResult Privacy()

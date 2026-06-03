@@ -39,5 +39,7 @@ public class User : IdentityUser
     // Makes sure there is a Blurb, and that it is less than 500 chars.
     [StringLength(500, ErrorMessage = "Max 500 characters")]
     public string? Blurb { get; set; }
+
+    public string? ProfilePhoto { get; set; }
 }
 

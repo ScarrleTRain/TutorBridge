@@ -1,8 +1,29 @@
-﻿@{
+﻿@model IEnumerable<TutorBridge.Areas.Identity.Data.User>
+@inject IWebHostEnvironment Env
+
+@{
     ViewData["Title"] = "Home Page";
+
+    
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container-fluid py-2">
+    <div class="d-flex flex-row flex-nowrap">
+        @foreach (var tutor in Model)
+        {
+            string? photoPath = tutor.ProfilePhoto != null
+                ? System.IO.Path.Combine(Env.WebRootPath, "images", "tutors", tutor.ProfilePhoto)
+                : null;
+            bool photoExists = photoPath != null && System.IO.File.Exists(photoPath);
+
+            <div class="card" style="width: 18rem;">
+                <img class="card-img-top" src="~/images/tutors/@(photoExists ? tutor.ProfilePhoto : "default.jpg")" alt="@tutor.NameFirst @tutor.NameLast">
+                <div class="card-body">
+                    <h5 class="card-title">@tutor.NameFirst @tutor.NameLast</h5>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    <a href="#" class="btn btn-primary">Book</a>
+                </div>
+            </div>
+        }
+    </div>
 </div>

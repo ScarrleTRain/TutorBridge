@@ -90,6 +90,7 @@ namespace TutorBridge.Data
                     Phone = "0213456789",
                     BirthDate = new DateOnly(1992, 1, 5),
                     Blurb = "Passionate about helping students reach their potential.",
+                    ProfilePhoto = "liam_williams.jpg",
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor1, "Tutor@1234");
@@ -104,6 +105,7 @@ namespace TutorBridge.Data
                     Phone = "0214567890",
                     BirthDate = new DateOnly(1988, 11, 30),
                     Blurb = "5 years of tutoring experience across multiple Subject.",
+                    ProfilePhoto = "olivia_brown.jpg",
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor2, "Tutor@1234");
@@ -118,6 +120,7 @@ namespace TutorBridge.Data
                     Phone = "0215678901",
                     BirthDate = new DateOnly(1995, 4, 18),
                     Blurb = "Patient and encouraging tutor with a love for teaching.",
+                    ProfilePhoto = "noah_jones.jpg",
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor3, "Tutor@1234");
@@ -132,6 +135,7 @@ namespace TutorBridge.Data
                     Phone = "0216789012",
                     BirthDate = new DateOnly(1993, 9, 25),
                     Blurb = "Former teacher with a focus on exam preparation.",
+                    ProfilePhoto = "ava_garcia.jpg",
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor4, "Tutor@1234");
@@ -146,6 +150,7 @@ namespace TutorBridge.Data
                     Phone = "0217890123",
                     BirthDate = new DateOnly(1987, 6, 14),
                     Blurb = "Specialising in making difficult concepts easy to understand.",
+                    ProfilePhoto = "william_miller.jpg",
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor5, "Tutor@1234");
@@ -160,6 +165,7 @@ namespace TutorBridge.Data
                     Phone = "0218901234",
                     BirthDate = new DateOnly(1996, 2, 8),
                     Blurb = "Passionate about helping students reach their potential.",
+                    ProfilePhoto = "sophia_davis.jpg",
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor6, "Tutor@1234");
@@ -174,6 +180,7 @@ namespace TutorBridge.Data
                     Phone = "0219012345",
                     BirthDate = new DateOnly(1991, 8, 3),
                     Blurb = "5 years of tutoring experience across multiple Subject.",
+                    ProfilePhoto = "benjamin_wilson.jpg",
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor7, "Tutor@1234");
@@ -188,6 +195,7 @@ namespace TutorBridge.Data
                     Phone = "0210123456",
                     BirthDate = new DateOnly(1994, 12, 19),
                     Blurb = "Former teacher with a focus on exam preparation.",
+                    ProfilePhoto = "isabella_taylor.jpg",
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor8, "Tutor@1234");
