@@ -12,6 +12,8 @@ builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.Requi
     .AddDefaultTokenProviders()
     .AddDefaultUI();
 
+builder.Services.AddScoped<IUserClaimsPrincipalFactory<User>, AppClaimsPrincipalFactory>();
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
