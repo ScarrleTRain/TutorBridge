@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using TutorBridge.Areas.Identity.Data;
 using TutorBridge.Models;
+using TutorBridge.ViewModels;
+using static TutorBridge.Models.Booking;
 
 namespace TutorBridge
 {
@@ -40,6 +44,62 @@ namespace TutorBridge
                 return NotFound();
             }
 
+            return View(booking);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Book(string id)
+        {
+            var tutor = await _context.Users.FindAsync(id);
+
+            if (tutor == null)
+                return NotFound();
+
+            var availableTimeSlots = await _context.Timeslot
+                .Where(t => t.TutorId == tutor.Id)
+                //.Where(t => t.DateTimeStart > DateTime.Now) Disable for debug TODO remove this.
+                .OrderBy(t => t.DateTimeStart)
+                .Select(t => new SelectListItem
+                {
+                    Value = t.TimeSlotId.ToString(),
+                    Text = $"{t.DateTimeStart:ddd, MMM d} {t.DateTimeStart:h:mm tt}–{t.DateTimeEnd:h:mm tt}"
+                })
+                .ToListAsync();
+
+            var availableSubjects = await _context.TutorSubject
+                .Where(t => t.TutorId == tutor.Id)
+                .Join(_context.Subject, ts => ts.SubjectId, s => s.SubjectId, (ts, s) => new SelectListItem
+                {
+                    Value = s.SubjectId.ToString(),
+                    Text = s.Name
+                })
+                .ToListAsync();
+
+            ViewBag.Tutor = tutor;
+            ViewBag.Timeslots = availableTimeSlots;
+            ViewBag.Subjects = availableSubjects;
+
+            var booking = new Booking
+            {
+                UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+            };
+
+            return View(booking);
+        }
+
+        [HttpPost, Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Book([Bind("TimeSlotId,SubjectId")] Booking booking)
+        {
+            booking.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            booking.Status = BookingStatus.Pending;
+
+            if (ModelState.IsValid)
+            {
+                _context.Add(booking);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
             return View(booking);
         }
 
