@@ -3,12 +3,10 @@
 
 @{
     ViewData["Title"] = "Home Page";
-
-    
 }
 
 <div class="container-fluid py-2">
-    <div class="d-flex flex-row flex-nowrap">
+    <div class="d-flex flex-row flex-nowrap overflow-auto p-3">
         @foreach (var tutor in Model)
         {
             string? photoPath = tutor.ProfilePhoto != null
@@ -16,12 +14,12 @@
                 : null;
             bool photoExists = photoPath != null && System.IO.File.Exists(photoPath);
 
-            <div class="card" style="width: 18rem;">
+            <div class="card flex-shrink-0 m-2" style="width: 18rem;">
                 <img class="card-img-top" src="~/images/tutors/@(photoExists ? tutor.ProfilePhoto : "default.jpg")" alt="@tutor.NameFirst @tutor.NameLast">
                 <div class="card-body">
                     <h5 class="card-title">@tutor.NameFirst @tutor.NameLast</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                    <a href="#" class="btn btn-primary">Book</a>
+                    <p class="card-text">@tutor.Blurb</p>
+                    <a class="btn btn-primary" asp-controller="Bookings" asp-action="Book" asp-route-id="@tutor.Id">Book</a>
                 </div>
             </div>
         }
