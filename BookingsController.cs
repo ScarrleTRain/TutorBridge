@@ -27,7 +27,13 @@ namespace TutorBridge
         // GET: Bookings
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Booking.ToListAsync());
+            var bookings = await _context.Booking
+                .Include(b => b.UserId)
+                .Include(b => b.TimeSlotId)
+                .Include(b => b.SubjectId)
+                .ToListAsync();
+
+            return View(bookings);
         }
 
         // GET: Bookings/Details/5
@@ -56,7 +62,7 @@ namespace TutorBridge
             if (tutor == null)
                 return NotFound();
 
-            var availableTimeSlots = await _context.Timeslot
+            var availableTimeSlots = await _context.TimeSlot
                 .Where(t => t.TutorId == tutor.Id)
                 //.Where(t => t.DateTimeStart > DateTime.Now) Disable for debug TODO remove this.
                 .OrderBy(t => t.DateTimeStart)

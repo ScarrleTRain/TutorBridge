@@ -262,9 +262,15 @@ namespace TutorBridge.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SubjectId");
+
+                    b.HasIndex("TimeSlotId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Booking");
                 });
@@ -292,7 +298,7 @@ namespace TutorBridge.Migrations
                     b.ToTable("Subject");
                 });
 
-            modelBuilder.Entity("TutorBridge.Models.Timeslot", b =>
+            modelBuilder.Entity("TutorBridge.Models.TimeSlot", b =>
                 {
                     b.Property<int>("TimeSlotId")
                         .ValueGeneratedOnAdd()
@@ -312,7 +318,7 @@ namespace TutorBridge.Migrations
 
                     b.HasKey("TimeSlotId");
 
-                    b.ToTable("Timeslot");
+                    b.ToTable("TimeSlot");
                 });
 
             modelBuilder.Entity("TutorBridge.Models.TutorSubject", b =>
@@ -377,6 +383,31 @@ namespace TutorBridge.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("TutorBridge.Models.Booking", b =>
+                {
+                    b.HasOne("TutorBridge.Models.Subject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TutorBridge.Models.TimeSlot", "TimeSlot")
+                        .WithMany()
+                        .HasForeignKey("TimeSlotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TutorBridge.Areas.Identity.Data.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Subject");
+
+                    b.Navigation("TimeSlot");
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

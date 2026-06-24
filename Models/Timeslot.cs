@@ -1,6 +1,6 @@
 ﻿namespace TutorBridge.Models
 {
-    public class Timeslot
+    public class TimeSlot
     {
         public int TimeSlotId { get; set; }
 

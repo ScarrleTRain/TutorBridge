@@ -373,9 +373,9 @@ namespace TutorBridge.Data
             }
 
             // =====================
-            // Timeslot (20)
+            // TimeSlot (20)
             // =====================
-            if (!context.Timeslot.Any())
+            if (!context.TimeSlot.Any())
             {
                 //var tutors = context.Users.Where(u => u.IsTutor).ToList();
                 var tutors = (await userManager.GetUsersInRoleAsync("Tutor")).ToList();
@@ -383,27 +383,27 @@ namespace TutorBridge.Data
 
                 var now = DateTime.Now.Date;
 
-                context.Timeslot.AddRange(
-                    new Timeslot { TutorId = T("liam.williams@tutorbridge.com").Id, DateTimeStart = now.AddDays(1).AddHours(9), DateTimeEnd = now.AddDays(1).AddHours(10) },
-                    new Timeslot { TutorId = T("liam.williams@tutorbridge.com").Id, DateTimeStart = now.AddDays(2).AddHours(11), DateTimeEnd = now.AddDays(2).AddHours(12) },
-                    new Timeslot { TutorId = T("olivia.brown@tutorbridge.com").Id, DateTimeStart = now.AddDays(1).AddHours(13), DateTimeEnd = now.AddDays(1).AddHours(14) },
-                    new Timeslot { TutorId = T("olivia.brown@tutorbridge.com").Id, DateTimeStart = now.AddDays(3).AddHours(10), DateTimeEnd = now.AddDays(3).AddHours(11) },
-                    new Timeslot { TutorId = T("noah.jones@tutorbridge.com").Id, DateTimeStart = now.AddDays(2).AddHours(9), DateTimeEnd = now.AddDays(2).AddHours(10) },
-                    new Timeslot { TutorId = T("noah.jones@tutorbridge.com").Id, DateTimeStart = now.AddDays(4).AddHours(14), DateTimeEnd = now.AddDays(4).AddHours(15) },
-                    new Timeslot { TutorId = T("ava.garcia@tutorbridge.com").Id, DateTimeStart = now.AddDays(1).AddHours(15), DateTimeEnd = now.AddDays(1).AddHours(16) },
-                    new Timeslot { TutorId = T("ava.garcia@tutorbridge.com").Id, DateTimeStart = now.AddDays(5).AddHours(11), DateTimeEnd = now.AddDays(5).AddHours(12) },
-                    new Timeslot { TutorId = T("william.miller@tutorbridge.com").Id, DateTimeStart = now.AddDays(3).AddHours(9), DateTimeEnd = now.AddDays(3).AddHours(10) },
-                    new Timeslot { TutorId = T("william.miller@tutorbridge.com").Id, DateTimeStart = now.AddDays(6).AddHours(13), DateTimeEnd = now.AddDays(6).AddHours(14) },
-                    new Timeslot { TutorId = T("sophia.davis@tutorbridge.com").Id, DateTimeStart = now.AddDays(2).AddHours(14), DateTimeEnd = now.AddDays(2).AddHours(15) },
-                    new Timeslot { TutorId = T("sophia.davis@tutorbridge.com").Id, DateTimeStart = now.AddDays(7).AddHours(10), DateTimeEnd = now.AddDays(7).AddHours(11) },
-                    new Timeslot { TutorId = T("benjamin.wilson@tutorbridge.com").Id, DateTimeStart = now.AddDays(4).AddHours(9), DateTimeEnd = now.AddDays(4).AddHours(10) },
-                    new Timeslot { TutorId = T("benjamin.wilson@tutorbridge.com").Id, DateTimeStart = now.AddDays(5).AddHours(15), DateTimeEnd = now.AddDays(5).AddHours(16) },
-                    new Timeslot { TutorId = T("isabella.taylor@tutorbridge.com").Id, DateTimeStart = now.AddDays(3).AddHours(11), DateTimeEnd = now.AddDays(3).AddHours(12) },
-                    new Timeslot { TutorId = T("isabella.taylor@tutorbridge.com").Id, DateTimeStart = now.AddDays(6).AddHours(9), DateTimeEnd = now.AddDays(6).AddHours(10) },
-                    new Timeslot { TutorId = T("liam.williams@tutorbridge.com").Id, DateTimeStart = now.AddDays(8).AddHours(13), DateTimeEnd = now.AddDays(8).AddHours(14) },
-                    new Timeslot { TutorId = T("olivia.brown@tutorbridge.com").Id, DateTimeStart = now.AddDays(7).AddHours(14), DateTimeEnd = now.AddDays(7).AddHours(15) },
-                    new Timeslot { TutorId = T("noah.jones@tutorbridge.com").Id, DateTimeStart = now.AddDays(9).AddHours(10), DateTimeEnd = now.AddDays(9).AddHours(11) },
-                    new Timeslot { TutorId = T("ava.garcia@tutorbridge.com").Id, DateTimeStart = now.AddDays(10).AddHours(9), DateTimeEnd = now.AddDays(10).AddHours(10) }
+                context.TimeSlot.AddRange(
+                    new TimeSlot { TutorId = T("liam.williams@tutorbridge.com").Id, DateTimeStart = now.AddDays(1).AddHours(9), DateTimeEnd = now.AddDays(1).AddHours(10) },
+                    new TimeSlot { TutorId = T("liam.williams@tutorbridge.com").Id, DateTimeStart = now.AddDays(2).AddHours(11), DateTimeEnd = now.AddDays(2).AddHours(12) },
+                    new TimeSlot { TutorId = T("olivia.brown@tutorbridge.com").Id, DateTimeStart = now.AddDays(1).AddHours(13), DateTimeEnd = now.AddDays(1).AddHours(14) },
+                    new TimeSlot { TutorId = T("olivia.brown@tutorbridge.com").Id, DateTimeStart = now.AddDays(3).AddHours(10), DateTimeEnd = now.AddDays(3).AddHours(11) },
+                    new TimeSlot { TutorId = T("noah.jones@tutorbridge.com").Id, DateTimeStart = now.AddDays(2).AddHours(9), DateTimeEnd = now.AddDays(2).AddHours(10) },
+                    new TimeSlot { TutorId = T("noah.jones@tutorbridge.com").Id, DateTimeStart = now.AddDays(4).AddHours(14), DateTimeEnd = now.AddDays(4).AddHours(15) },
+                    new TimeSlot { TutorId = T("ava.garcia@tutorbridge.com").Id, DateTimeStart = now.AddDays(1).AddHours(15), DateTimeEnd = now.AddDays(1).AddHours(16) },
+                    new TimeSlot { TutorId = T("ava.garcia@tutorbridge.com").Id, DateTimeStart = now.AddDays(5).AddHours(11), DateTimeEnd = now.AddDays(5).AddHours(12) },
+                    new TimeSlot { TutorId = T("william.miller@tutorbridge.com").Id, DateTimeStart = now.AddDays(3).AddHours(9), DateTimeEnd = now.AddDays(3).AddHours(10) },
+                    new TimeSlot { TutorId = T("william.miller@tutorbridge.com").Id, DateTimeStart = now.AddDays(6).AddHours(13), DateTimeEnd = now.AddDays(6).AddHours(14) },
+                    new TimeSlot { TutorId = T("sophia.davis@tutorbridge.com").Id, DateTimeStart = now.AddDays(2).AddHours(14), DateTimeEnd = now.AddDays(2).AddHours(15) },
+                    new TimeSlot { TutorId = T("sophia.davis@tutorbridge.com").Id, DateTimeStart = now.AddDays(7).AddHours(10), DateTimeEnd = now.AddDays(7).AddHours(11) },
+                    new TimeSlot { TutorId = T("benjamin.wilson@tutorbridge.com").Id, DateTimeStart = now.AddDays(4).AddHours(9), DateTimeEnd = now.AddDays(4).AddHours(10) },
+                    new TimeSlot { TutorId = T("benjamin.wilson@tutorbridge.com").Id, DateTimeStart = now.AddDays(5).AddHours(15), DateTimeEnd = now.AddDays(5).AddHours(16) },
+                    new TimeSlot { TutorId = T("isabella.taylor@tutorbridge.com").Id, DateTimeStart = now.AddDays(3).AddHours(11), DateTimeEnd = now.AddDays(3).AddHours(12) },
+                    new TimeSlot { TutorId = T("isabella.taylor@tutorbridge.com").Id, DateTimeStart = now.AddDays(6).AddHours(9), DateTimeEnd = now.AddDays(6).AddHours(10) },
+                    new TimeSlot { TutorId = T("liam.williams@tutorbridge.com").Id, DateTimeStart = now.AddDays(8).AddHours(13), DateTimeEnd = now.AddDays(8).AddHours(14) },
+                    new TimeSlot { TutorId = T("olivia.brown@tutorbridge.com").Id, DateTimeStart = now.AddDays(7).AddHours(14), DateTimeEnd = now.AddDays(7).AddHours(15) },
+                    new TimeSlot { TutorId = T("noah.jones@tutorbridge.com").Id, DateTimeStart = now.AddDays(9).AddHours(10), DateTimeEnd = now.AddDays(9).AddHours(11) },
+                    new TimeSlot { TutorId = T("ava.garcia@tutorbridge.com").Id, DateTimeStart = now.AddDays(10).AddHours(9), DateTimeEnd = now.AddDays(10).AddHours(10) }
                 );
                 await context.SaveChangesAsync();
             }
@@ -415,33 +415,33 @@ namespace TutorBridge.Data
             {
                 //var students = context.Users.Where(u => !u.IsTutor && !u.IsAdmin).ToList();
                 var students = (await userManager.GetUsersInRoleAsync("Student")).ToList();
-                var Timeslot = context.Timeslot.ToList();
+                var TimeSlot = context.TimeSlot.ToList();
                 var Subject = context.Subject.ToList();
 
                 User St(string email) => students.First(s => s.Email == email);
                 Subject S(string name) => Subject.First(s => s.Name == name);
 
                 context.Booking.AddRange(
-                    new Booking { UserId = St("lucas.anderson@tutorbridge.com").Id, TimeSlotId = Timeslot[0].TimeSlotId, SubjectId = S("Mathematics").SubjectId, Status = Booking.BookingStatus.Confirmed },
-                    new Booking { UserId = St("mia.thomas@tutorbridge.com").Id, TimeSlotId = Timeslot[1].TimeSlotId, SubjectId = S("Physics").SubjectId, Status = Booking.BookingStatus.Pending },
-                    new Booking { UserId = St("henry.jackson@tutorbridge.com").Id, TimeSlotId = Timeslot[2].TimeSlotId, SubjectId = S("English").SubjectId, Status = Booking.BookingStatus.Confirmed },
-                    new Booking { UserId = St("charlotte.white@tutorbridge.com").Id, TimeSlotId = Timeslot[3].TimeSlotId, SubjectId = S("History").SubjectId, Status = Booking.BookingStatus.Cancelled },
-                    new Booking { UserId = St("alexander.harris@tutorbridge.com").Id, TimeSlotId = Timeslot[4].TimeSlotId, SubjectId = S("Science").SubjectId, Status = Booking.BookingStatus.Confirmed },
-                    new Booking { UserId = St("amelia.martin@tutorbridge.com").Id, TimeSlotId = Timeslot[5].TimeSlotId, SubjectId = S("Chemistry").SubjectId, Status = Booking.BookingStatus.Pending },
-                    new Booking { UserId = St("mason.thompson@tutorbridge.com").Id, TimeSlotId = Timeslot[6].TimeSlotId, SubjectId = S("Spanish").SubjectId, Status = Booking.BookingStatus.Confirmed },
-                    new Booking { UserId = St("harper.robinson@tutorbridge.com").Id, TimeSlotId = Timeslot[7].TimeSlotId, SubjectId = S("French").SubjectId, Status = Booking.BookingStatus.Pending },
-                    new Booking { UserId = St("ethan.clark@tutorbridge.com").Id, TimeSlotId = Timeslot[8].TimeSlotId, SubjectId = S("Computer Science").SubjectId, Status = Booking.BookingStatus.Confirmed },
-                    new Booking { UserId = St("evelyn.lewis@tutorbridge.com").Id, TimeSlotId = Timeslot[9].TimeSlotId, SubjectId = S("Mathematics").SubjectId, Status = Booking.BookingStatus.Cancelled },
-                    new Booking { UserId = St("lucas.anderson@tutorbridge.com").Id, TimeSlotId = Timeslot[10].TimeSlotId, SubjectId = S("Art").SubjectId, Status = Booking.BookingStatus.Confirmed },
-                    new Booking { UserId = St("mia.thomas@tutorbridge.com").Id, TimeSlotId = Timeslot[11].TimeSlotId, SubjectId = S("Music").SubjectId, Status = Booking.BookingStatus.Pending },
-                    new Booking { UserId = St("henry.jackson@tutorbridge.com").Id, TimeSlotId = Timeslot[12].TimeSlotId, SubjectId = S("Economics").SubjectId, Status = Booking.BookingStatus.Confirmed },
-                    new Booking { UserId = St("charlotte.white@tutorbridge.com").Id, TimeSlotId = Timeslot[13].TimeSlotId, SubjectId = S("Accounting").SubjectId, Status = Booking.BookingStatus.Confirmed },
-                    new Booking { UserId = St("alexander.harris@tutorbridge.com").Id, TimeSlotId = Timeslot[14].TimeSlotId, SubjectId = S("Biology").SubjectId, Status = Booking.BookingStatus.Pending },
-                    new Booking { UserId = St("amelia.martin@tutorbridge.com").Id, TimeSlotId = Timeslot[15].TimeSlotId, SubjectId = S("Psychology").SubjectId, Status = Booking.BookingStatus.Cancelled },
-                    new Booking { UserId = St("mason.thompson@tutorbridge.com").Id, TimeSlotId = Timeslot[16].TimeSlotId, SubjectId = S("Statistics").SubjectId, Status = Booking.BookingStatus.Confirmed },
-                    new Booking { UserId = St("harper.robinson@tutorbridge.com").Id, TimeSlotId = Timeslot[17].TimeSlotId, SubjectId = S("Geography").SubjectId, Status = Booking.BookingStatus.Pending },
-                    new Booking { UserId = St("ethan.clark@tutorbridge.com").Id, TimeSlotId = Timeslot[18].TimeSlotId, SubjectId = S("Japanese").SubjectId, Status = Booking.BookingStatus.Confirmed },
-                    new Booking { UserId = St("evelyn.lewis@tutorbridge.com").Id, TimeSlotId = Timeslot[19].TimeSlotId, SubjectId = S("Philosophy").SubjectId, Status = Booking.BookingStatus.Pending }
+                    new Booking { UserId = St("lucas.anderson@tutorbridge.com").Id, TimeSlotId = TimeSlot[0].TimeSlotId, SubjectId = S("Mathematics").SubjectId, Status = Booking.BookingStatus.Confirmed },
+                    new Booking { UserId = St("mia.thomas@tutorbridge.com").Id, TimeSlotId = TimeSlot[1].TimeSlotId, SubjectId = S("Physics").SubjectId, Status = Booking.BookingStatus.Pending },
+                    new Booking { UserId = St("henry.jackson@tutorbridge.com").Id, TimeSlotId = TimeSlot[2].TimeSlotId, SubjectId = S("English").SubjectId, Status = Booking.BookingStatus.Confirmed },
+                    new Booking { UserId = St("charlotte.white@tutorbridge.com").Id, TimeSlotId = TimeSlot[3].TimeSlotId, SubjectId = S("History").SubjectId, Status = Booking.BookingStatus.Cancelled },
+                    new Booking { UserId = St("alexander.harris@tutorbridge.com").Id, TimeSlotId = TimeSlot[4].TimeSlotId, SubjectId = S("Science").SubjectId, Status = Booking.BookingStatus.Confirmed },
+                    new Booking { UserId = St("amelia.martin@tutorbridge.com").Id, TimeSlotId = TimeSlot[5].TimeSlotId, SubjectId = S("Chemistry").SubjectId, Status = Booking.BookingStatus.Pending },
+                    new Booking { UserId = St("mason.thompson@tutorbridge.com").Id, TimeSlotId = TimeSlot[6].TimeSlotId, SubjectId = S("Spanish").SubjectId, Status = Booking.BookingStatus.Confirmed },
+                    new Booking { UserId = St("harper.robinson@tutorbridge.com").Id, TimeSlotId = TimeSlot[7].TimeSlotId, SubjectId = S("French").SubjectId, Status = Booking.BookingStatus.Pending },
+                    new Booking { UserId = St("ethan.clark@tutorbridge.com").Id, TimeSlotId = TimeSlot[8].TimeSlotId, SubjectId = S("Computer Science").SubjectId, Status = Booking.BookingStatus.Confirmed },
+                    new Booking { UserId = St("evelyn.lewis@tutorbridge.com").Id, TimeSlotId = TimeSlot[9].TimeSlotId, SubjectId = S("Mathematics").SubjectId, Status = Booking.BookingStatus.Cancelled },
+                    new Booking { UserId = St("lucas.anderson@tutorbridge.com").Id, TimeSlotId = TimeSlot[10].TimeSlotId, SubjectId = S("Art").SubjectId, Status = Booking.BookingStatus.Confirmed },
+                    new Booking { UserId = St("mia.thomas@tutorbridge.com").Id, TimeSlotId = TimeSlot[11].TimeSlotId, SubjectId = S("Music").SubjectId, Status = Booking.BookingStatus.Pending },
+                    new Booking { UserId = St("henry.jackson@tutorbridge.com").Id, TimeSlotId = TimeSlot[12].TimeSlotId, SubjectId = S("Economics").SubjectId, Status = Booking.BookingStatus.Confirmed },
+                    new Booking { UserId = St("charlotte.white@tutorbridge.com").Id, TimeSlotId = TimeSlot[13].TimeSlotId, SubjectId = S("Accounting").SubjectId, Status = Booking.BookingStatus.Confirmed },
+                    new Booking { UserId = St("alexander.harris@tutorbridge.com").Id, TimeSlotId = TimeSlot[14].TimeSlotId, SubjectId = S("Biology").SubjectId, Status = Booking.BookingStatus.Pending },
+                    new Booking { UserId = St("amelia.martin@tutorbridge.com").Id, TimeSlotId = TimeSlot[15].TimeSlotId, SubjectId = S("Psychology").SubjectId, Status = Booking.BookingStatus.Cancelled },
+                    new Booking { UserId = St("mason.thompson@tutorbridge.com").Id, TimeSlotId = TimeSlot[16].TimeSlotId, SubjectId = S("Statistics").SubjectId, Status = Booking.BookingStatus.Confirmed },
+                    new Booking { UserId = St("harper.robinson@tutorbridge.com").Id, TimeSlotId = TimeSlot[17].TimeSlotId, SubjectId = S("Geography").SubjectId, Status = Booking.BookingStatus.Pending },
+                    new Booking { UserId = St("ethan.clark@tutorbridge.com").Id, TimeSlotId = TimeSlot[18].TimeSlotId, SubjectId = S("Japanese").SubjectId, Status = Booking.BookingStatus.Confirmed },
+                    new Booking { UserId = St("evelyn.lewis@tutorbridge.com").Id, TimeSlotId = TimeSlot[19].TimeSlotId, SubjectId = S("Philosophy").SubjectId, Status = Booking.BookingStatus.Pending }
                 );
                 await context.SaveChangesAsync();
             }

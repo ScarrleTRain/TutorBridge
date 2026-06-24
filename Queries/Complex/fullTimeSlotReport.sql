@@ -3,7 +3,7 @@ SELECT t.TimeslotId AS Id,
        CONVERT (VARCHAR, t.DateTimeStart, 103) AS [Date],
        CONVERT (VARCHAR (5), CAST (t.DateTimeStart AS TIME)) AS [Start Time],
        CONVERT (VARCHAR (5), CAST (t.DateTimeEnd AS TIME)) AS [End Time]
-FROM   Timeslot AS t
+FROM   TimeSlot AS t
        LEFT OUTER JOIN
        AspNetUsers AS u
        ON t.TutorId = u.Id;

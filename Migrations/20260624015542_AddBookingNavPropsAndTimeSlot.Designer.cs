@@ -12,8 +12,8 @@ using TutorBridge.Areas.Identity.Data;
 namespace TutorBridge.Migrations
 {
     [DbContext(typeof(TutorBridgeContext))]
-    [Migration("20260603075315_AddProfilePhoto")]
-    partial class AddProfilePhoto
+    [Migration("20260624015542_AddBookingNavPropsAndTimeSlot")]
+    partial class AddBookingNavPropsAndTimeSlot
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -265,9 +265,15 @@ namespace TutorBridge.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SubjectId");
+
+                    b.HasIndex("TimeSlotId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Booking");
                 });
@@ -380,6 +386,31 @@ namespace TutorBridge.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("TutorBridge.Models.Booking", b =>
+                {
+                    b.HasOne("TutorBridge.Models.Subject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TutorBridge.Models.TimeSlot", "TimeSlot")
+                        .WithMany()
+                        .HasForeignKey("TimeSlotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TutorBridge.Areas.Identity.Data.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Subject");
+
+                    b.Navigation("TimeSlot");
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

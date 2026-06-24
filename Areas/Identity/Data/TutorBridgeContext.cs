@@ -25,7 +25,7 @@ public DbSet<TutorBridge.Models.Booking> Booking { get; set; } = default!;
 
 public DbSet<TutorBridge.Models.Subject> Subject { get; set; } = default!;
 
-public DbSet<TutorBridge.Models.Timeslot> Timeslot { get; set; } = default!;
+public DbSet<TutorBridge.Models.TimeSlot> TimeSlot { get; set; } = default!;
 
 public DbSet<TutorBridge.Models.TutorSubject> TutorSubject { get; set; } = default!;
 }

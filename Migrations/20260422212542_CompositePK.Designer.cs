@@ -302,7 +302,7 @@ namespace TutorBridge.Migrations
                     b.ToTable("Subject");
                 });
 
-            modelBuilder.Entity("TutorBridge.Models.Timeslot", b =>
+            modelBuilder.Entity("TutorBridge.Models.TimeSlot", b =>
                 {
                     b.Property<int>("TimeSlotId")
                         .ValueGeneratedOnAdd()
@@ -322,7 +322,7 @@ namespace TutorBridge.Migrations
 
                     b.HasKey("TimeSlotId");
 
-                    b.ToTable("Timeslot");
+                    b.ToTable("TimeSlot");
                 });
 
             modelBuilder.Entity("TutorBridge.Models.TutorSubject", b =>

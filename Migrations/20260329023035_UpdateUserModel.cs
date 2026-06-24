@@ -94,7 +94,7 @@ namespace TutorBridge.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Timeslot",
+                name: "TimeSlot",
                 columns: table => new
                 {
                     TimeSlotId = table.Column<int>(type: "int", nullable: false)
@@ -133,7 +133,7 @@ namespace TutorBridge.Migrations
                 name: "Subject");
 
             migrationBuilder.DropTable(
-                name: "Timeslot");
+                name: "TimeSlot");
 
             migrationBuilder.DropTable(
                 name: "TutorSubject");

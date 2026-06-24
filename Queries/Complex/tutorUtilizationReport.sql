@@ -5,7 +5,7 @@ SELECT   u.NameFirst + ' ' + u.NameLast AS Tutor,
          CAST (count(b.Id) * 100.0 / count(t.TimeslotId) AS DECIMAL (5, 1)) AS [Utilization %]
 FROM     AspNetUsers AS u
          INNER JOIN
-         Timeslot AS t
+         TimeSlot AS t
          ON u.Id = t.TutorId
          LEFT OUTER JOIN
          Booking AS b

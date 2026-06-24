@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using TutorBridge.Areas.Identity.Data;
 
 namespace TutorBridge.Models
 {
@@ -12,11 +14,19 @@ namespace TutorBridge.Models
         }
 
         public int Id { get; set; }
-        public string? UserId { get; set; }
-        public int TimeSlotId { get; set; }
-        public int SubjectId { get; set; }
 
-        // Makes sure there is a Booking Status, and that it is either Pending, Confirmed, or Cancelled.
+        public string? UserId { get; set; }
+        [ForeignKey("UserId")]
+        public User? User { get; set; }
+
+        public int TimeSlotId { get; set; }
+        [ForeignKey("TimeSlotId")]
+        public TimeSlot? TimeSlot { get; set; }
+
+        public int SubjectId { get; set; }
+        [ForeignKey("SubjectId")]
+        public Subject? Subject { get; set; }
+
         [Required(ErrorMessage = "Booking Status is required")]
         [RegularExpression(@"^(Pending|Confirmed|Cancelled)$", ErrorMessage = "Invalid status")]
         public BookingStatus Status { get; set; }

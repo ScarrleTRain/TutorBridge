@@ -20,7 +20,7 @@ namespace TutorBridge.Migrations
 
             migrationBuilder.AlterColumn<string>(
                 name: "TutorId",
-                table: "Timeslot",
+                table: "TimeSlot",
                 type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(int),
@@ -105,7 +105,7 @@ namespace TutorBridge.Migrations
 
             migrationBuilder.AlterColumn<int>(
                 name: "TutorId",
-                table: "Timeslot",
+                table: "TimeSlot",
                 type: "int",
                 nullable: false,
                 oldClrType: typeof(string),

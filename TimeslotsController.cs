@@ -22,7 +22,7 @@ namespace TutorBridge
         // GET: Timeslots
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Timeslot.ToListAsync());
+            return View(await _context.TimeSlot.ToListAsync());
         }
 
         // GET: Timeslots/Details/5
@@ -33,7 +33,7 @@ namespace TutorBridge
                 return NotFound();
             }
 
-            var timeslot = await _context.Timeslot
+            var timeslot = await _context.TimeSlot
                 .FirstOrDefaultAsync(m => m.TimeSlotId == id);
             if (timeslot == null)
             {
@@ -54,7 +54,7 @@ namespace TutorBridge
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TimeSlotId,TutorId,DateTimeStart,DateTimeEnd")] Timeslot timeslot)
+        public async Task<IActionResult> Create([Bind("TimeSlotId,TutorId,DateTimeStart,DateTimeEnd")] TimeSlot timeslot)
         {
             if (ModelState.IsValid)
             {
@@ -73,7 +73,7 @@ namespace TutorBridge
                 return NotFound();
             }
 
-            var timeslot = await _context.Timeslot.FindAsync(id);
+            var timeslot = await _context.TimeSlot.FindAsync(id);
             if (timeslot == null)
             {
                 return NotFound();
@@ -86,7 +86,7 @@ namespace TutorBridge
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TimeSlotId,TutorId,DateTimeStart,DateTimeEnd")] Timeslot timeslot)
+        public async Task<IActionResult> Edit(int id, [Bind("TimeSlotId,TutorId,DateTimeStart,DateTimeEnd")] TimeSlot timeslot)
         {
             if (id != timeslot.TimeSlotId)
             {
@@ -124,7 +124,7 @@ namespace TutorBridge
                 return NotFound();
             }
 
-            var timeslot = await _context.Timeslot
+            var timeslot = await _context.TimeSlot
                 .FirstOrDefaultAsync(m => m.TimeSlotId == id);
             if (timeslot == null)
             {
@@ -139,10 +139,10 @@ namespace TutorBridge
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var timeslot = await _context.Timeslot.FindAsync(id);
+            var timeslot = await _context.TimeSlot.FindAsync(id);
             if (timeslot != null)
             {
-                _context.Timeslot.Remove(timeslot);
+                _context.TimeSlot.Remove(timeslot);
             }
 
             await _context.SaveChangesAsync();
@@ -151,7 +151,7 @@ namespace TutorBridge
 
         private bool TimeslotExists(int id)
         {
-            return _context.Timeslot.Any(e => e.TimeSlotId == id);
+            return _context.TimeSlot.Any(e => e.TimeSlotId == id);
         }
     }
 }

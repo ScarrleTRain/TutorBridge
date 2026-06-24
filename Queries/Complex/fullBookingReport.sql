@@ -11,7 +11,7 @@ FROM   Booking AS b
        AspNetUsers AS u
        ON b.UserId = u.Id
        INNER JOIN
-       Timeslot AS t
+       TimeSlot AS t
        ON b.TimeslotId = t.TimeslotId
        INNER JOIN
        AspNetUsers AS t2
