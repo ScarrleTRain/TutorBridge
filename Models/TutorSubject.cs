@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TutorBridge.Areas.Identity.Data;
 
 namespace TutorBridge.Models
 {
@@ -8,6 +9,10 @@ namespace TutorBridge.Models
     public class TutorSubject
     {
         public required string TutorId { get; set; }
+        [ForeignKey("TutorId")]
+        public User? Tutor { get; set; }
         public required int SubjectId { get; set; }
+        [ForeignKey("SubjectId")]
+        public Subject? Subject { get; set; }
     }
 }

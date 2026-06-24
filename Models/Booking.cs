@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TutorBridge.Areas.Identity.Data;
 
@@ -15,6 +16,7 @@ namespace TutorBridge.Models
 
         public int Id { get; set; }
 
+        [Display(Name = "Student")]
         public string? UserId { get; set; }
         [ForeignKey("UserId")]
         public User? User { get; set; }
