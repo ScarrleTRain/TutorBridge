@@ -8,6 +8,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using TutorBridge.Areas.Identity.Data;
+using TutorBridge.Controllers;
 using TutorBridge.Models;
 using TutorBridge.ViewModels;
 using static TutorBridge.Models.Booking;
@@ -59,10 +60,12 @@ namespace TutorBridge
                 .Where(t => t.TutorId == tutor.Id)
                 //.Where(t => t.DateTimeStart > DateTime.Now) Disable for debug TODO remove this.
                 .OrderBy(t => t.DateTimeStart)
-                .Select(t => new SelectListItem
+                .Select(t => new
                 {
-                    Value = t.TimeSlotId.ToString(),
-                    Text = $"{t.DateTimeStart:ddd, MMM d} {t.DateTimeStart:h:mm tt}–{t.DateTimeEnd:h:mm tt}"
+                    id = t.TimeSlotId,
+                    start = t.DateTimeStart,
+                    end = t.DateTimeEnd,
+                    title = $"{t.DateTimeStart:h:mm tt}–{t.DateTimeEnd:h:mm tt}"
                 })
                 .ToListAsync();
 
@@ -76,7 +79,7 @@ namespace TutorBridge
                 .ToListAsync();
 
             ViewBag.Tutor = tutor;
-            ViewBag.Timeslots = availableTimeSlots;
+            ViewBag.TimeSlots = availableTimeSlots;
             ViewBag.Subjects = availableSubjects;
 
             var booking = new Booking
@@ -98,7 +101,7 @@ namespace TutorBridge
             {
                 _context.Add(booking);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(HomeController.Index), "Home");
             }
             return View(booking);
         }

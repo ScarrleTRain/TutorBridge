@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Identity
 @using System.Security.Claims
 @inject IWebHostEnvironment Env
+@using System.Text.Json
 
 @{
     ViewData["Title"] = "Book";
@@ -10,7 +11,11 @@
         ? System.IO.Path.Combine(Env.WebRootPath, "images", "tutors", ViewBag.Tutor.ProfilePhoto)
         : null;
     bool photoExists = photoPath != null && System.IO.File.Exists(photoPath);
+    var timeslotJson = JsonSerializer.Serialize(ViewBag.TimeSlots);
+    
 }
+
+
 
 @* <script>
     console.log("Claims:");
@@ -23,35 +28,43 @@
 <h1>Book@* - @ViewBag.Tutor.NameFirst @ViewBag.Tutor.NameLast*@</h1>
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">          
-            <div class="card flex-shrink-0 m-2" style="width: 18rem;">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
                 <img class="card-img-top" src="~/images/tutors/@(photoExists ? ViewBag.Tutor.ProfilePhoto : "default.jpg")" alt="@ViewBag.Tutor.NameFirst @ViewBag.Tutor.NameLast">
                 <div class="card-body">
                     <h5 class="card-title">@ViewBag.Tutor.NameFirst @ViewBag.Tutor.NameLast</h5>
                     <p class="card-text">@ViewBag.Tutor.Blurb</p>
                 </div>
             </div>
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="TimeSlotId" class="control-label">Timeslot</label>
-                <select asp-for="TimeSlotId" asp-items="ViewBag.TimeSlots" class="form-control">
-                    <option value="">-- Select a time --</option>
-                </select>
-                <span asp-validation-for="TimeSlotId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="SubjectId" class="control-label">Subject</label>
-                <select asp-for="SubjectId" asp-items="ViewBag.Subjects" class="form-control">
-                    <option value="">-- Select a subject --</option>
-                </select>
-                <span asp-validation-for="SubjectId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
+        </div>
 
-        </form>
+        <div class="col-md-6">
+            <div id="calendar" class="mb-3"></div>
+            <div id="slot-feedback" class="alert alert-info d-none mb-3">
+                No timeslot selected.
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <form asp-action="Book">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <input type="hidden" asp-for="TimeSlotId" id="TimeSlotId" />
+                <div class="form-group mb-3">
+                    <label asp-for="SubjectId" class="control-label">Subject</label>
+                    <select asp-for="SubjectId" asp-items="ViewBag.Subjects" class="form-control">
+                        <option value="">-- Select a subject --</option>
+                    </select>
+                    <span asp-validation-for="SubjectId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <button type="submit" id="submit-btn" class="btn btn-primary w-100" disabled>
+                        Confirm Booking
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -60,3 +73,54 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+<script>
+    const timeslots = @Html.Raw(timeslotJson);
+
+    document.addEventListener('DOMContentLoaded', function () {
+    const calendarEl = document.getElementById('calendar');
+    const hiddenInput = document.getElementById('TimeSlotId');
+    const feedback = document.getElementById('slot-feedback');
+    const submitBtn = document.getElementById('submit-btn');
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'timeGridWeek',
+        headerToolbar: {
+        left: 'prev,next today',
+        center: 'title'
+        },
+        themeSystem: 'bootstrap5',
+        allDaySlot: false,
+        slotMinTime: "06:00:00",
+        slotDuration: '01:00:00',
+        firstDay: new Date().getDay(),
+        events: timeslots,
+        eventClick: function (info) {
+            // Deselect previously selected event
+            calendarEl.querySelectorAll('.fc-event-selected').forEach(el => {
+            el.classList.remove('fc-event-selected');
+        });
+
+    // Highlight selected
+    info.el.classList.add('fc-event-selected');
+
+    // Update hidden input
+    hiddenInput.value = info.event.id;
+
+    // Show feedback
+    const start = info.event.start;
+    const options = { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' };
+    feedback.textContent = `Selected: ${start.toLocaleDateString('en-NZ', options)} — ${info.event.title}`;
+    feedback.classList.remove('d-none');
+
+    // Enable submit
+    submitBtn.disabled = false;
+    }
+    });
+
+    calendar.render();
+    });
+</script>
