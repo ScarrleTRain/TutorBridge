@@ -13,14 +13,16 @@
     <thead>
         <tr>
             <th>
-                
                 @Html.DisplayNameFor(model => model.UserId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.TimeSlotId)
+                <span>Tutor</span>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.SubjectId)
+                <span>Time</span>
+            </th>
+            <th>
+                <span>Subject</span>
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Status)
@@ -30,18 +32,29 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
+        <tr class="@(item.Status switch
+            {
+                Booking.BookingStatus.Pending => "bg-warning bg-opacity-25",
+                Booking.BookingStatus.Confirmed => "bg-success bg-opacity-25",
+                Booking.BookingStatus.Cancelled => "bg-danger bg-opacity-25",
+                _ => ""
+            })" style="--bs-table-bg: transparent;">
             <td>
-                @Html.DisplayFor(modelItem => item.UserId)
+                @item.User.NameFirst @item.User.NameLast
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.TimeSlotId)
+                @item.TimeSlot.Tutor.NameFirst @item.TimeSlot.Tutor.NameLast
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.SubjectId)
+                @item.TimeSlot.DateTimeStart.ToString("dd/MM/yyyy")
+                @item.TimeSlot.DateTimeStart.ToString("h:mm tt") -
+                @item.TimeSlot.DateTimeEnd.ToString("h:mm tt")
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Status)
+                @item.Subject.Name
+            </td>
+            <td>
+                @item.Status
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

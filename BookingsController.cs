@@ -28,9 +28,10 @@ namespace TutorBridge
         public async Task<IActionResult> Index()
         {
             var bookings = await _context.Booking
-                .Include(b => b.UserId)
-                .Include(b => b.TimeSlotId)
-                .Include(b => b.SubjectId)
+                .Include(b => b.User)
+                .Include(b => b.Subject)
+                .Include(b => b.TimeSlot)
+                .Include(t => t.TimeSlot.Tutor)
                 .ToListAsync();
 
             return View(bookings);
