@@ -2,46 +2,62 @@
 
 @{
     ViewData["Title"] = "Index";
+    Layout = "_FullWidthLayout";
+
+    var events = Model.Select(t => new {
+        id = t.TimeSlotId,
+        title = t.Tutor?.NameFirst + " " + t.Tutor?.NameLast ?? "Error", // Find whether booked or not
+        start = t.DateTimeStart,
+        end = t.DateTimeEnd
+    });
+    
 }
 
-<h1>Index</h1>
+<div id="calendar"></div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.TutorId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateTimeStart)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateTimeEnd)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.TutorId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateTimeStart)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateTimeEnd)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.TimeSlotId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.TimeSlotId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.TimeSlotId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+<script>
+    const timeslots = @Json.Serialize(events);
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendarEl = document.getElementById('calendar');
+        const hiddenInput = document.getElementById('TimeSlotId');
+        const feedback = document.getElementById('slot-feedback');
+        const submitBtn = document.getElementById('submit-btn');
+
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'timeGridWeek',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title'
+            },
+            themeSystem: 'bootstrap5',
+            allDaySlot: false,
+            slotMinTime: "06:00:00",
+            slotDuration: '00:30:00',
+            firstDay: new Date().getDay(),
+            events: timeslots,
+            eventClick: function (info) {
+                calendarEl.querySelectorAll('.fc-event-selected').forEach(el => {
+                    el.classList.remove('fc-event-selected');
+                });
+                info.el.classList.add('fc-event-selected');
+                hiddenInput.value = info.event.id;
+            }
+        });
+
+        function resizeCalendar() {
+            const calendarEl = document.getElementById("calendar");
+            const top = calendarEl.getBoundingClientRect().top;
+            const bottom = calendarEl.getBoundingClientRect().bottom;
+
+            calendar.setOption('height', window.innerHeight - top - bottom);
+        }
+
+        window.addEventListener('resize', resizeCalendar);
+
+        resizeCalendar();
+        calendar.render();
+    });
+</script>

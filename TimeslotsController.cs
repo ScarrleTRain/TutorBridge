@@ -22,7 +22,8 @@ namespace TutorBridge
         // GET: Timeslots
         public async Task<IActionResult> Index()
         {
-            return View(await _context.TimeSlot.ToListAsync());
+            var timeslots = await _context.TimeSlot.Include(t => t.Tutor).ToListAsync();
+            return View(timeslots);
         }
 
         // GET: Timeslots/Details/5
