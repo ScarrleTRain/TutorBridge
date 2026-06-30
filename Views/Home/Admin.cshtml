@@ -1,0 +1,108 @@
+﻿@model TutorBridge.ViewModels.AdminDashboardStats
+@inject IWebHostEnvironment Env
+@using System.ComponentModel
+@using System.Reflection
+
+@{
+
+    ViewData["Title"] = "Home Page";
+}
+
+<div>
+    @* .row.g-2.justify-content-center>(.col-sm-12.text-center>h2{Admin Dashboard})+.col-sm-3*12>a[href="#"].text-reset.text-decoration-none>.card.text-wrap.text-center.shadow>(.card-header>h3{Card $}.card-title)+(.card-body>p) *@
+    <div class="row g-2 justify-content-center">
+        <div class="col-sm-12 text-center">
+            <h2>Admin Dashboard</h2>
+        </div>
+        @foreach(var prop in Model.GetType().GetProperties())
+        {
+            var displayAttr = prop.GetCustomAttribute<DisplayNameAttribute>();
+            var label = displayAttr?.DisplayName ?? prop.Name;
+
+            <div class="col-sm-3">
+                <a class="text-reset text-decoration-none" href="#">
+                    <div class="card text-wrap text-center shadow">
+                        <div class="card-header">
+                            <h3 class="mb-0 card-title">@prop.GetValue(Model)</h3>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-0">@label</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+        <div class="col-sm-3">
+            <a class="text-reset text-decoration-none" href="#">
+                <div class="card text-wrap text-center shadow">
+                    <div class="card-header">
+                        <h3 class="mb-0 card-title">Card 1</h3>
+                    </div>
+                    <div class="card-body">
+                        <p></p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-sm-3">
+            <a class="text-reset text-decoration-none" href="#">
+                <div class="card text-wrap text-center shadow">
+                    <div class="card-header">
+                        <h3 class="mb-0 card-title">Card 2</h3>
+                    </div>
+                    <div class="card-body">
+                        <p></p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-sm-3">
+            <a class="text-reset text-decoration-none" href="#">
+                <div class="card text-wrap text-center shadow">
+                    <div class="card-header">
+                        <h3 class="mb-0 card-title">Card 3</h3>
+                    </div>
+                    <div class="card-body">
+                        <p></p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-sm-3">
+            <a class="text-reset text-decoration-none" href="#">
+                <div class="card text-wrap text-center shadow">
+                    <div class="card-header">
+                        <h3 class="mb-0 card-title">Card 4</h3>
+                    </div>
+                    <div class="card-body">
+                        <p></p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-sm-3">
+            <a class="text-reset text-decoration-none" href="#">
+                <div class="card text-wrap text-center shadow">
+                    <div class="card-header">
+                        <h3 class="mb-0 card-title">Card 5</h3>
+                    </div>
+                    <div class="card-body">
+                        <p></p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-sm-3">
+            <a class="text-reset text-decoration-none" href="#">
+                <div class="card text-wrap text-center shadow">
+                    <div class="card-header">
+                        <h3 class="mb-0 card-title">Card 6</h3>
+                    </div>
+                    <div class="card-body">
+                        <p></p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
