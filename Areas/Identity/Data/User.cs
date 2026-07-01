@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+using TutorBridge.Validation;
 
 namespace TutorBridge.Areas.Identity.Data;
 
@@ -29,8 +30,9 @@ public class User : IdentityUser
     [RegularExpression(@"^02\d{7,9}$", ErrorMessage = "Enter a valid NZ mobile number")]
     public string? Phone { get; set; }
 
-    // Makes sure there is a Birth Date, and that it is a date datatype.
+    // Makes sure there is a Birth Date, and that it is a date datatype as well as being older than 5 years.
     [Required(ErrorMessage = "Birth Date is required")]
+    [MinAge(5)]
     [DataType(DataType.Date)]
     public DateOnly BirthDate { get; set; }
 
