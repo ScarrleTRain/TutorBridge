@@ -1,67 +1,156 @@
 ﻿@model IEnumerable<TutorBridge.Models.Booking>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Bookings";
 }
 
-<h1>Index</h1>
+<div class="card shadow-lg">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">Bookings</h2>
+        <a asp-action="Create" class="btn btn-primary bg-secondary btn-sm">+ Create New</a>
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.UserId)
-            </th>
-            <th>
-                <span>Tutor</span>
-            </th>
-            <th>
-                <span>Time</span>
-            </th>
-            <th>
-                <span>Subject</span>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr class="@(item.Status switch
-            {
-                Booking.BookingStatus.Pending => "bg-warning bg-opacity-25",
-                Booking.BookingStatus.Confirmed => "bg-success bg-opacity-25",
-                Booking.BookingStatus.Cancelled => "bg-danger bg-opacity-25",
-                _ => ""
-            })" style="--bs-table-bg: transparent;">
-            <td>
-                @item.User.NameFirst @item.User.NameLast
-            </td>
-            <td>
-                @item.TimeSlot.Tutor.NameFirst @item.TimeSlot.Tutor.NameLast
-            </td>
-            <td>
-                @item.TimeSlot.DateTimeStart.ToString("dd/MM/yyyy")
-                @item.TimeSlot.DateTimeStart.ToString("h:mm tt") -
-                @item.TimeSlot.DateTimeEnd.ToString("h:mm tt")
-            </td>
-            <td>
-                @item.Subject.Name
-            </td>
-            <td>
-                @item.Status
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <div class="card-body">
+        <div class="d-flex gap-3 align-items-center flex-wrap pb-3 mb-2 border-bottom">
+            <input type="text" id="bookingSearch" class="form-control form-control-sm" style="width:220px"
+                   placeholder="Search student, tutor or subject...">
+
+            <select id="statusFilter" class="form-control form-control-sm" style="width:150px">
+                <option value="">All statuses</option>
+                @foreach (var status in Enum.GetValues(typeof(Booking.BookingStatus)))
+                {
+                    <option value="@status">@status</option>
+                }
+            </select>
+        </div>
+
+        <div class="overflow-auto" style="max-height: 60vh; min-height: 200px;">
+            <table class="table table-hover" id="bookingsTable">
+                <thead style="position: sticky; top: 0;">
+                    <tr>
+                        <th data-sort="student" style="cursor: pointer;">
+                            Student <i class="bi bi-arrow-down-up sort-icon opacity-50"></i>
+                        </th>
+                        <th data-sort="tutor" style="cursor: pointer;">
+                            Tutor <i class="bi bi-arrow-down-up sort-icon opacity-50"></i>
+                        </th>
+                        <th data-sort="time" style="cursor: pointer;">
+                            Time <i class="bi bi-arrow-down-up sort-icon opacity-50"></i>
+                        </th>
+                        <th data-sort="subject" style="cursor: pointer;">
+                            Subject <i class="bi bi-arrow-down-up sort-icon opacity-50"></i>
+                        </th>
+                        <th data-sort="status" style="cursor: pointer;">
+                            Status <i class="bi bi-arrow-down-up sort-icon opacity-50"></i>
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                    <tr class="@(item.Status switch
+                        {
+                            Booking.BookingStatus.Pending => "bg-warning bg-opacity-25",
+                            Booking.BookingStatus.Confirmed => "bg-success bg-opacity-25",
+                            Booking.BookingStatus.Cancelled => "bg-danger bg-opacity-25",
+                            _ => ""
+                        })"
+                        style="--bs-table-bg: transparent;"
+                        data-student="@item.User.NameFirst @item.User.NameLast"
+                        data-tutor="@item.TimeSlot.Tutor.NameFirst @item.TimeSlot.Tutor.NameLast"
+                        data-time="@item.TimeSlot.DateTimeStart.ToString("o")"
+                        data-subject="@item.Subject.Name"
+                        data-status="@item.Status">
+
+                        <td>@item.User.NameFirst @item.User.NameLast</td>
+                        <td>@item.TimeSlot.Tutor.NameFirst @item.TimeSlot.Tutor.NameLast</td>
+                        <td>
+                            @item.TimeSlot.DateTimeStart.ToString("dd/MM/yyyy")
+                            @item.TimeSlot.DateTimeStart.ToString("h:mm tt") -
+                            @item.TimeSlot.DateTimeEnd.ToString("h:mm tt")
+                        </td>
+                        <td>@item.Subject.Name</td>
+                        <td>@item.Status</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                            <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        </td> 
+                        @* TODO: I want to replace these with logos. *@
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-muted small" id="bookingCount">Showing @Model.Count() entries</div>
+    </div>
+</div>
+
+<script>
+    // Filterign
+    (function () {
+        const search = document.getElementById('bookingSearch');
+        const status = document.getElementById('statusFilter');
+        const rows = Array.from(document.querySelectorAll('#bookingsTable tbody tr'));
+        const countEl = document.getElementById('bookingCount');
+
+        function applyFilter() {
+            const term = search.value.trim().toLowerCase();
+            const statusVal = status.value;
+            let visible = 0;
+
+            rows.forEach(row => {
+                const haystack = [
+                    row.dataset.student,
+                    row.dataset.tutor,
+                    row.dataset.subject
+                ].join(' ').toLowerCase();
+
+                const matchesText = haystack.includes(term);
+                const matchesStatus = !statusVal || row.dataset.status === statusVal;
+                const show = matchesText && matchesStatus;
+
+                row.style.display = show ? '' : 'none';
+                if (show) visible++;
+            });
+
+            countEl.textContent = `Showing ${visible} of ${rows.length} entries`;
+        }
+
+        search.addEventListener('input', applyFilter);
+        status.addEventListener('change', applyFilter);
+    })();
+
+    // Sorting vvv
+    document.querySelectorAll('#bookingsTable th[data-sort]').forEach(th => {
+        th.addEventListener('click', () => {
+            const key = th.dataset.sort;
+            const tbody = document.querySelector('#bookingsTable tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const asc = th.dataset.dir !== 'asc';
+
+            rows.sort((a, b) => {
+                let valA = a.dataset[key] ?? '';
+                let valB = b.dataset[key] ?? '';
+                if (key === 'time') {
+                    return asc ? new Date(valA) - new Date(valB) : new Date(valB) - new Date(valA);
+                }
+                return asc
+                    ? valA.localeCompare(valB)
+                    : valB.localeCompare(valA);
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+
+            // reset all icons, then mark the active one
+            document.querySelectorAll('#bookingsTable th[data-sort]').forEach(h => {
+                h.dataset.dir = '';
+                h.querySelector('i').className = 'bi bi-arrow-down-up sort-icon opacity-50';
+            });
+            th.dataset.dir = asc ? 'asc' : 'desc';
+            th.querySelector('i').className = (asc ? 'bi bi-arrow-down' :'bi bi-arrow-up') + ' sort-icon opacity-50';
+        });
+    });
+</script>
