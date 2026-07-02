@@ -8,87 +8,87 @@ using Microsoft.EntityFrameworkCore;
 using TutorBridge.Areas.Identity.Data;
 using TutorBridge.Models;
 
-namespace TutorBridge
+namespace TutorBridge.Controllers
 {
-    public class TutorSubjectsController : Controller
+    public class SubjectsController : Controller
     {
         private readonly TutorBridgeContext _context;
 
-        public TutorSubjectsController(TutorBridgeContext context)
+        public SubjectsController(TutorBridgeContext context)
         {
             _context = context;
         }
 
-        // GET: TutorSubjects
+        // GET: Subjects
         public async Task<IActionResult> Index()
         {
-            return View(await _context.TutorSubject.ToListAsync());
+            return View(await _context.Subject.ToListAsync());
         }
 
-        // GET: TutorSubjects/Details/5
-        public async Task<IActionResult> Details(string id)
+        // GET: Subjects/Details/5
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var tutorSubject = await _context.TutorSubject
-                .FirstOrDefaultAsync(m => m.TutorId == id);
-            if (tutorSubject == null)
+            var subject = await _context.Subject
+                .FirstOrDefaultAsync(m => m.SubjectId == id);
+            if (subject == null)
             {
                 return NotFound();
             }
 
-            return View(tutorSubject);
+            return View(subject);
         }
 
-        // GET: TutorSubjects/Create
+        // GET: Subjects/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: TutorSubjects/Create
+        // POST: Subjects/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TutorId,SubjectId")] TutorSubject tutorSubject)
+        public async Task<IActionResult> Create([Bind("SubjectId,Name,Description")] Subject subject)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(tutorSubject);
+                _context.Add(subject);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(tutorSubject);
+            return View(subject);
         }
 
-        // GET: TutorSubjects/Edit/5
-        public async Task<IActionResult> Edit(string id)
+        // GET: Subjects/Edit/5
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var tutorSubject = await _context.TutorSubject.FindAsync(id);
-            if (tutorSubject == null)
+            var subject = await _context.Subject.FindAsync(id);
+            if (subject == null)
             {
                 return NotFound();
             }
-            return View(tutorSubject);
+            return View(subject);
         }
 
-        // POST: TutorSubjects/Edit/5
+        // POST: Subjects/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("TutorId,SubjectId")] TutorSubject tutorSubject)
+        public async Task<IActionResult> Edit(int id, [Bind("SubjectId,Name,Description")] Subject subject)
         {
-            if (id != tutorSubject.TutorId)
+            if (id != subject.SubjectId)
             {
                 return NotFound();
             }
@@ -97,12 +97,12 @@ namespace TutorBridge
             {
                 try
                 {
-                    _context.Update(tutorSubject);
+                    _context.Update(subject);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TutorSubjectExists(tutorSubject.TutorId))
+                    if (!SubjectExists(subject.SubjectId))
                     {
                         return NotFound();
                     }
@@ -113,45 +113,45 @@ namespace TutorBridge
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(tutorSubject);
+            return View(subject);
         }
 
-        // GET: TutorSubjects/Delete/5
-        public async Task<IActionResult> Delete(string id)
+        // GET: Subjects/Delete/5
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var tutorSubject = await _context.TutorSubject
-                .FirstOrDefaultAsync(m => m.TutorId == id);
-            if (tutorSubject == null)
+            var subject = await _context.Subject
+                .FirstOrDefaultAsync(m => m.SubjectId == id);
+            if (subject == null)
             {
                 return NotFound();
             }
 
-            return View(tutorSubject);
+            return View(subject);
         }
 
-        // POST: TutorSubjects/Delete/5
+        // POST: Subjects/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var tutorSubject = await _context.TutorSubject.FindAsync(id);
-            if (tutorSubject != null)
+            var subject = await _context.Subject.FindAsync(id);
+            if (subject != null)
             {
-                _context.TutorSubject.Remove(tutorSubject);
+                _context.Subject.Remove(subject);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TutorSubjectExists(string id)
+        private bool SubjectExists(int id)
         {
-            return _context.TutorSubject.Any(e => e.TutorId == id);
+            return _context.Subject.Any(e => e.SubjectId == id);
         }
     }
 }

@@ -8,12 +8,11 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using TutorBridge.Areas.Identity.Data;
-using TutorBridge.Controllers;
 using TutorBridge.Models;
 using TutorBridge.ViewModels;
 using static TutorBridge.Models.Booking;
 
-namespace TutorBridge
+namespace TutorBridge.Controllers
 {
     public class BookingsController : Controller
     {

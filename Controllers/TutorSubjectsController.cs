@@ -8,88 +8,87 @@ using Microsoft.EntityFrameworkCore;
 using TutorBridge.Areas.Identity.Data;
 using TutorBridge.Models;
 
-namespace TutorBridge
+namespace TutorBridge.Controllers
 {
-    public class TimeslotsController : Controller
+    public class TutorSubjectsController : Controller
     {
         private readonly TutorBridgeContext _context;
 
-        public TimeslotsController(TutorBridgeContext context)
+        public TutorSubjectsController(TutorBridgeContext context)
         {
             _context = context;
         }
 
-        // GET: Timeslots
+        // GET: TutorSubjects
         public async Task<IActionResult> Index()
         {
-            var timeslots = await _context.TimeSlot.Include(t => t.Tutor).ToListAsync();
-            return View(timeslots);
+            return View(await _context.TutorSubject.ToListAsync());
         }
 
-        // GET: Timeslots/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: TutorSubjects/Details/5
+        public async Task<IActionResult> Details(string id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var timeslot = await _context.TimeSlot
-                .FirstOrDefaultAsync(m => m.TimeSlotId == id);
-            if (timeslot == null)
+            var tutorSubject = await _context.TutorSubject
+                .FirstOrDefaultAsync(m => m.TutorId == id);
+            if (tutorSubject == null)
             {
                 return NotFound();
             }
 
-            return View(timeslot);
+            return View(tutorSubject);
         }
 
-        // GET: Timeslots/Create
+        // GET: TutorSubjects/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Timeslots/Create
+        // POST: TutorSubjects/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TimeSlotId,TutorId,DateTimeStart,DateTimeEnd")] TimeSlot timeslot)
+        public async Task<IActionResult> Create([Bind("TutorId,SubjectId")] TutorSubject tutorSubject)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(timeslot);
+                _context.Add(tutorSubject);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(timeslot);
+            return View(tutorSubject);
         }
 
-        // GET: Timeslots/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // GET: TutorSubjects/Edit/5
+        public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var timeslot = await _context.TimeSlot.FindAsync(id);
-            if (timeslot == null)
+            var tutorSubject = await _context.TutorSubject.FindAsync(id);
+            if (tutorSubject == null)
             {
                 return NotFound();
             }
-            return View(timeslot);
+            return View(tutorSubject);
         }
 
-        // POST: Timeslots/Edit/5
+        // POST: TutorSubjects/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TimeSlotId,TutorId,DateTimeStart,DateTimeEnd")] TimeSlot timeslot)
+        public async Task<IActionResult> Edit(string id, [Bind("TutorId,SubjectId")] TutorSubject tutorSubject)
         {
-            if (id != timeslot.TimeSlotId)
+            if (id != tutorSubject.TutorId)
             {
                 return NotFound();
             }
@@ -98,12 +97,12 @@ namespace TutorBridge
             {
                 try
                 {
-                    _context.Update(timeslot);
+                    _context.Update(tutorSubject);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TimeslotExists(timeslot.TimeSlotId))
+                    if (!TutorSubjectExists(tutorSubject.TutorId))
                     {
                         return NotFound();
                     }
@@ -114,45 +113,45 @@ namespace TutorBridge
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(timeslot);
+            return View(tutorSubject);
         }
 
-        // GET: Timeslots/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // GET: TutorSubjects/Delete/5
+        public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var timeslot = await _context.TimeSlot
-                .FirstOrDefaultAsync(m => m.TimeSlotId == id);
-            if (timeslot == null)
+            var tutorSubject = await _context.TutorSubject
+                .FirstOrDefaultAsync(m => m.TutorId == id);
+            if (tutorSubject == null)
             {
                 return NotFound();
             }
 
-            return View(timeslot);
+            return View(tutorSubject);
         }
 
-        // POST: Timeslots/Delete/5
+        // POST: TutorSubjects/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var timeslot = await _context.TimeSlot.FindAsync(id);
-            if (timeslot != null)
+            var tutorSubject = await _context.TutorSubject.FindAsync(id);
+            if (tutorSubject != null)
             {
-                _context.TimeSlot.Remove(timeslot);
+                _context.TutorSubject.Remove(tutorSubject);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TimeslotExists(int id)
+        private bool TutorSubjectExists(string id)
         {
-            return _context.TimeSlot.Any(e => e.TimeSlotId == id);
+            return _context.TutorSubject.Any(e => e.TutorId == id);
         }
     }
 }
