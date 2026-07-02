@@ -1,41 +1,119 @@
 ﻿@model IEnumerable<TutorBridge.Models.Subject>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Subjects";
 }
 
-<h1>Index</h1>
+<div class="card shadow-lg">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">Subjects</h2>
+        <a asp-action="Create" class="btn btn-primary bg-secondary btn-sm">+ Create New</a>
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.SubjectId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.SubjectId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.SubjectId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <div class="card-body">
+        <div class="d-flex gap-3 align-items-center flex-wrap pb-3 mb-2 border-bottom">
+            <input type="text" id="subjectSearch" class="form-control form-control-sm" style="width:220px"
+                   placeholder="Search by name...">
+        </div>
+
+        <div class="overflow-auto" style="max-height: 60vh; min-height: 200px;">
+            <table class="table table-hover" id="subjectsTable">
+                <thead style="position: sticky; top: 0;">
+                    <tr>
+                        <th data-sort="id" style="cursor: pointer;">
+                            Id <i class="bi bi-arrow-down-up sort-icon opacity-50"></i>
+                        </th>
+                        <th data-sort="name" style="cursor: pointer;">
+                            Name <i class="bi bi-arrow-down-up sort-icon opacity-50"></i>
+                        </th>
+                        <th>
+                            Description
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                    <tr data-name="@item.Name"
+                        data-id="@item.SubjectId">
+                        <td>@item.SubjectId</td>
+                        <td>@item.Name</td>
+                        <td>@item.Description</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.SubjectId">Edit</a> |
+                            <a asp-action="Details" asp-route-id="@item.SubjectId">Details</a> |
+                            <a asp-action="Delete" asp-route-id="@item.SubjectId">Delete</a>
+                        </td> 
+                        @* TODO: I want to replace these with logos. *@
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-muted small" id="subjectCount">Showing @Model.Count() entries</div>
+    </div>
+</div>
+
+<script>
+    // Filterign
+    (function () {
+        const search = document.getElementById('subjectSearch');
+        const rows = Array.from(document.querySelectorAll('#subjectsTable tbody tr'));
+        const countEl = document.getElementById('subjectCount');
+
+        function applyFilter() {
+            const term = search.value.trim().toLowerCase();
+            let visible = 0;
+
+            rows.forEach(row => {
+                const haystack = [
+                    row.dataset.name
+                ].join(' ').toLowerCase();
+
+                const show = haystack.includes(term);
+
+                row.style.display = show ? '' : 'none';
+                if (show) visible++;
+            });
+
+            countEl.textContent = `Showing ${visible} of ${rows.length} entries`;
+        }
+
+        search.addEventListener('input', applyFilter);
+    })();
+
+    // Sorting vvv
+    document.querySelectorAll('#subjectsTable th[data-sort]').forEach(th => {
+        th.addEventListener('click', () => {
+            const key = th.dataset.sort;
+            const tbody = document.querySelector('#subjectsTable tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const asc = th.dataset.dir !== 'asc';
+
+            rows.sort((a, b) => {
+                let valA = a.dataset[key] ?? '';
+                let valB = b.dataset[key] ?? '';
+
+                if (key === 'id') {
+                    return asc ? Number(valA) - Number(valB) : Number(valB) - Number(valA);
+                }
+
+                return asc
+                    ? valA.localeCompare(valB)
+                    : valB.localeCompare(valA);
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+
+            // reset all icons, then mark the active one
+            document.querySelectorAll('#subjectsTable th[data-sort]').forEach(h => {
+                h.dataset.dir = '';
+                h.querySelector('i').className = 'bi bi-arrow-down-up sort-icon opacity-50';
+            });
+            th.dataset.dir = asc ? 'asc' : 'desc';
+            th.querySelector('i').className = (asc ? 'bi bi-arrow-down' :'bi bi-arrow-up') + ' sort-icon opacity-50';
+        });
+    });
+</script>
