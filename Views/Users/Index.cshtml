@@ -1,0 +1,36 @@
+﻿@model IEnumerable<TutorBridge.ViewModels.UserVM>
+@using System.Text.Json
+
+<script>let user;</script>
+@foreach(var item in Model)
+{ 
+    <p>@item.Id | @item.NameFirst @item.NameLast | @item.Phone | @item.BirthDate | @item.Email</p>
+    <script>
+        user = @Html.Raw(JsonSerializer.Serialize(item));
+        console.log(user);
+    </script>
+
+@* {
+    "NameFirst": "Ava",
+    "NameLast": "Garcia",
+    "Phone": "0216789012",
+    "BirthDate": "1993-09-25",
+    "Blurb": "Former teacher with a focus on exam preparation.",
+    "ProfilePhoto": "ava_garcia.jpg",
+    "Id": "1a15c90d-6149-4171-8803-5b44a9e6051a",
+    "UserName": "ava.garcia@tutorbridge.com",
+    "NormalizedUserName": "AVA.GARCIA@TUTORBRIDGE.COM",
+    "Email": "ava.garcia@tutorbridge.com",
+    "NormalizedEmail": "AVA.GARCIA@TUTORBRIDGE.COM",
+    "EmailConfirmed": true,
+    "PasswordHash": "AQAAAAIAAYagAAAAEG2/pmcJD89y8/H3a73TZfF2CK0C3WCHiIE03T3f1MOmiVfTApNBev6qsoUDZevWkg==",
+    "SecurityStamp": "QD73JIO2D4X4QYHINDN4E5X4CXXJN67D",
+    "ConcurrencyStamp": "f59668e1-8557-461c-978a-f27c9e9b2ce1",
+    "PhoneNumber": null,
+    "PhoneNumberConfirmed": false,
+    "TwoFactorEnabled": false,
+    "LockoutEnd": null,
+    "LockoutEnabled": true,
+    "AccessFailedCount": 0
+} *@
+}
