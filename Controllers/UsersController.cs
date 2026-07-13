@@ -15,10 +15,12 @@ namespace TutorBridge.Controllers
     public class UsersController : Controller
     {
         private readonly UserManager<User> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UsersController(UserManager<User> userManager)
+        public UsersController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public async Task<IActionResult> Index()
@@ -42,6 +44,11 @@ namespace TutorBridge.Controllers
                     Role = roles.FirstOrDefault() ?? "No Role"
                 });
             }
+
+            ViewBag.Roles = await _roleManager.Roles
+               .Select(r => r.Name)
+               .ToListAsync();
+
             return View(model);
         }
     }

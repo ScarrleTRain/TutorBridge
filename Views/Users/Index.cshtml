@@ -2,35 +2,170 @@
 @using System.Text.Json
 
 <script>let user;</script>
-@foreach(var item in Model)
-{ 
-    <p>@item.Id | @item.NameFirst @item.NameLast | @item.Phone | @item.BirthDate | @item.Email</p>
-    <script>
-        user = @Html.Raw(JsonSerializer.Serialize(item));
-        console.log(user);
-    </script>
 
-@* {
-    "NameFirst": "Ava",
-    "NameLast": "Garcia",
-    "Phone": "0216789012",
-    "BirthDate": "1993-09-25",
-    "Blurb": "Former teacher with a focus on exam preparation.",
-    "ProfilePhoto": "ava_garcia.jpg",
-    "Id": "1a15c90d-6149-4171-8803-5b44a9e6051a",
-    "UserName": "ava.garcia@tutorbridge.com",
-    "NormalizedUserName": "AVA.GARCIA@TUTORBRIDGE.COM",
-    "Email": "ava.garcia@tutorbridge.com",
-    "NormalizedEmail": "AVA.GARCIA@TUTORBRIDGE.COM",
-    "EmailConfirmed": true,
-    "PasswordHash": "AQAAAAIAAYagAAAAEG2/pmcJD89y8/H3a73TZfF2CK0C3WCHiIE03T3f1MOmiVfTApNBev6qsoUDZevWkg==",
-    "SecurityStamp": "QD73JIO2D4X4QYHINDN4E5X4CXXJN67D",
-    "ConcurrencyStamp": "f59668e1-8557-461c-978a-f27c9e9b2ce1",
-    "PhoneNumber": null,
-    "PhoneNumberConfirmed": false,
-    "TwoFactorEnabled": false,
-    "LockoutEnd": null,
-    "LockoutEnabled": true,
-    "AccessFailedCount": 0
-} *@
+@{
+    ViewData["Title"] = "Users";
 }
+
+<div class="card shadow-lg">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">Users</h2>
+        <a asp-action="Create" class="btn btn-primary bg-secondary btn-sm">+ Create New</a>
+    </div>
+
+    <div class="card-body">
+        <div class="d-flex gap-3 align-items-center flex-wrap pb-3 mb-2 border-bottom">
+            <input type="text" id="userSearch" class="form-control form-control-sm" style="width:220px"
+                   placeholder="Search by name...">
+
+            <select id="roleFilter" class="form-control form-control-sm" style="width:150px">
+                <option value="">All Roles</option>
+
+                @foreach (var role in (List<string>)ViewBag.Roles)
+                {
+                    <option value="@role">@role</option>
+                }
+            </select>
+        </div>
+
+        <div class="overflow-auto" style="max-height: 60vh; min-height: 200px;">
+            <table class="table table-hover" id="usersTable">
+                <thead style="position: sticky; top: 0;">
+                    <tr>
+                        <th data-sort="id" style="cursor: pointer;">
+                            Id <i class="bi bi-arrow-down-up sort-icon opacity-50"></i>
+                        </th>
+                        <th data-sort="name" style="cursor: pointer;">
+                            Name <i class="bi bi-arrow-down-up sort-icon opacity-50"></i>
+                        </th>
+                        <th data-sort="email" style="cursor: pointer;">
+                            Email <i class="bi bi-arrow-down-up sort-icon opacity-50"></i>
+                        </th>
+                        <th data-sort="phone" style="cursor: pointer;">
+                            Phone <i class="bi bi-arrow-down-up sort-icon opacity-50"></i>
+                        </th>
+                        <th data-sort="birthdate" style="cursor: pointer;">
+                            Birth Date <i class="bi bi-arrow-down-up sort-icon opacity-50"></i>
+                        </th>
+                        <th data-sort="role" style="cursor: pointer;">
+                            Role <i class="bi bi-arrow-down-up sort-icon opacity-50"></i>
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                    <tr class="@(item.Role switch
+                        {
+                            "Tutor" => "bg-warning bg-opacity-25",
+                            "Student" => "bg-success bg-opacity-25",
+                            "Admin" => "bg-danger bg-opacity-25",
+                            _ => ""
+                        })"
+                        style="--bs-table-bg: transparent;"
+                        data-id="@item.Id"
+                        data-name="@item.NameFirst @item.NameLast"
+                        data-email="@item.Email"
+                        data-phone="@item.Phone"
+                        data-birthdate="@item.BirthDate.ToString("o")"
+                        data-role="@item.Role">
+                        <td>@item.Id</td>
+                        <td>@item.NameFirst @item.NameLast</td>
+                        <td>@item.Email</td>
+                        <td>@item.Phone</td>
+                        <td>@item.BirthDate</td>
+                        <td>@item.Role</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="text-decoration-none">
+                                <i class="bi bi-pencil-square"></i>
+                            </a> |
+                            <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none">
+                                <i class="bi bi-file-text"></i>
+                            </a> |
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="text-decoration-none">
+                                <i class="bi bi-trash3"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-muted small" id="userCount">Showing @Model.Count() entries</div>
+    </div>
+</div>
+
+<script>
+    // Filterign
+    (function () {
+        const search = document.getElementById('userSearch');
+        const role = document.getElementById('roleFilter');
+        const rows = Array.from(document.querySelectorAll('#usersTable tbody tr'));
+        const countEl = document.getElementById('userCount');
+
+        function applyFilter() {
+            const term = search.value.trim().toLowerCase();
+            const roleVal = role.value;
+            let visible = 0;
+
+            rows.forEach(row => {
+                const haystack = [
+                    row.dataset.name,
+                    row.dataset.id,
+                    row.dataset.email,
+                    row.dataset.phone
+                ].join(' ').toLowerCase();
+
+                console.log(row.dataset);
+
+                const matchesText = haystack.includes(term);
+                const matchesRole = !roleVal || row.dataset.role === roleVal;
+                const show = matchesText && matchesRole;
+
+                row.style.display = show ? '' : 'none';
+                if (show) visible++;
+            });
+
+            countEl.textContent = `Showing ${visible} of ${rows.length} entries`;
+        }
+
+        role.addEventListener('change', applyFilter);
+        search.addEventListener('input', applyFilter);
+    })();
+
+    // Sorting vvv
+    document.querySelectorAll('#usersTable th[data-sort]').forEach(th => {
+        th.addEventListener('click', () => {
+            const key = th.dataset.sort;
+            const tbody = document.querySelector('#usersTable tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const asc = th.dataset.dir !== 'asc';
+
+            rows.sort((a, b) => {
+                let valA = a.dataset[key] ?? '';
+                let valB = b.dataset[key] ?? '';
+
+                if (key === 'id') {
+                    return asc ? Number(valA) - Number(valB) : Number(valB) - Number(valA);
+                }
+
+                return asc
+                    ? valA.localeCompare(valB)
+                    : valB.localeCompare(valA);
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+
+            // reset all icons, then mark the active one
+            document.querySelectorAll('#usersTable th[data-sort]').forEach(h => {
+                h.dataset.dir = '';
+                h.querySelector('i').className = 'bi bi-arrow-down-up sort-icon opacity-50';
+            });
+            th.dataset.dir = asc ? 'asc' : 'desc';
+            th.querySelector('i').className = (asc ? 'bi bi-arrow-up' : 'bi bi-arrow-down') + ' sort-icon opacity-50';
+        });
+    });
+</script>
+
