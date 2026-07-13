@@ -35,7 +35,7 @@
                                 <a class="nav-link" asp-controller="Subjects" asp-action="Index">Subjects</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="TutorSubjects" asp-action="Index">Tutor Subjects</a>
+                                <a class="nav-link" asp-controller="Users" asp-action="Index">Users</a>
                             </li>
                         }
                         @if (User.IsInRole("Admin") || User.IsInRole("Tutor"))
@@ -57,11 +57,25 @@
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+
+    @{
+        bool useContainer = ViewData["NoContainer"] as bool? != true;
+
+        if (useContainer)
+        {
+            <div class="container">
+                <main role="main" class="pb-3">
+                    @RenderBody()
+                </main>
+            </div>
+        }
+        else
+        {
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        }
+    }
 
     <footer class="border-top footer text-muted">
         <div class="container">

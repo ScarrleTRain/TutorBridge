@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Index";
-    Layout = "_FullWidthLayout";
+    ViewData["NoContainer"] = true;
 
     var events = Model.Select(t => new {
         id = t.TimeSlotId,
