@@ -1,10 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using TutorBridge.Areas.Identity.Data;
 using TutorBridge.Models;
 
@@ -13,17 +16,34 @@ namespace TutorBridge.Controllers
     public class TimeslotsController : Controller
     {
         private readonly TutorBridgeContext _context;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public TimeslotsController(TutorBridgeContext context)
+        public TimeslotsController(TutorBridgeContext context, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
+            _roleManager = roleManager;
         }
 
         // GET: Timeslots
+        [Authorize(Roles = "Admin,Tutor")]
         public async Task<IActionResult> Index()
         {
-            var timeslots = await _context.TimeSlot.Include(t => t.Tutor).ToListAsync();
-            return View(timeslots);
+            if (User.IsInRole("Admin"))
+            {
+                var timeslots = await _context.TimeSlot.Include(t => t.Tutor).ToListAsync();
+                return View(timeslots);
+            }
+            else if (User.IsInRole("Tutor"))
+            {
+                var timeslots = await _context.TimeSlot.Where(t => t.TutorId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                                                       .Include(t => t.Tutor)
+                                                       .ToListAsync();
+                return View(timeslots);
+            }
+            else
+            {
+                return Forbid(); 
+            }
         }
 
         // GET: Timeslots/Details/5

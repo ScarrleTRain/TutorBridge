@@ -24,6 +24,7 @@ namespace TutorBridge.Controllers
         }
 
         // GET: Bookings
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             var bookings = await _context.Booking
