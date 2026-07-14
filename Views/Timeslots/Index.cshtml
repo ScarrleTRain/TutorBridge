@@ -4,18 +4,61 @@
     ViewData["Title"] = "Index";
     ViewData["NoContainer"] = true;
 
+    HashSet<int> bookedIds = ViewBag.BookedIds;
+
     var events = Model.Select(t => new {
         id = t.TimeSlotId,
         title = t.Tutor?.NameFirst + " " + t.Tutor?.NameLast ?? "Error", // Find whether booked or not
         start = t.DateTimeStart,
-        end = t.DateTimeEnd
+        end = t.DateTimeEnd,
+        isBooked = bookedIds.Contains(t.TimeSlotId)
     });
-    
 }
 
-<div id="calendar"></div>
-
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script src="https://unpkg.com/@@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6"></script>
+<link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css"/>
+<link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/light.css"/>
+<style>
+    .fc-event {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+        border-radius: 0.375rem; /* matches bs-border-radius */
+    }
+
+    .fc-event:hover {
+        filter: brightness(0.92);
+        cursor: pointer;
+    }
+
+    .fc-event-selected {
+        outline: 2px solid var(--bs-secondary);
+        outline-offset: 1px;
+    }
+
+    .fc-toolbar-title {
+        font-size: 1.1rem !important;
+        font-weight: 600;
+    }
+
+    .fc-event-main {
+        height: 100%;
+        display: flex;
+        align-items: center;
+    }
+</style>
+
+<div class="card shadow-lg m-3 mx-xxl-auto mx-xl-3" style="max-width: calc(1400px - 2rem);">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">Timeslots</h2>
+        <a asp-action="Create" class="btn btn-primary bg-secondary btn-sm">+ Create New</a>
+    </div>
+
+    <div class="card-body">
+        <div id="calendar"></div>
+    </div>
+</div>
 
 <script>
     const timeslots = @Json.Serialize(events);
@@ -39,11 +82,51 @@
             firstDay: new Date().getDay(),
             events: timeslots,
             eventClick: function (info) {
-                calendarEl.querySelectorAll('.fc-event-selected').forEach(el => {
-                    el.classList.remove('fc-event-selected');
+                const id = info.event.id;
+                const editUrl = '@Url.Action("Edit", "Timeslots")/' + id;
+                const detailsUrl = '@Url.Action("Details", "Timeslots")/' + id;
+                const deleteUrl = '@Url.Action("Delete", "Timeslots")/' + id;
+
+                // console.log(activeTippy);
+                // if (activeTippy) activeTippy.destroy();
+
+                activeTippy = tippy(info.el, {
+                    content: `
+                        <div class="d-flex gap-2 p-1">
+                            <a href="${editUrl}" class="text-decoration-none">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a href="${detailsUrl}" class="text-decoration-none">
+                                <i class="bi bi-file-text"></i>
+                            </a>
+                            <a href="${deleteUrl}" class="text-decoration-none">
+                                <i class="bi bi-trash3"></i>
+                            </a>
+                        </div>
+                    `,
+                    allowHTML: true,
+                    interactive: true,
+                    trigger: 'manual',
+                    placement: 'top',
+                    arrow: false,
+                    theme: 'light',
+                    offset: [0, 5],
+                    onHidden: (instance) => instance.destroy(),
                 });
-                info.el.classList.add('fc-event-selected');
-                hiddenInput.value = info.event.id;
+
+                activeTippy.show();
+            },
+            eventDidMount: function (info) {
+                const isBooked = info.event._def.extendedProps.isBooked;
+                info.el.classList.add(isBooked ? 'bg-danger' : 'bg-success', 'bg-opacity-75');
+            },
+            eventContent: function (arg) {
+                return {
+                    html: `<div class="d-flex align-items-center gap-1 px-1" style="height:100%;">
+                             <i class="bi bi-person-fill small"></i>
+                             <span class="small">${arg.event.title}</span>
+                           </div>`
+                };
             }
         });
 

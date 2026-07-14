@@ -31,6 +31,13 @@ namespace TutorBridge.Controllers
             if (User.IsInRole("Admin"))
             {
                 var timeslots = await _context.TimeSlot.Include(t => t.Tutor).ToListAsync();
+
+                var bookedIds = await _context.Booking
+                    .Select(b => b.TimeSlotId)
+                    .ToHashSetAsync();
+
+                ViewBag.BookedIds = bookedIds;
+
                 return View(timeslots);
             }
             else if (User.IsInRole("Tutor"))
@@ -38,6 +45,13 @@ namespace TutorBridge.Controllers
                 var timeslots = await _context.TimeSlot.Where(t => t.TutorId == User.FindFirstValue(ClaimTypes.NameIdentifier))
                                                        .Include(t => t.Tutor)
                                                        .ToListAsync();
+
+                var bookedIds = await _context.Booking
+                    .Select(b => b.TimeSlotId)
+                    .ToHashSetAsync();
+
+                ViewBag.BookedIds = bookedIds;
+
                 return View(timeslots);
             }
             else
