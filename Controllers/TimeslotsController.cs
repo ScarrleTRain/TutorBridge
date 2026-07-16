@@ -71,6 +71,7 @@ namespace TutorBridge.Controllers
             }
 
             var timeslot = await _context.TimeSlot
+                .Include(t => t.Tutor)
                 .FirstOrDefaultAsync(m => m.TimeSlotId == id);
             if (timeslot == null)
             {
@@ -130,6 +131,10 @@ namespace TutorBridge.Controllers
                 return NotFound();
             }
 
+            var tutors = await _userManager.GetUsersInRoleAsync("Tutor");
+
+            ViewData["TutorId"] = new SelectList(tutors, "Id", "UserName");
+
             var timeslot = await _context.TimeSlot.FindAsync(id);
             if (timeslot == null)
             {
@@ -148,6 +153,20 @@ namespace TutorBridge.Controllers
             if (id != timeslot.TimeSlotId)
             {
                 return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                bool overlaps = await _context.TimeSlot.AnyAsync(t =>
+                    t.TutorId == timeslot.TutorId &&
+                    t.DateTimeStart < timeslot.DateTimeEnd &&
+                    t.DateTimeEnd > timeslot.DateTimeStart);
+
+                if (overlaps)
+                {
+                    ModelState.AddModelError(nameof(timeslot.DateTimeStart),
+                        "This tutor already has a timeslot that overlaps with this time.");
+                }
             }
 
             if (ModelState.IsValid)
@@ -182,6 +201,7 @@ namespace TutorBridge.Controllers
             }
 
             var timeslot = await _context.TimeSlot
+                .Include(t => t.Tutor)
                 .FirstOrDefaultAsync(m => m.TimeSlotId == id);
             if (timeslot == null)
             {
