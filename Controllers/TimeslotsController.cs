@@ -17,11 +17,13 @@ namespace TutorBridge.Controllers
     {
         private readonly TutorBridgeContext _context;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<User> _userManager;
 
-        public TimeslotsController(TutorBridgeContext context, RoleManager<IdentityRole> roleManager)
+        public TimeslotsController(TutorBridgeContext context, RoleManager<IdentityRole> roleManager, UserManager<User> userManager)
         {
             _context = context;
             _roleManager = roleManager;
+            _userManager = userManager;
         }
 
         // GET: Timeslots
@@ -79,8 +81,12 @@ namespace TutorBridge.Controllers
         }
 
         // GET: Timeslots/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var tutors = await _userManager.GetUsersInRoleAsync("Tutor");
+
+            ViewData["TutorId"] = new SelectList(tutors, "Id", "UserName");
+
             return View();
         }
 
@@ -93,10 +99,26 @@ namespace TutorBridge.Controllers
         {
             if (ModelState.IsValid)
             {
+                bool overlaps = await _context.TimeSlot.AnyAsync(t =>
+                    t.TutorId == timeslot.TutorId &&
+                    t.DateTimeStart < timeslot.DateTimeEnd &&
+                    t.DateTimeEnd > timeslot.DateTimeStart);
+
+                if (overlaps)
+                {
+                    ModelState.AddModelError(nameof(timeslot.DateTimeStart),
+                        "This tutor already has a timeslot that overlaps with this time.");
+                }
+            }
+
+            if (ModelState.IsValid)
+            {
                 _context.Add(timeslot);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            var tutors = await _userManager.GetUsersInRoleAsync("Tutor");
+            ViewData["TutorId"] = new SelectList(tutors, "Id", "UserName", timeslot.TutorId);
             return View(timeslot);
         }
 

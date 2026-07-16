@@ -62,6 +62,11 @@
 
 <script>
     window.__timeslotEvents = @Json.Serialize(events);
+    window.__timeslotUrls = {
+        edit: '@Url.Action("Edit", "Timeslots")',
+        details: '@Url.Action("Details", "Timeslots")',
+        delete: '@Url.Action("Delete", "Timeslots")'
+    };
 </script>
 <script src="~/js/calendar-common.js"></script>
 <script src="~/js/calendar-timeslots.js"></script>

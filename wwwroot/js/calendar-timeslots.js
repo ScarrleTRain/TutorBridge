@@ -7,9 +7,9 @@
     const calendar = new FullCalendar.Calendar(calendarEl, createBaseCalendarOptions(window.__timeslotEvents, {
         eventClick: function (info) {
             const id = info.event.id;
-            const editUrl = '@Url.Action("Edit", "Timeslots")/' + id;
-            const detailsUrl = '@Url.Action("Details", "Timeslots")/' + id;
-            const deleteUrl = '@Url.Action("Delete", "Timeslots")/' + id;
+            const editUrl = `${window.__timeslotUrls.edit}/${id}`;
+            const detailsUrl = `${window.__timeslotUrls.details}/${id}`;
+            const deleteUrl = `${window.__timeslotUrls.delete}/${id}`;
 
             activeTippy = tippy(info.el, {
                 content: `
