@@ -24,17 +24,36 @@ namespace TutorBridge.Controllers
         }
 
         // GET: Bookings
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Tutor")]
         public async Task<IActionResult> Index()
         {
-            var bookings = await _context.Booking
-                .Include(b => b.User)
-                .Include(b => b.Subject)
-                .Include(b => b.TimeSlot)
-                .Include(t => t.TimeSlot.Tutor)
-                .ToListAsync();
+            if (User.IsInRole("Admin"))
+            {
+                var bookings = await _context.Booking
+                    .Include(b => b.User)
+                    .Include(b => b.Subject)
+                    .Include(b => b.TimeSlot)
+                    .Include(t => t.TimeSlot.Tutor)
+                    .ToListAsync();
 
-            return View(bookings);
+                return View(bookings);
+            }
+            else if (User.IsInRole("Tutor"))
+            {
+                var bookings = await _context.Booking
+                    .Include(b => b.TimeSlot)
+                    .Where(t => t.TimeSlot.TutorId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                    .Include(t => t.TimeSlot.Tutor)
+                    .Include(b => b.User)
+                    .Include(b => b.Subject)
+                    .ToListAsync();
+
+                return View(bookings);
+            }
+            else
+            {
+                return Forbid();
+            }
         }
 
         // GET: Bookings/Details/5

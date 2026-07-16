@@ -15,17 +15,36 @@
     
 }
 
-
-
-@* <script>
-    console.log("Claims:");
-    @foreach (var claim in User.Claims)
-    {
-        @:console.log("@claim.Type : @claim.Value");
+<style>
+    .fc-event {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+        border-radius: 0.375rem; /* matches bs-border-radius */
     }
-</script> *@
 
-<h1>Book@* - @ViewBag.Tutor.NameFirst @ViewBag.Tutor.NameLast*@</h1>
+    .fc-event:hover {
+        filter: brightness(0.92);
+        cursor: pointer;
+    }
+
+    .fc-event-selected {
+        outline: 2px solid var(--bs-secondary);
+        outline-offset: 1px;
+    }
+
+    .fc-toolbar-title {
+        font-size: 1.1rem !important;
+        font-weight: 600;
+    }
+
+    .fc-event-main {
+        height: 100%;
+        display: flex;
+        align-items: center;
+    }
+</style>
+
+<h1>Book</h1>
 <hr />
 <div class="row">
     <div class="row">
@@ -75,51 +94,8 @@
 }
 
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
-
 <script>
-    const timeslots = @Html.Raw(timeslotJson);
-
-    document.addEventListener('DOMContentLoaded', function () {
-    const calendarEl = document.getElementById('calendar');
-    const hiddenInput = document.getElementById('TimeSlotId');
-    const feedback = document.getElementById('slot-feedback');
-    const submitBtn = document.getElementById('submit-btn');
-
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'timeGridWeek',
-        headerToolbar: {
-        left: 'prev,next today',
-        center: 'title'
-        },
-        themeSystem: 'bootstrap5',
-        allDaySlot: false,
-        slotMinTime: "06:00:00",
-        slotDuration: '01:00:00',
-        firstDay: new Date().getDay(),
-        events: timeslots,
-        eventClick: function (info) {
-            // Deselect previously selected event
-            calendarEl.querySelectorAll('.fc-event-selected').forEach(el => {
-            el.classList.remove('fc-event-selected');
-        });
-
-    // Highlight selected
-    info.el.classList.add('fc-event-selected');
-
-    // Update hidden input
-    hiddenInput.value = info.event.id;
-
-    // Show feedback
-    const start = info.event.start;
-    const options = { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' };
-    feedback.textContent = `Selected: ${start.toLocaleDateString('en-NZ', options)} — ${info.event.title}`;
-    feedback.classList.remove('d-none');
-
-    // Enable submit
-    submitBtn.disabled = false;
-    }
-    });
-
-    calendar.render();
-    });
+    window.__timeslotEvents = @Json.Serialize(ViewBag.TimeSlots);
 </script>
+<script src="~/js/calendar-common.js"></script>
+<script src="~/js/calendar-book.js"></script>
