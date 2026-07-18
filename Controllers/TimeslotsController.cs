@@ -84,9 +84,15 @@ namespace TutorBridge.Controllers
         // GET: Timeslots/Create
         public async Task<IActionResult> Create()
         {
-            var tutors = await _userManager.GetUsersInRoleAsync("Tutor");
+            var tutors = (await _userManager.GetUsersInRoleAsync("Tutor"))
+                .Select(u => new SelectListItem
+                {
+                    Value = u.Id,
+                    Text = $"{u.NameFirst} {u.NameLast}"
+                })
+                .ToList();
 
-            ViewData["TutorId"] = new SelectList(tutors, "Id", "UserName");
+            ViewBag.Tutors = tutors;
 
             return View();
         }

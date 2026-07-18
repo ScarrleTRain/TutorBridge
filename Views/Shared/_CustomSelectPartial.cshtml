@@ -1,0 +1,53 @@
+﻿@model IEnumerable<SelectListItem>
+
+@{
+    // Parameters passed in via ViewData
+    string fieldName = ViewData["FieldName"]?.ToString() ?? "SelectedValue";
+    string placeholder = ViewData["Placeholder"]?.ToString() ?? "-- Select --";
+    string labelText = ViewData["LabelText"]?.ToString() ?? "";
+    string iconClass = ViewData["IconClass"]?.ToString() ?? "";
+    string currentValue = ViewData["CurrentValue"]?.ToString() ?? "";
+    string searchPlaceholder = ViewData["SearchPlaceholder"]?.ToString() ?? "Search...";
+}
+
+<div class="mb-3">
+    @if (!string.IsNullOrEmpty(labelText))
+    {
+        <label class="form-label" for="@(fieldName)DropdownBtn">
+            @if (!string.IsNullOrEmpty(iconClass))
+            {
+                <i class="@iconClass me-1 text-primary"></i>
+            }
+            @labelText
+        </label>
+    }
+
+    <div class="dropdown custom-select-dropdown" data-field="@fieldName">
+        <button class="form-select text-start" type="button" id="@(fieldName)DropdownBtn"
+                data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+            <span class="dropdown-label">@placeholder</span>
+        </button>
+        <div class="dropdown-menu w-100 p-2" aria-labelledby="@(fieldName)DropdownBtn">
+            <input type="text" class="form-control form-control-sm mb-2 dropdown-search"
+                   placeholder="@searchPlaceholder" autocomplete="off" />
+
+            <ul class="list-unstyled mb-0 custom-option-list">
+                @foreach (var item in Model)
+                {
+                    <li>
+                        <a class="dropdown-item custom-option" href="#"
+                           data-id="@item.Text (@item.Value)" data-name="@item.Text">
+                            <span class="option-text">@item.Text</span>
+                        </a>
+                    </li>
+                }
+                <li class="no-results-msg text-muted small px-2 py-1 d-none">No results found</li>
+            </ul>
+        </div>
+    </div>
+
+    <input type="hidden" name="@fieldName" id="@(fieldName)Hidden" value="@currentValue" />
+    <span asp-validation-for="@fieldName" class="text-danger small"></span>
+
+    <script src="~/js/custom-dropdown.js"></script>
+</div>

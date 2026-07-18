@@ -17,13 +17,15 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="col-md-6">
-                <label asp-for="TutorId" class="form-label">
-                    <i class="bi bi-person-badge me-1 text-primary"></i>Tutor
-                </label>
-                <select asp-for="TutorId" class="form-select" asp-items="ViewBag.TutorId">
-                    <option value="">-- Select Tutor --</option>
-                </select>
-                <span asp-validation-for="TutorId" class="text-danger small"></span>
+                
+                @{
+                    ViewData["FieldName"] = "TutorId";
+                    ViewData["LabelText"] = "Tutor";
+                    ViewData["IconClass"] = "bi bi-person-badge";
+                    ViewData["Placeholder"] = "-- Select Tutor --";
+                    ViewData["SearchPlaceholder"] = "Search tutors...";
+                }
+                <partial name="_CustomSelectPartial" model="ViewBag.Tutors" />
             </div>
 
             <div class="col-md-3">
