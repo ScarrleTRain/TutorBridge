@@ -13,6 +13,7 @@ using TutorBridge.Models;
 
 namespace TutorBridge.Controllers
 {
+    [Authorize(Roles = "Admin,Tutor")]
     public class TimeslotsController : Controller
     {
         private readonly TutorBridgeContext _context;
@@ -27,7 +28,6 @@ namespace TutorBridge.Controllers
         }
 
         // GET: Timeslots
-        [Authorize(Roles = "Admin,Tutor")]
         public async Task<IActionResult> Index()
         {
             if (User.IsInRole("Admin"))
