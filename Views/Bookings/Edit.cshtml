@@ -4,46 +4,77 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+<div class="card shadow-lg">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0"><i class="bi bi-calendar-plus me-2"></i>Edit Booking</h2>
+        <a asp-action="Index" class="btn btn-primary bg-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Back to List
+        </a>
+    </div>
 
-<h4>Booking</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
+    <div class="card-body">
+        <form asp-action="Edit" class="row g-3">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
-                <input asp-for="UserId" class="form-control" />
-                <span asp-validation-for="UserId" class="text-danger"></span>
+
+            <div class="col-md-6">
+                @{
+                    ViewData["FieldName"] = "UserId";
+                    ViewData["LabelText"] = "User";
+                    ViewData["IconClass"] = "bi bi-person-badge";
+                    ViewData["Placeholder"] = "-- Select User --";
+                    ViewData["SearchPlaceholder"] = "Search users...";
+                    ViewData["CurrentValue"] = Model.UserId?.ToString();
+                }
+                <partial name="_CustomSelectPartial" model="ViewBag.Users" />
             </div>
-            <div class="form-group">
-                <label asp-for="TimeSlotId" class="control-label"></label>
-                <input asp-for="TimeSlotId" class="form-control" />
-                <span asp-validation-for="TimeSlotId" class="text-danger"></span>
+
+            <div class="col-md-6">
+                @{
+                    ViewData["FieldName"] = "TimeSlotId";
+                    ViewData["LabelText"] = "Timeslot";
+                    ViewData["IconClass"] = "bi bi-calendar-plus me-2";
+                    ViewData["Placeholder"] = "-- Select Timeslot --";
+                    ViewData["SearchPlaceholder"] = "Search timeslots...";
+                    ViewData["CurrentValue"] = Model.TimeSlotId.ToString();
+                }
+                <partial name="_CustomSelectPartial" model="ViewBag.Timeslots" />
             </div>
-            <div class="form-group">
-                <label asp-for="SubjectId" class="control-label"></label>
-                <input asp-for="SubjectId" class="form-control" />
-                <span asp-validation-for="SubjectId" class="text-danger"></span>
+
+            <div class="col-md-6">
+                @{
+                    ViewData["FieldName"] = "SubjectId";
+                    ViewData["LabelText"] = "Subject";
+                    ViewData["IconClass"] = "bi bi-calendar-plus me-2";
+                    ViewData["Placeholder"] = "-- Select Subject --";
+                    ViewData["SearchPlaceholder"] = "Search subjects...";
+                    ViewData["CurrentValue"] = Model.SubjectId.ToString();
+                }
+                <partial name="_CustomSelectPartial" model="ViewBag.Subjects" />
             </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <select asp-for="Status" class="form-control"></select>
-                <span asp-validation-for="Status" class="text-danger"></span>
+
+            <div class="col-md-6">
+                <label asp-for="Status" class="form-label">
+                    <i class="bi bi-flag me-1 text-primary"></i>Status
+                </label>
+                <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<TutorBridge.Models.Booking.BookingStatus>()"></select>
+                <span asp-validation-for="Status" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+
+            <div class="col-12 pt-2 border-top mt-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg me-1"></i>Save
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    Cancel
+                </a>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
