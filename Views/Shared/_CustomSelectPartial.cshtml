@@ -36,8 +36,8 @@
                 {
                     <li>
                         <a class="dropdown-item custom-option" href="#"
-                           data-id="@item.Text (@item.Value)" data-name="@item.Text">
-                            <span class="option-text">@item.Text</span>
+                           data-id="@item.Value" data-name="@item.Text">
+                            <span class="option-text" data-hover-text="@item.Text (@item.Value)">@item.Text</span>
                         </a>
                     </li>
                 }
@@ -48,6 +48,4 @@
 
     <input type="hidden" name="@fieldName" id="@(fieldName)Hidden" value="@currentValue" />
     <span asp-validation-for="@fieldName" class="text-danger small"></span>
-
-    <script src="~/js/custom-dropdown.js"></script>
 </div>

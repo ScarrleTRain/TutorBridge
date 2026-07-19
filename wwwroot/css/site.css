@@ -51,7 +51,7 @@ body {
 }
 
 .custom-option:hover .option-text::after {
-    content: attr(data-id-text);
+    content: attr(data-hover-text);
     visibility: visible;
     position: absolute;
     left: 0;

@@ -12,6 +12,7 @@
             const deleteUrl = `${window.__timeslotUrls.delete}/${id}`;
 
             activeTippy = tippy(info.el, {
+                appendTo: () => document.body,
                 content: `
                     <div class="d-flex gap-2 p-1">
                         <a href="${editUrl}" class="text-decoration-none">
@@ -30,6 +31,7 @@
                 trigger: 'manual',
                 placement: 'top',
                 arrow: false,
+                zIndex: 999,
                 theme: 'light',
                 offset: [0, 5],
                 onHidden: (instance) => instance.destroy(),

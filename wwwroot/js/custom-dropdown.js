@@ -20,8 +20,6 @@ function initCustomDropdown(container) {
     }
 
     options.forEach(option => {
-        option.querySelector('.option-text').setAttribute('data-id-text', option.dataset.id);
-
         option.addEventListener('click', function (e) {
             e.preventDefault();
             hiddenInput.value = this.dataset.id;

@@ -84,15 +84,7 @@ namespace TutorBridge.Controllers
         // GET: Timeslots/Create
         public async Task<IActionResult> Create()
         {
-            var tutors = (await _userManager.GetUsersInRoleAsync("Tutor"))
-                .Select(u => new SelectListItem
-                {
-                    Value = u.Id,
-                    Text = $"{u.NameFirst} {u.NameLast}"
-                })
-                .ToList();
-
-            ViewBag.Tutors = tutors;
+            ViewBag.Tutors = await TutorDropdown();
 
             return View();
         }
@@ -124,8 +116,9 @@ namespace TutorBridge.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            var tutors = await _userManager.GetUsersInRoleAsync("Tutor");
-            ViewData["TutorId"] = new SelectList(tutors, "Id", "UserName", timeslot.TutorId);
+
+            ViewBag.Tutors = await TutorDropdown();
+
             return View(timeslot);
         }
 
@@ -137,15 +130,14 @@ namespace TutorBridge.Controllers
                 return NotFound();
             }
 
-            var tutors = await _userManager.GetUsersInRoleAsync("Tutor");
-
-            ViewData["TutorId"] = new SelectList(tutors, "Id", "UserName");
-
             var timeslot = await _context.TimeSlot.FindAsync(id);
             if (timeslot == null)
             {
                 return NotFound();
             }
+
+            ViewBag.Tutors = await TutorDropdown();
+
             return View(timeslot);
         }
 
@@ -195,6 +187,9 @@ namespace TutorBridge.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewBag.Tutors = await TutorDropdown();
+
             return View(timeslot);
         }
 
@@ -235,6 +230,17 @@ namespace TutorBridge.Controllers
         private bool TimeslotExists(int id)
         {
             return _context.TimeSlot.Any(e => e.TimeSlotId == id);
+        }
+
+        public async Task<IEnumerable<SelectListItem>> TutorDropdown()
+        {
+             return (await _userManager.GetUsersInRoleAsync("Tutor"))
+                .Select(u => new SelectListItem
+                {
+                    Value = u.Id,
+                    Text = $"{u.NameFirst} {u.NameLast}"
+                })
+                .ToList().OrderBy(u => u.Text);
         }
     }
 }
