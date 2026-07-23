@@ -35,15 +35,15 @@
                 </dd>
             }
 
-            @if (Model.TimeSlot != null )
+            @if (Model.Timeslot != null )
             {
-                if (Model.TimeSlot.Tutor != null)
+                if (Model.Timeslot.Tutor != null)
                 {
                     <dt class="col-md-3">
                         <i class="bi-person-badge me-1 text-primary"></i>Tutor
                     </dt>
                     <dd class="col-md-9">
-                        @Model.TimeSlot.Tutor.NameFirst @Model.TimeSlot.Tutor.NameLast <span class="text-secondary">(@Model.TimeSlot.Tutor.Id)</span>
+                        @Model.Timeslot.Tutor.NameFirst @Model.Timeslot.Tutor.NameLast <span class="text-secondary">(@Model.Timeslot.Tutor.Id)</span>
                     </dd>
                 }
                 else
@@ -52,7 +52,7 @@
                         <i class="bi-person-badge me-1 text-primary"></i>Tutor
                     </dt>
                     <dd class="col-md-9">
-                        @Model.TimeSlot.TutorId
+                        @Model.Timeslot.TutorId
                     </dd>
                 }
 
@@ -61,9 +61,9 @@
                 </dt>
                 <dd class="col-md-9">
                     @{
-                        var time = $"{Model.TimeSlot.DateTimeStart:d}, {Model.TimeSlot.DateTimeStart:t} - {Model.TimeSlot.DateTimeEnd:t}";
+                        var time = $"{Model.Timeslot.DateTimeStart:d}, {Model.Timeslot.DateTimeStart:t} - {Model.Timeslot.DateTimeEnd:t}";
                     }
-                    @time <span class="text-secondary">(@Model.TimeSlotId)</span>
+                    @time <span class="text-secondary">(@Model.TimeslotId)</span>
                 </dd>
             }
             else
@@ -72,7 +72,7 @@
                     <i class="bi bi-clock me-1 text-primary"></i>Time Slot Id
                 </dt>
                 <dd class="col-md-9">
-                    @Html.DisplayFor(model => model.TimeSlotId)
+                    @Html.DisplayFor(model => model.TimeslotId)
                 </dd>
             }
 

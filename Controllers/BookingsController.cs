@@ -33,8 +33,8 @@ namespace TutorBridge.Controllers
                 var bookings = await _context.Booking
                     .Include(b => b.User)
                     .Include(b => b.Subject)
-                    .Include(b => b.TimeSlot)
-                    .Include(t => t.TimeSlot.Tutor)
+                    .Include(b => b.Timeslot)
+                    .ThenInclude(t => t.Tutor)
                     .ToListAsync();
 
                 return View(bookings);
@@ -42,9 +42,9 @@ namespace TutorBridge.Controllers
             else if (User.IsInRole("Tutor"))
             {
                 var bookings = await _context.Booking
-                    .Include(b => b.TimeSlot)
-                    .Where(t => t.TimeSlot.TutorId == User.FindFirstValue(ClaimTypes.NameIdentifier))
-                    .Include(t => t.TimeSlot.Tutor)
+                    .Include(b => b.Timeslot)
+                    .ThenInclude(t => t.Tutor)
+                    .Where(t => t.Timeslot.TutorId == User.FindFirstValue(ClaimTypes.NameIdentifier))
                     .Include(b => b.User)
                     .Include(b => b.Subject)
                     .ToListAsync();
@@ -68,9 +68,9 @@ namespace TutorBridge.Controllers
 
             var booking = await _context.Booking
                 .Include(b => b.User)
-                .Include(b => b.TimeSlot)
-                .Include(t => t.TimeSlot.Tutor)
                 .Include(b => b.Subject)
+                .Include(b => b.Timeslot)
+                .ThenInclude(t => t.Tutor)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (booking == null)
             {
@@ -88,13 +88,13 @@ namespace TutorBridge.Controllers
             if (tutor == null)
                 return NotFound();
 
-            var availableTimeSlots = await _context.TimeSlot
+            var availableTimeslots = await _context.Timeslot
                 .Where(t => t.TutorId == tutor.Id)
                 //.Where(t => t.DateTimeStart > DateTime.Now) Disable for debug TODO remove this.
                 .OrderBy(t => t.DateTimeStart)
                 .Select(t => new
                 {
-                    id = t.TimeSlotId,
+                    id = t.TimeslotId,
                     start = t.DateTimeStart,
                     end = t.DateTimeEnd,
                     title = $"{t.DateTimeStart:h:mm tt}–{t.DateTimeEnd:h:mm tt}"
@@ -111,7 +111,7 @@ namespace TutorBridge.Controllers
                 .ToListAsync();
 
             ViewBag.Tutor = tutor;
-            ViewBag.TimeSlots = availableTimeSlots;
+            ViewBag.Timeslots = availableTimeslots;
             ViewBag.Subjects = availableSubjects;
 
             var booking = new Booking
@@ -124,7 +124,7 @@ namespace TutorBridge.Controllers
 
         [HttpPost, Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Book([Bind("TimeSlotId,SubjectId")] Booking booking)
+        public async Task<IActionResult> Book([Bind("TimeslotId,SubjectId")] Booking booking)
         {
             booking.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             booking.Status = BookingStatus.Pending;
@@ -153,7 +153,7 @@ namespace TutorBridge.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UserId,TimeSlotId,SubjectId,Status")] Booking booking)
+        public async Task<IActionResult> Create([Bind("Id,UserId,TimeslotId,SubjectId,Status")] Booking booking)
         {
             if (ModelState.IsValid)
             {
@@ -195,7 +195,7 @@ namespace TutorBridge.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,TimeSlotId,SubjectId,Status")] Booking booking)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,TimeslotId,SubjectId,Status")] Booking booking)
         {
             if (id != booking.Id)
             {
@@ -240,8 +240,8 @@ namespace TutorBridge.Controllers
 
             var booking = await _context.Booking
                 .Include(b => b.User)
-                .Include(b => b.TimeSlot)
-                .Include(t => t.TimeSlot.Tutor)
+                .Include(b => b.Timeslot)
+                .ThenInclude(t => t.Tutor)
                 .Include(b => b.Subject)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (booking == null)
@@ -288,11 +288,11 @@ namespace TutorBridge.Controllers
 
         public async Task<IEnumerable<SelectListItem>> TimeslotDropdown()
         {
-            return (await _context.TimeSlot
+            return (await _context.Timeslot
                 .Include(t => t.Tutor)
                 .Select(t => new SelectListItem
                 {
-                    Value = t.TimeSlotId.ToString(),
+                    Value = t.TimeslotId.ToString(),
                     Text = $"{t.Tutor.NameFirst} {t.Tutor.NameLast} // {t.DateTimeStart:d} {t.DateTimeStart:t} - {t.DateTimeEnd:t}"
                 })
                 .ToListAsync())

@@ -10,9 +10,9 @@ namespace TutorBridge.Models
     {
         public required string TutorId { get; set; }
         [ForeignKey("TutorId")]
-        public User? Tutor { get; set; }
+        public User Tutor { get; set; } = null!;
         public required int SubjectId { get; set; }
         [ForeignKey("SubjectId")]
-        public Subject? Subject { get; set; }
+        public Subject Subject { get; set; } = null!;
     }
 }

@@ -32,10 +32,10 @@ namespace TutorBridge.Controllers
         {
             if (User.IsInRole("Admin"))
             {
-                var timeslots = await _context.TimeSlot.Include(t => t.Tutor).ToListAsync();
+                var timeslots = await _context.Timeslot.Include(t => t.Tutor).ToListAsync();
 
                 var bookedIds = await _context.Booking
-                    .Select(b => b.TimeSlotId)
+                    .Select(b => b.TimeslotId)
                     .ToHashSetAsync();
 
                 ViewBag.BookedIds = bookedIds;
@@ -44,12 +44,12 @@ namespace TutorBridge.Controllers
             }
             else if (User.IsInRole("Tutor"))
             {
-                var timeslots = await _context.TimeSlot.Where(t => t.TutorId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                var timeslots = await _context.Timeslot.Where(t => t.TutorId == User.FindFirstValue(ClaimTypes.NameIdentifier))
                                                        .Include(t => t.Tutor)
                                                        .ToListAsync();
 
                 var bookedIds = await _context.Booking
-                    .Select(b => b.TimeSlotId)
+                    .Select(b => b.TimeslotId)
                     .ToHashSetAsync();
 
                 ViewBag.BookedIds = bookedIds;
@@ -70,9 +70,9 @@ namespace TutorBridge.Controllers
                 return NotFound();
             }
 
-            var timeslot = await _context.TimeSlot
+            var timeslot = await _context.Timeslot
                 .Include(t => t.Tutor)
-                .FirstOrDefaultAsync(m => m.TimeSlotId == id);
+                .FirstOrDefaultAsync(m => m.TimeslotId == id);
             if (timeslot == null)
             {
                 return NotFound();
@@ -94,11 +94,11 @@ namespace TutorBridge.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TimeSlotId,TutorId,DateTimeStart,DateTimeEnd")] TimeSlot timeslot)
+        public async Task<IActionResult> Create([Bind("TimeslotId,TutorId,DateTimeStart,DateTimeEnd")] Timeslot timeslot)
         {
             if (ModelState.IsValid)
             {
-                bool overlaps = await _context.TimeSlot.AnyAsync(t =>
+                bool overlaps = await _context.Timeslot.AnyAsync(t =>
                     t.TutorId == timeslot.TutorId &&
                     t.DateTimeStart < timeslot.DateTimeEnd &&
                     t.DateTimeEnd > timeslot.DateTimeStart);
@@ -130,7 +130,7 @@ namespace TutorBridge.Controllers
                 return NotFound();
             }
 
-            var timeslot = await _context.TimeSlot.FindAsync(id);
+            var timeslot = await _context.Timeslot.FindAsync(id);
             if (timeslot == null)
             {
                 return NotFound();
@@ -146,16 +146,22 @@ namespace TutorBridge.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TimeSlotId,TutorId,DateTimeStart,DateTimeEnd")] TimeSlot timeslot)
+        public async Task<IActionResult> Edit(int id, [Bind("TimeslotId,TutorId,DateTimeStart,DateTimeEnd")] Timeslot timeslot)
         {
-            if (id != timeslot.TimeSlotId)
+            if (id != timeslot.TimeslotId)
             {
                 return NotFound();
             }
 
+            if (timeslot.Bookings.Any(b => b.Status != Booking.BookingStatus.Cancelled))
+            {
+                ModelState.AddModelError("", "This timeslot has an active booking. Please cancel it first.");
+                return View("Delete", timeslot); // explicit view name since action is "DeleteConfirmed"
+            }
+
             if (ModelState.IsValid)
             {
-                bool overlaps = await _context.TimeSlot.AnyAsync(t =>
+                bool overlaps = await _context.Timeslot.AnyAsync(t =>
                     t.TutorId == timeslot.TutorId &&
                     t.DateTimeStart < timeslot.DateTimeEnd &&
                     t.DateTimeEnd > timeslot.DateTimeStart);
@@ -176,7 +182,7 @@ namespace TutorBridge.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TimeslotExists(timeslot.TimeSlotId))
+                    if (!TimeslotExists(timeslot.TimeslotId))
                     {
                         return NotFound();
                     }
@@ -201,9 +207,9 @@ namespace TutorBridge.Controllers
                 return NotFound();
             }
 
-            var timeslot = await _context.TimeSlot
+            var timeslot = await _context.Timeslot
                 .Include(t => t.Tutor)
-                .FirstOrDefaultAsync(m => m.TimeSlotId == id);
+                .FirstOrDefaultAsync(m => m.TimeslotId == id);
             if (timeslot == null)
             {
                 return NotFound();
@@ -217,10 +223,10 @@ namespace TutorBridge.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var timeslot = await _context.TimeSlot.FindAsync(id);
+            var timeslot = await _context.Timeslot.FindAsync(id);
             if (timeslot != null)
             {
-                _context.TimeSlot.Remove(timeslot);
+                _context.Timeslot.Remove(timeslot);
             }
 
             await _context.SaveChangesAsync();
@@ -229,7 +235,7 @@ namespace TutorBridge.Controllers
 
         private bool TimeslotExists(int id)
         {
-            return _context.TimeSlot.Any(e => e.TimeSlotId == id);
+            return _context.Timeslot.Any(e => e.TimeslotId == id);
         }
 
         public async Task<IEnumerable<SelectListItem>> TutorDropdown()

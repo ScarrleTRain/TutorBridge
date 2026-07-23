@@ -11,6 +11,6 @@ WHERE    u.IsTutor = 1
          AND u.Id NOT IN (SELECT DISTINCT t.TutorId
                           FROM   Booking AS b
                                  INNER JOIN
-                                 TimeSlot AS t
+                                 Timeslot AS t
                                  ON b.TimeslotId = t.TimeslotId)
 GROUP BY u.Id, u.NameFirst, u.NameLast;

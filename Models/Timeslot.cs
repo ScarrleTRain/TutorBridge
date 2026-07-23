@@ -4,15 +4,16 @@ using TutorBridge.Areas.Identity.Data;
 
 namespace TutorBridge.Models
 {
-    public class TimeSlot : IValidatableObject
+    public class Timeslot : IValidatableObject
     {
-        public int TimeSlotId { get; set; }
+        public int TimeslotId { get; set; }
 
         public required string TutorId { get; set; }
         [ForeignKey("TutorId")]
-        public User? Tutor { get; set; }
+        public User Tutor { get; set; } = null!;
         public DateTime DateTimeStart { get; set; }
         public DateTime DateTimeEnd { get; set; }
+        public ICollection<Booking> Bookings { get; set; } = null!;
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

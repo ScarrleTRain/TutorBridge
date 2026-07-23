@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TutorBridge.Areas.Identity.Data;
 
@@ -11,9 +12,11 @@ using TutorBridge.Areas.Identity.Data;
 namespace TutorBridge.Migrations
 {
     [DbContext(typeof(TutorBridgeContext))]
-    partial class TutorBridgeContextModelSnapshot : ModelSnapshot
+    [Migration("20260723080143_UpdateCascadeAndNullability")]
+    partial class UpdateCascadeAndNullability
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -273,7 +276,7 @@ namespace TutorBridge.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Booking", (string)null);
+                    b.ToTable("Booking");
                 });
 
             modelBuilder.Entity("TutorBridge.Models.Subject", b =>
@@ -296,7 +299,7 @@ namespace TutorBridge.Migrations
 
                     b.HasKey("SubjectId");
 
-                    b.ToTable("Subject", (string)null);
+                    b.ToTable("Subject");
                 });
 
             modelBuilder.Entity("TutorBridge.Models.Timeslot", b =>
@@ -321,7 +324,7 @@ namespace TutorBridge.Migrations
 
                     b.HasIndex("TutorId");
 
-                    b.ToTable("Timeslot", (string)null);
+                    b.ToTable("Timeslot");
                 });
 
             modelBuilder.Entity("TutorBridge.Models.TutorSubject", b =>
@@ -336,7 +339,7 @@ namespace TutorBridge.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("TutorSubject", (string)null);
+                    b.ToTable("TutorSubject");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

@@ -1,6 +1,6 @@
 ﻿document.addEventListener('DOMContentLoaded', function () {
     const calendarEl = document.getElementById('calendar');
-    const hiddenInput = document.getElementById('TimeSlotId');
+    const hiddenInput = document.getElementById('TimeslotId');
     const feedback = document.getElementById('slot-feedback');
     const submitBtn = document.getElementById('submit-btn');
 

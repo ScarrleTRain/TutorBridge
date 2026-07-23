@@ -11,7 +11,7 @@
         ? System.IO.Path.Combine(Env.WebRootPath, "images", "tutors", ViewBag.Tutor.ProfilePhoto)
         : null;
     bool photoExists = photoPath != null && System.IO.File.Exists(photoPath);
-    var timeslotJson = JsonSerializer.Serialize(ViewBag.TimeSlots);
+    var timeslotJson = JsonSerializer.Serialize(ViewBag.Timeslots);
     
 }
 
@@ -69,7 +69,7 @@
             <form asp-action="Book">
                 @Html.AntiForgeryToken()
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                <input type="hidden" asp-for="TimeSlotId" id="TimeSlotId" />
+                <input type="hidden" asp-for="TimeslotId" id="TimeslotId" />
                 <div class="form-group mb-3">
                     <label asp-for="SubjectId" class="control-label">Subject</label>
                     <select asp-for="SubjectId" asp-items="ViewBag.Subjects" class="form-control">
@@ -95,7 +95,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 <script>
-    window.__timeslotEvents = @Json.Serialize(ViewBag.TimeSlots);
+    window.__timeslotEvents = @Json.Serialize(ViewBag.Timeslots);
 </script>
 <script src="~/js/calendar-common.js"></script>
 <script src="~/js/calendar-book.js"></script>

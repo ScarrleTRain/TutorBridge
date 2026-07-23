@@ -1,2 +1,2 @@
 ﻿SELECT *
-FROM   TimeSlot;
+FROM   Timeslot;

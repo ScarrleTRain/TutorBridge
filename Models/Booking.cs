@@ -17,17 +17,17 @@ namespace TutorBridge.Models
         public int Id { get; set; }
 
         [Display(Name = "Student")]
-        public string? UserId { get; set; }
+        public required string UserId { get; set; }
         [ForeignKey("UserId")]
-        public User? User { get; set; }
+        public User User { get; set; } = null!;
 
-        public int TimeSlotId { get; set; }
-        [ForeignKey("TimeSlotId")]
-        public TimeSlot? TimeSlot { get; set; }
+        public int TimeslotId { get; set; }
+        [ForeignKey("TimeslotId")]
+        public Timeslot Timeslot { get; set; } = null!;
 
         public int SubjectId { get; set; }
         [ForeignKey("SubjectId")]
-        public Subject? Subject { get; set; }
+        public Subject Subject { get; set; } = null!;
 
         [Required(ErrorMessage = "Booking Status is required")]
         [RegularExpression(@"^(Pending|Confirmed|Cancelled)$", ErrorMessage = "Invalid status")]

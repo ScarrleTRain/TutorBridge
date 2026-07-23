@@ -58,17 +58,17 @@
                         })"
                         style="--bs-table-bg: transparent;"
                         data-student="@item.User.NameFirst @item.User.NameLast"
-                        data-tutor="@item.TimeSlot.Tutor.NameFirst @item.TimeSlot.Tutor.NameLast"
-                        data-time="@item.TimeSlot.DateTimeStart.ToString("o")"
+                        data-tutor="@item.Timeslot.Tutor.NameFirst @item.Timeslot.Tutor.NameLast"
+                        data-time="@item.Timeslot.DateTimeStart.ToString("o")"
                         data-subject="@item.Subject.Name"
                         data-status="@item.Status">
 
                         <td>@item.User.NameFirst @item.User.NameLast</td>
-                        <td>@item.TimeSlot.Tutor.NameFirst @item.TimeSlot.Tutor.NameLast</td>
+                        <td>@item.Timeslot.Tutor.NameFirst @item.Timeslot.Tutor.NameLast</td>
                         <td>
-                            @item.TimeSlot.DateTimeStart.ToString("dd/MM/yyyy")
-                            @item.TimeSlot.DateTimeStart.ToString("h:mm tt") -
-                            @item.TimeSlot.DateTimeEnd.ToString("h:mm tt")
+                            @item.Timeslot.DateTimeStart.ToString("dd/MM/yyyy")
+                            @item.Timeslot.DateTimeStart.ToString("h:mm tt") -
+                            @item.Timeslot.DateTimeEnd.ToString("h:mm tt")
                         </td>
                         <td>@item.Subject.Name</td>
                         <td>@item.Status</td>

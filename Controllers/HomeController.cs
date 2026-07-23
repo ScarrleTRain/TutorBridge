@@ -40,7 +40,7 @@ namespace TutorBridge.Controllers
                 ConfirmedBookings = await _context.Booking.CountAsync(b => b.Status == Booking.BookingStatus.Confirmed),
                 CancelledBookings = await _context.Booking.CountAsync(b => b.Status == Booking.BookingStatus.Cancelled),
                 BookingsThisWeek = await _context.Booking
-                    .Join(_context.TimeSlot, b => b.TimeSlotId, t => t.TimeSlotId, (b, t) => t)
+                    .Join(_context.Timeslot, b => b.TimeslotId, t => t.TimeslotId, (b, t) => t)
                     .CountAsync(t => t.DateTimeStart >= DateTime.Now.AddDays(-7))
             };
             return View(stats);

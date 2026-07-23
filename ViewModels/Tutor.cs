@@ -18,9 +18,9 @@ namespace TutorBridge.ViewModels
 
         public string? ProfilePhoto { get; set; }
 
-        public List<TimeSlot> Timeslots { get; set; }
+        public List<Timeslot> Timeslots { get; set; }
 
-        public Tutor(string nameFirst, string nameLast, string? phone, DateOnly birthDate, string? blurb, string? profilePhoto, List<TimeSlot> timeslots)
+        public Tutor(string nameFirst, string nameLast, string? phone, DateOnly birthDate, string? blurb, string? profilePhoto, List<Timeslot> timeslots)
         {
             NameFirst = nameFirst;
             NameLast = nameLast;
@@ -31,7 +31,7 @@ namespace TutorBridge.ViewModels
             Timeslots = timeslots;
         }
 
-        public Tutor(User tutor, List<TimeSlot> timeslots)
+        public Tutor(User tutor, List<Timeslot> timeslots)
         {
             NameFirst = tutor.NameFirst;
             NameLast = tutor.NameLast;
