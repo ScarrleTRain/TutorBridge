@@ -153,6 +153,15 @@ namespace TutorBridge.Controllers
                 return NotFound();
             }
 
+            var existing = await _context.Timeslot.FindAsync(id);
+            if (existing == null) return NotFound();
+
+            if (existing.IsPast())
+            {
+                ModelState.AddModelError("", "This timeslot has already started and can no longer be edited.");
+                return View("Edit", timeslot);
+            }
+            
             if (timeslot.Bookings.Any(b => b.Status != Booking.BookingStatus.Cancelled))
             {
                 ModelState.AddModelError("", "This timeslot has an active booking. Please cancel it first.");

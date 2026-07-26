@@ -15,6 +15,16 @@ namespace TutorBridge.Models
         public DateTime DateTimeEnd { get; set; }
         public ICollection<Booking> Bookings { get; set; } = null!;
 
+        public bool IsPast()
+        {
+            return DateTimeStart < DateTime.UtcNow;
+        }
+
+        public bool CanBeModified()
+        {
+            return !IsPast() && !Bookings.Any(b => b.Status != Booking.BookingStatus.Cancelled);
+        }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (DateTimeEnd <= DateTimeStart)

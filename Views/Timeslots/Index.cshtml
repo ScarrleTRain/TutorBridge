@@ -11,7 +11,8 @@
         title = t.Tutor?.NameFirst + " " + t.Tutor?.NameLast ?? "Error", // Find whether booked or not
         start = t.DateTimeStart,
         end = t.DateTimeEnd,
-        isBooked = bookedIds.Contains(t.TimeslotId)
+        isBooked = bookedIds.Contains(t.TimeslotId),
+        isPast = t.IsPast()   
     });
 }
 

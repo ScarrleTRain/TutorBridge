@@ -7,23 +7,29 @@
     const calendar = new FullCalendar.Calendar(calendarEl, createBaseCalendarOptions(window.__timeslotEvents, {
         eventClick: function (info) {
             const id = info.event.id;
+            const isPast = info.event.extendedProps.isPast
+
             const editUrl = `${window.__timeslotUrls.edit}/${id}`;
             const detailsUrl = `${window.__timeslotUrls.details}/${id}`;
             const deleteUrl = `${window.__timeslotUrls.delete}/${id}`;
+
+            const editIcon = isPast
+                ? ''
+                : `<a href="${editUrl}" class="text-decoration-none"><i class="bi bi-pencil-square"></i></a>`;
+
+            const deleteIcon = isPast
+                ? ''
+                : `<a href="${deleteUrl}" class="text-decoration-none"><i class="bi bi-trash3"></i></a>`;
 
             activeTippy = tippy(info.el, {
                 appendTo: () => document.body,
                 content: `
                     <div class="d-flex gap-2 p-1">
-                        <a href="${editUrl}" class="text-decoration-none">
-                            <i class="bi bi-pencil-square"></i>
-                        </a>
+                        ${editIcon}
                         <a href="${detailsUrl}" class="text-decoration-none">
                             <i class="bi bi-file-text"></i>
                         </a>
-                        <a href="${deleteUrl}" class="text-decoration-none">
-                            <i class="bi bi-trash3"></i>
-                        </a>
+                        ${deleteIcon}
                     </div>
                     `,
                 allowHTML: true,
