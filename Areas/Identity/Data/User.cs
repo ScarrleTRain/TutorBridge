@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using TutorBridge.Models;
 using TutorBridge.Validation;
 
 namespace TutorBridge.Areas.Identity.Data;
 
 // Add profile data for application users by adding properties to the User class
-public class User : IdentityUser
+public class User : IdentityUser, ISoftDeletable
 {
     // Id inherited
 
@@ -43,5 +44,9 @@ public class User : IdentityUser
     public string? Blurb { get; set; }
 
     public string? ProfilePhoto { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime? DeletedAt { get; set; }
 }
 

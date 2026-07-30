@@ -18,6 +18,10 @@ namespace TutorBridge.Data
                     await roleManager.CreateAsync(new IdentityRole(role));
             }
 
+            // Reference point for backdating CreatedAt values so seeded accounts
+            // look like they've existed for a while, rather than all being "created now".
+            var seedTime = DateTime.UtcNow;
+
             // =====================
             // Subject (20)
             // =====================
@@ -62,6 +66,7 @@ namespace TutorBridge.Data
                     NameLast = "Smith",
                     Phone = "0211234567",
                     BirthDate = new DateOnly(1985, 3, 12),
+                    CreatedAt = seedTime.AddDays(-150),
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(admin1, "Admin@1234");
@@ -75,6 +80,7 @@ namespace TutorBridge.Data
                     NameLast = "Johnson",
                     Phone = "0219876543",
                     BirthDate = new DateOnly(1990, 7, 22),
+                    CreatedAt = seedTime.AddDays(-148),
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(admin2, "Admin@1234");
@@ -91,6 +97,7 @@ namespace TutorBridge.Data
                     BirthDate = new DateOnly(1992, 1, 5),
                     Blurb = "Passionate about helping students reach their potential.",
                     ProfilePhoto = "liam_williams.jpg",
+                    CreatedAt = seedTime.AddDays(-120),
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor1, "Tutor@1234");
@@ -106,6 +113,7 @@ namespace TutorBridge.Data
                     BirthDate = new DateOnly(1988, 11, 30),
                     Blurb = "5 years of tutoring experience across multiple Subject.",
                     ProfilePhoto = "olivia_brown.jpg",
+                    CreatedAt = seedTime.AddDays(-118),
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor2, "Tutor@1234");
@@ -121,6 +129,7 @@ namespace TutorBridge.Data
                     BirthDate = new DateOnly(1995, 4, 18),
                     Blurb = "Patient and encouraging tutor with a love for teaching.",
                     ProfilePhoto = "noah_jones.jpg",
+                    CreatedAt = seedTime.AddDays(-116),
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor3, "Tutor@1234");
@@ -136,6 +145,7 @@ namespace TutorBridge.Data
                     BirthDate = new DateOnly(1993, 9, 25),
                     Blurb = "Former teacher with a focus on exam preparation.",
                     ProfilePhoto = "ava_garcia.jpg",
+                    CreatedAt = seedTime.AddDays(-114),
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor4, "Tutor@1234");
@@ -151,6 +161,7 @@ namespace TutorBridge.Data
                     BirthDate = new DateOnly(1987, 6, 14),
                     Blurb = "Specialising in making difficult concepts easy to understand.",
                     ProfilePhoto = "william_miller.jpg",
+                    CreatedAt = seedTime.AddDays(-112),
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor5, "Tutor@1234");
@@ -166,6 +177,7 @@ namespace TutorBridge.Data
                     BirthDate = new DateOnly(1996, 2, 8),
                     Blurb = "Passionate about helping students reach their potential.",
                     ProfilePhoto = "sophia_davis.jpg",
+                    CreatedAt = seedTime.AddDays(-110),
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor6, "Tutor@1234");
@@ -181,6 +193,7 @@ namespace TutorBridge.Data
                     BirthDate = new DateOnly(1991, 8, 3),
                     Blurb = "5 years of tutoring experience across multiple Subject.",
                     ProfilePhoto = "benjamin_wilson.jpg",
+                    CreatedAt = seedTime.AddDays(-108),
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor7, "Tutor@1234");
@@ -196,6 +209,7 @@ namespace TutorBridge.Data
                     BirthDate = new DateOnly(1994, 12, 19),
                     Blurb = "Former teacher with a focus on exam preparation.",
                     ProfilePhoto = "isabella_taylor.jpg",
+                    CreatedAt = seedTime.AddDays(-106),
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(tutor8, "Tutor@1234");
@@ -210,6 +224,7 @@ namespace TutorBridge.Data
                     NameLast = "Anderson",
                     Phone = "0211122334",
                     BirthDate = new DateOnly(2005, 3, 10),
+                    CreatedAt = seedTime.AddDays(-90),
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(student1, "Student@1234");
@@ -223,6 +238,7 @@ namespace TutorBridge.Data
                     NameLast = "Thomas",
                     Phone = "0212233445",
                     BirthDate = new DateOnly(2006, 7, 21),
+                    CreatedAt = seedTime.AddDays(-85),
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(student2, "Student@1234");
@@ -236,6 +252,7 @@ namespace TutorBridge.Data
                     NameLast = "Jackson",
                     Phone = "0213344556",
                     BirthDate = new DateOnly(2004, 11, 5),
+                    CreatedAt = seedTime.AddDays(-80),
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(student3, "Student@1234");
@@ -249,6 +266,7 @@ namespace TutorBridge.Data
                     NameLast = "White",
                     Phone = "0214455667",
                     BirthDate = new DateOnly(2005, 9, 15),
+                    CreatedAt = seedTime.AddDays(-75),
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(student4, "Student@1234");
@@ -262,6 +280,7 @@ namespace TutorBridge.Data
                     NameLast = "Harris",
                     Phone = "0215566778",
                     BirthDate = new DateOnly(2006, 1, 28),
+                    CreatedAt = seedTime.AddDays(-70),
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(student5, "Student@1234");
@@ -275,6 +294,7 @@ namespace TutorBridge.Data
                     NameLast = "Martin",
                     Phone = "0216677889",
                     BirthDate = new DateOnly(2004, 6, 3),
+                    CreatedAt = seedTime.AddDays(-65),
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(student6, "Student@1234");
@@ -288,6 +308,7 @@ namespace TutorBridge.Data
                     NameLast = "Thompson",
                     Phone = "0217788990",
                     BirthDate = new DateOnly(2005, 4, 17),
+                    CreatedAt = seedTime.AddDays(-60),
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(student7, "Student@1234");
@@ -301,6 +322,7 @@ namespace TutorBridge.Data
                     NameLast = "Robinson",
                     Phone = "0218899001",
                     BirthDate = new DateOnly(2006, 10, 9),
+                    CreatedAt = seedTime.AddDays(-55),
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(student8, "Student@1234");
@@ -314,6 +336,7 @@ namespace TutorBridge.Data
                     NameLast = "Clark",
                     Phone = "0219900112",
                     BirthDate = new DateOnly(2004, 2, 22),
+                    CreatedAt = seedTime.AddDays(-50),
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(student9, "Student@1234");
@@ -327,6 +350,7 @@ namespace TutorBridge.Data
                     NameLast = "Lewis",
                     Phone = "0210011223",
                     BirthDate = new DateOnly(2005, 8, 14),
+                    CreatedAt = seedTime.AddDays(-45),
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(student10, "Student@1234");
@@ -385,7 +409,8 @@ namespace TutorBridge.Data
 
                 var now = DateTime.Now.Date;
 
-                context.Timeslot.AddRange(
+                var timeslotSeed = new List<Timeslot>
+                {
                     new Timeslot { TutorId = T("liam.williams@tutorbridge.com").Id, DateTimeStart = now.AddDays(33).AddHours(15), DateTimeEnd = now.AddDays(33).AddHours(16) },
                     new Timeslot { TutorId = T("olivia.brown@tutorbridge.com").Id, DateTimeStart = now.AddDays(0).AddHours(14), DateTimeEnd = now.AddDays(0).AddHours(15) },
                     new Timeslot { TutorId = T("noah.jones@tutorbridge.com").Id, DateTimeStart = now.AddDays(-6).AddHours(14), DateTimeEnd = now.AddDays(-6).AddHours(15) },
@@ -476,7 +501,18 @@ namespace TutorBridge.Data
                     new Timeslot { TutorId = T("isabella.taylor@tutorbridge.com").Id, DateTimeStart = now.AddDays(10).AddHours(10), DateTimeEnd = now.AddDays(10).AddHours(12) },
                     new Timeslot { TutorId = T("liam.williams@tutorbridge.com").Id, DateTimeStart = now.AddDays(37).AddHours(10), DateTimeEnd = now.AddDays(37).AddHours(11) },
                     new Timeslot { TutorId = T("olivia.brown@tutorbridge.com").Id, DateTimeStart = now.AddDays(36).AddHours(13), DateTimeEnd = now.AddDays(36).AddHours(14) }
-                );
+                };
+
+                // A tutor opens a slot up some days before it happens, never after "now".
+                for (int i = 0; i < timeslotSeed.Count; i++)
+                {
+                    var ts = timeslotSeed[i];
+                    var leadDays = 3 + (i % 12); // stagger 3-14 days of lead time
+                    var candidate = ts.DateTimeStart.AddDays(-leadDays);
+                    ts.CreatedAt = candidate < seedTime ? candidate : seedTime.AddDays(-(1 + i % 3));
+                }
+
+                context.Timeslot.AddRange(timeslotSeed);
                 await context.SaveChangesAsync();
             }
 
@@ -493,7 +529,8 @@ namespace TutorBridge.Data
                 User St(string email) => students.First(s => s.Email == email);
                 Subject S(string name) => Subject.First(s => s.Name == name);
 
-                context.Booking.AddRange(
+                var bookingSeed = new List<Booking>
+                {
                     new Booking { UserId = St("lucas.anderson@tutorbridge.com").Id, TimeslotId = Timeslot[0].TimeslotId, SubjectId = S("Physics").SubjectId, Status = Booking.BookingStatus.Confirmed },
                     new Booking { UserId = St("mia.thomas@tutorbridge.com").Id, TimeslotId = Timeslot[1].TimeslotId, SubjectId = S("English").SubjectId, Status = Booking.BookingStatus.Pending },
                     new Booking { UserId = St("henry.jackson@tutorbridge.com").Id, TimeslotId = Timeslot[2].TimeslotId, SubjectId = S("Science").SubjectId, Status = Booking.BookingStatus.Cancelled },
@@ -566,7 +603,19 @@ namespace TutorBridge.Data
                     new Booking { UserId = St("evelyn.lewis@tutorbridge.com").Id, TimeslotId = Timeslot[85].TimeslotId, SubjectId = S("Art").SubjectId, Status = Booking.BookingStatus.Confirmed },
                     new Booking { UserId = St("lucas.anderson@tutorbridge.com").Id, TimeslotId = Timeslot[86].TimeslotId, SubjectId = S("Philosophy").SubjectId, Status = Booking.BookingStatus.Confirmed },
                     new Booking { UserId = St("mia.thomas@tutorbridge.com").Id, TimeslotId = Timeslot[89].TimeslotId, SubjectId = S("English").SubjectId, Status = Booking.BookingStatus.Pending }
-                );
+                };
+
+                // A booking is made a day or so after its timeslot became available,
+                // but never after the session's start time (or after "now" for future slots).
+                foreach (var booking in bookingSeed)
+                {
+                    var relatedTimeslot = Timeslot.First(t => t.TimeslotId == booking.TimeslotId);
+                    var cap = relatedTimeslot.DateTimeStart < seedTime ? relatedTimeslot.DateTimeStart : seedTime;
+                    var candidate = relatedTimeslot.CreatedAt.AddDays(1);
+                    booking.CreatedAt = candidate < cap ? candidate : cap.AddHours(-1);
+                }
+
+                context.Booking.AddRange(bookingSeed);
                 await context.SaveChangesAsync();
             }
         }

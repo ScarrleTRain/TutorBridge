@@ -5,7 +5,7 @@ using TutorBridge.Areas.Identity.Data;
 
 namespace TutorBridge.Models
 {
-    public class Booking
+    public class Booking : ISoftDeletable
     {
         public enum BookingStatus
         {
@@ -32,5 +32,9 @@ namespace TutorBridge.Models
         [Required(ErrorMessage = "Booking Status is required")]
         [RegularExpression(@"^(Pending|Confirmed|Cancelled)$", ErrorMessage = "Invalid status")]
         public BookingStatus Status { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+
+        public DateTime? DeletedAt { get; set; }
     }
 }

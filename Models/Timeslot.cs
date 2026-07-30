@@ -4,7 +4,7 @@ using TutorBridge.Areas.Identity.Data;
 
 namespace TutorBridge.Models
 {
-    public class Timeslot : IValidatableObject
+    public class Timeslot : IValidatableObject, ISoftDeletable
     {
         public int TimeslotId { get; set; }
 
@@ -14,6 +14,8 @@ namespace TutorBridge.Models
         public DateTime DateTimeStart { get; set; }
         public DateTime DateTimeEnd { get; set; }
         public ICollection<Booking> Bookings { get; set; } = null!;
+        public DateTime CreatedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
 
         public bool IsPast()
         {
