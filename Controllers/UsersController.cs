@@ -28,13 +28,13 @@ namespace TutorBridge.Controllers
         public async Task<IActionResult> Index()
         {
             var users = await _userManager.Users.ToListAsync();
-            var model = new List<UserVM>();
+            var model = new List<UserViewModel>();
 
             foreach (var user in users)
             {
                 var roles = await _userManager.GetRolesAsync(user);
 
-                model.Add(new UserVM
+                model.Add(new UserViewModel
                 {
                     Id = user.Id,
                     NameFirst = user.NameFirst,

@@ -8,7 +8,7 @@ using TutorBridge.Validation;
 
 namespace TutorBridge.ViewModels
 {
-    public class UserVM
+    public class UserViewModel
     {
         public required string Id { get; set; }
         public required string NameFirst { get; set; }
