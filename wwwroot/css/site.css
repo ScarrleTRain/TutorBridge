@@ -57,3 +57,52 @@ body {
     left: 0;
     top: 0;
 }
+
+.custom-toggler {
+    padding: 10px 20px;
+    gap: 10px;
+}
+
+.navbar-float-wrapper {
+    z-index: 1030;
+}
+
+.navbar-collapse.floating-menu {
+    left: calc(100% + 8px);
+    max-width: 80vw;
+    overflow: hidden;
+}
+
+.floating-menu-inner {
+    padding: 0.5rem 1.25rem;
+    white-space: nowrap;
+    height: 44px; /* match toggler button height so it lines up */
+}
+
+.floating-menu-inner .navbar-brand {
+    font-weight: 600;
+    margin: 0;
+}
+
+.floating-menu-inner .navbar-nav {
+    flex-direction: row;
+    gap: 1rem;
+    margin: 0;
+}
+
+.floating-menu-inner .nav-link {
+    /* color: #fff; */
+    white-space: nowrap;
+}
+
+.floating-menu-inner ul {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    white-space: nowrap;
+/*    font-weight: 800;*/
+}
