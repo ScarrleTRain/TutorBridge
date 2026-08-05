@@ -11,6 +11,8 @@ namespace TutorBridge.Data
             UserManager<User> userManager,
             RoleManager<IdentityRole> roleManager)
         {
+            context.Database.EnsureCreated();
+
             string[] roles = { "Admin", "Tutor", "Student" };
             foreach (var role in roles)
             {
