@@ -26,6 +26,11 @@ public class User : IdentityUser, ISoftDeletable
     [RegularExpression(@"^[a-zA-Z\s-]+$", ErrorMessage = "First name can only contain letters")]
     public required string NameLast { get; set; }
 
+    public string FullName
+    {
+        get => NameFirst + " " + NameLast;
+    }
+
     // Makes sure there is a phone number, and that it begins with 02, and then 7 to 9 digits, and is a valid phone number.
     [Phone(ErrorMessage = "Invalid phone number")]
     [RegularExpression(@"^02\d{7,9}$", ErrorMessage = "Enter a valid NZ mobile number")]

@@ -1,4 +1,4 @@
-﻿@model TutorBridge.ViewModels.AdminDashboardStats
+﻿@model TutorBridge.ViewModels.AdminDashboardViewModel
 @inject IWebHostEnvironment Env
 @using System.ComponentModel
 @using System.Reflection
@@ -14,95 +14,86 @@
         <div class="col-sm-12 text-center">
             <h2>Admin Dashboard</h2>
         </div>
-        @foreach(var prop in Model.GetType().GetProperties())
-        {
-            var displayAttr = prop.GetCustomAttribute<DisplayNameAttribute>();
-            var label = displayAttr?.DisplayName ?? prop.Name;
-
-            <div class="col-sm-3">
-                <a class="text-reset text-decoration-none" href="#">
-                    <div class="card text-wrap text-center shadow">
-                        <div class="card-header">
-                            <h3 class="mb-0 card-title">@prop.GetValue(Model)</h3>
-                        </div>
-                        <div class="card-body">
-                            <p class="mb-0">@label</p>
-                        </div>
-                    </div>
-                </a>
+        <div class="col-md-4">
+            <div class="card shadow h-100">
+                <div class="card-header"><h5 class="mb-0">Users by Role</h5></div>
+                <div class="card-body"><canvas id="usersByRoleChart"></canvas></div>
             </div>
-        }
-        <div class="col-sm-3">
-            <a class="text-reset text-decoration-none" href="#">
-                <div class="card text-wrap text-center shadow">
-                    <div class="card-header">
-                        <h3 class="mb-0 card-title">Card 1</h3>
-                    </div>
-                    <div class="card-body">
-                        <p></p>
-                    </div>
-                </div>
-            </a>
         </div>
-        <div class="col-sm-3">
-            <a class="text-reset text-decoration-none" href="#">
-                <div class="card text-wrap text-center shadow">
-                    <div class="card-header">
-                        <h3 class="mb-0 card-title">Card 2</h3>
-                    </div>
-                    <div class="card-body">
-                        <p></p>
-                    </div>
-                </div>
-            </a>
+
+        <div class="col-md-4">
+            <div class="card shadow h-100">
+                <div class="card-header"><h5 class="mb-0">Bookings by Status</h5></div>
+                <div class="card-body"><canvas id="bookingsByStatusChart"></canvas></div>
+            </div>
         </div>
-        <div class="col-sm-3">
-            <a class="text-reset text-decoration-none" href="#">
-                <div class="card text-wrap text-center shadow">
-                    <div class="card-header">
-                        <h3 class="mb-0 card-title">Card 3</h3>
-                    </div>
-                    <div class="card-body">
-                        <p></p>
-                    </div>
-                </div>
-            </a>
+
+        <div class="col-md-4">
+            <div class="card shadow h-100">
+                <div class="card-header"><h5 class="mb-0">Sessions per Tutor</h5></div>
+                <div class="card-body"><canvas id="sessionsPerTutorChart"></canvas></div>
+            </div>
         </div>
-        <div class="col-sm-3">
-            <a class="text-reset text-decoration-none" href="#">
-                <div class="card text-wrap text-center shadow">
-                    <div class="card-header">
-                        <h3 class="mb-0 card-title">Card 4</h3>
-                    </div>
-                    <div class="card-body">
-                        <p></p>
-                    </div>
-                </div>
-            </a>
+
+        <div class="col-md-8">
+            <div class="card shadow h-100">
+                <div class="card-header"><h5 class="mb-0">Bookings Over Time</h5></div>
+                <div class="card-body"><canvas id="bookingsOverTimeChart"></canvas></div>
+            </div>
         </div>
-        <div class="col-sm-3">
-            <a class="text-reset text-decoration-none" href="#">
-                <div class="card text-wrap text-center shadow">
-                    <div class="card-header">
-                        <h3 class="mb-0 card-title">Card 5</h3>
-                    </div>
-                    <div class="card-body">
-                        <p></p>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="col-sm-3">
-            <a class="text-reset text-decoration-none" href="#">
-                <div class="card text-wrap text-center shadow">
-                    <div class="card-header">
-                        <h3 class="mb-0 card-title">Card 6</h3>
-                    </div>
-                    <div class="card-body">
-                        <p></p>
-                    </div>
-                </div>
-            </a>
+
+        <div class="col-md-4">
+            <div class="card shadow h-100">
+                <div class="card-header"><h5 class="mb-0">Upcoming Sessions</h5></div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var s in Model.UpcomingSessions)
+                    {
+                        <li class="list-group-item">
+                            @s.StartTime.ToString("ddd d MMM, HH:mm") — @s.StudentName with @s.TutorName (@s.Subject)
+                        </li>
+                    }
+                </ul>
+            </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+    <script>
+        new Chart(document.getElementById('usersByRoleChart'), {
+            type: 'pie',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.UsersByRole.Labels)),
+                datasets: [{ data: @Html.Raw(Json.Serialize(Model.UsersByRole.Values)) }]
+            }
+        });
+
+        new Chart(document.getElementById('bookingsByStatusChart'), {
+            type: 'pie',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.BookingsByStatus.Labels)),
+                datasets: [{ data: @Html.Raw(Json.Serialize(Model.BookingsByStatus.Values)) }]
+            }
+        });
+
+        new Chart(document.getElementById('sessionsPerTutorChart'), {
+            type: 'pie',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.SessionsPerTutor.Labels)),
+                datasets: [{ label: 'Sessions', data: @Html.Raw(Json.Serialize(Model.SessionsPerTutor.Values)) }]
+            },
+            // plugins: [ChartDataLabels],
+            options: { plugins: { legend: { display: false } } }
+        });
+
+        new Chart(document.getElementById('bookingsOverTimeChart'), {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.BookingsOverTime.Select(w => w.WeekLabel))),
+                datasets: [{ label: 'Bookings', data: @Html.Raw(Json.Serialize(Model.BookingsOverTime.Select(w => w.Count))), tension: 0.3 }]
+            }
+        });
+    </script>
+}

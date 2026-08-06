@@ -22,9 +22,6 @@ namespace TutorBridge.Controllers
 
         public async Task<IActionResult> Index()
         {
-            if (User.IsInRole("Admin"))
-                return RedirectToAction("Admin");
-
             var tutors = await _userManager.GetUsersInRoleAsync("Tutor");
             return View(tutors);
         }
@@ -32,18 +29,18 @@ namespace TutorBridge.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Admin()
         {
-            var stats = new AdminDashboardStats
+            var vm = new AdminDashboardViewModel
             {
-                TotalStudents = (await _userManager.GetUsersInRoleAsync("Student")).Count,
-                TotalTutors = (await _userManager.GetUsersInRoleAsync("Tutor")).Count,
-                PendingBookings = await _context.Booking.CountAsync(b => b.Status == Booking.BookingStatus.Pending),
-                ConfirmedBookings = await _context.Booking.CountAsync(b => b.Status == Booking.BookingStatus.Confirmed),
-                CancelledBookings = await _context.Booking.CountAsync(b => b.Status == Booking.BookingStatus.Cancelled),
-                BookingsThisWeek = await _context.Booking
-                    .Join(_context.Timeslot, b => b.TimeslotId, t => t.TimeslotId, (b, t) => t)
-                    .CountAsync(t => t.DateTimeStart >= DateTime.Now.AddDays(-7))
+                UsersByRole = await GetUsersByRoleAsync(),
+                BookingsByStatus = await GetBookingsByStatusAsync(),
+                BookingsBySubject = await GetBookingsBySubjectAsync(),
+                SessionsPerTutor = await GetSessionsPerTutorAsync(),
+                BookingsOverTime = await GetBookingsOverTimeAsync(),
+                UpcomingSessions = await GetUpcomingSessionsAsync(),
+                RecentSignups = await GetRecentSignupsAsync()
             };
-            return View(stats);
+
+            return View(vm);
         }
 
         public IActionResult Privacy()
@@ -55,6 +52,137 @@ namespace TutorBridge.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+        
+        private async Task<ChartDataDto> GetUsersByRoleAsync()
+        {
+            var data = await (
+                from ur in _context.UserRoles
+                join r in _context.Roles on ur.RoleId equals r.Id
+                group ur by r.Name into g
+                select new { Role = g.Key, Count = g.Count() }
+            ).AsNoTracking().ToListAsync();
+
+            return new ChartDataDto
+            {
+                Labels = data.Select(d => d.Role).ToList(),
+                Values = data.Select(d => d.Count).ToList()
+            };
+        }
+
+        private async Task<ChartDataDto> GetBookingsByStatusAsync()
+        {
+            var data = await _context.Booking
+                .AsNoTracking()
+                .GroupBy(b => b.Status)
+                .Select(g => new { Status = g.Key.ToString(), Count = g.Count() })
+                .ToListAsync();
+
+            return new ChartDataDto
+            {
+                Labels = data.Select(d => d.Status).ToList(),
+                Values = data.Select(d => d.Count).ToList()
+            };
+        }
+
+        private async Task<ChartDataDto> GetBookingsBySubjectAsync()
+        {
+            var data = await _context.Booking
+                .AsNoTracking()
+                .Include(b => b.Timeslot)
+                .GroupBy(b => b.Subject.Name)
+                .Select(g => new { Subject = g.Key, Count = g.Count() })
+                .OrderByDescending(g => g.Count)
+                .ToListAsync();
+
+            return new ChartDataDto
+            {
+                Labels = data.Select(d => d.Subject).ToList(),
+                Values = data.Select(d => d.Count).ToList()
+            };
+        }
+
+        private async Task<ChartDataDto> GetSessionsPerTutorAsync()
+        {
+            var data = await _context.Booking
+                .AsNoTracking()
+                .Include(b => b.Timeslot).ThenInclude(t => t.Tutor)
+                .GroupBy(b => new
+                {
+                    b.Timeslot.Tutor.Id,
+                    b.Timeslot.Tutor.NameFirst,
+                    b.Timeslot.Tutor.NameLast
+                })
+                .Select(g => new
+                {
+                    g.Key.NameFirst,
+                    g.Key.NameLast,
+                    Count = g.Count()
+                })
+                .OrderByDescending(g => g.Count)
+                .ToListAsync();
+
+            return new ChartDataDto
+            {
+                Labels = data.Select(d => $"{d.NameFirst} {d.NameLast}").ToList(),
+                Values = data.Select(d => d.Count).ToList()
+            };
+        }
+
+        private async Task<List<BookingsPerWeekDto>> GetBookingsOverTimeAsync()
+        {
+            var cutoff = DateTime.UtcNow.AddDays(-56);
+
+            var raw = await _context.Booking
+                .AsNoTracking()
+                .Where(b => b.CreatedAt >= cutoff)
+                .ToListAsync();
+
+            return raw
+                .GroupBy(b => System.Globalization.ISOWeek.GetWeekOfYear(b.CreatedAt))
+                .OrderBy(g => g.Key)
+                .Select(g => new BookingsPerWeekDto
+                {
+                    WeekLabel = $"Wk {g.Key}",
+                    Count = g.Count()
+                })
+                .ToList();
+        }
+
+        private async Task<List<UpcomingSessionDto>> GetUpcomingSessionsAsync()
+        {
+            return await _context.Booking
+                .AsNoTracking()
+                .Include(b => b.User)
+                .Include(b => b.Timeslot).ThenInclude(t => t.Tutor)
+                .Include(b => b.Timeslot)
+                .Include(b => b.Subject)
+                .Where(b => b.Timeslot.DateTimeStart >= DateTime.UtcNow)
+                .OrderBy(b => b.Timeslot.DateTimeStart)
+                .Take(5)
+                .Select(b => new UpcomingSessionDto
+                {
+                    StudentName = b.User.FullName,
+                    TutorName = b.Timeslot.Tutor.FullName,
+                    Subject = b.Subject.Name,
+                    StartTime = b.Timeslot.DateTimeStart
+                })
+                .ToListAsync();
+        }
+
+        private async Task<List<RecentSignupDto>> GetRecentSignupsAsync()
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .OrderByDescending(u => u.CreatedAt)
+                .Take(5)
+                .Select(u => new RecentSignupDto
+                {
+                    FullName = u.FullName,
+                    Role = "TBD", // needs the same role join as above, or a computed property
+                    CreatedAt = u.CreatedAt
+                })
+                .ToListAsync();
         }
     }
 }
