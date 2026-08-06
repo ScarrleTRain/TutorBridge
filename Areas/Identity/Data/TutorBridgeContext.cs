@@ -8,6 +8,8 @@ namespace TutorBridge.Areas.Identity.Data;
 
 public class TutorBridgeContext : IdentityDbContext<User>
 {
+    public bool IsSeeding { get; set; } = false;
+
     public TutorBridgeContext(DbContextOptions<TutorBridgeContext> options)
         : base(options)
     {
@@ -72,13 +74,17 @@ public class TutorBridgeContext : IdentityDbContext<User>
 
     public override int SaveChanges()
     {
-        ApplySoftDelete();
+        if (!IsSeeding)
+            ApplySoftDelete();
+
         return base.SaveChanges();
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        ApplySoftDelete();
+        if (!IsSeeding)
+            ApplySoftDelete();
+
         return base.SaveChangesAsync(cancellationToken);
     }
 

@@ -12,6 +12,7 @@ namespace TutorBridge.Data
             RoleManager<IdentityRole> roleManager)
         {
             context.Database.EnsureCreated();
+            context.IsSeeding = true;
 
             string[] roles = { "Admin", "Tutor", "Student" };
             foreach (var role in roles)
@@ -619,6 +620,7 @@ namespace TutorBridge.Data
 
                 context.Booking.AddRange(bookingSeed);
                 await context.SaveChangesAsync();
+                context.IsSeeding = false;
             }
         }
     }
