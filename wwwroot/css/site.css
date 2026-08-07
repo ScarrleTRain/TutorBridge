@@ -63,12 +63,33 @@ body {
     gap: 10px;
 }
 
+/* Navbar */
+
+.login {
+    right: 0;
+    z-index: 1031;
+    height: 44px;
+}
+
+.login ul {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    white-space: nowrap;
+}
+
 .navbar-float-wrapper {
+    width: calc(100% - 32px);
     z-index: 1030;
 }
 
 .navbar-collapse.floating-menu {
     left: calc(100% + 8px);
+/*    width: fit-content;*/
     max-width: 80vw;
     overflow: hidden;
 }
