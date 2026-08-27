@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TutorBridge.Areas.Identity.Data;
 using TutorBridge.Data;
+using TutorBridge.Services;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("TutorBridgeContextConnection") ?? throw new InvalidOperationException("Connection string 'TutorBridgeContextConnection' not found.");;
 
@@ -13,6 +14,7 @@ builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.Requi
     .AddDefaultUI();
 
 builder.Services.AddScoped<IUserClaimsPrincipalFactory<User>, AppClaimsPrincipalFactory>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

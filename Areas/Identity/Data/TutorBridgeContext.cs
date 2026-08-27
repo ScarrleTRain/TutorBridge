@@ -70,6 +70,20 @@ public class TutorBridgeContext : IdentityDbContext<User>
         builder.Entity<TutorSubject>().HasQueryFilter(ts => ts.Tutor.DeletedAt == null);
 
         builder.Entity<User>().HasQueryFilter(u => u.DeletedAt == null);
+
+        builder.Entity<Notification>()
+            .Property(n => n.Type)
+            .HasConversion<string>();
+
+        builder.Entity<Notification>()
+            .HasOne(n => n.User)
+            .WithMany()
+            .HasForeignKey(n => n.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<Notification>().HasQueryFilter(n =>
+            n.DeletedAt == null &&
+            n.User.DeletedAt == null);
     }
 
     public override int SaveChanges()
@@ -108,11 +122,13 @@ public class TutorBridgeContext : IdentityDbContext<User>
         }
     }
 
-    public DbSet<TutorBridge.Models.Booking> Booking { get; set; } = default!;
+public DbSet<TutorBridge.Models.Booking> Booking { get; set; } = default!;
 
 public DbSet<TutorBridge.Models.Subject> Subject { get; set; } = default!;
 
 public DbSet<TutorBridge.Models.Timeslot> Timeslot { get; set; } = default!;
 
 public DbSet<TutorBridge.Models.TutorSubject> TutorSubject { get; set; } = default!;
+
+public DbSet<TutorBridge.Models.Notification> Notification { get; set; } = default!;
 }

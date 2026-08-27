@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using TutorBridge.Areas.Identity.Data;
 using TutorBridge.Models;
+using TutorBridge.Services;
 using TutorBridge.ViewModels;
 using static TutorBridge.Models.Booking;
 
@@ -18,10 +19,12 @@ namespace TutorBridge.Controllers
     public class BookingsController : Controller
     {
         private readonly TutorBridgeContext _context;
+        private readonly INotificationService _notificationService;
 
-        public BookingsController(TutorBridgeContext context)
+        public BookingsController(TutorBridgeContext context, INotificationService notificationService)
         {
             _context = context;
+            _notificationService = notificationService;
         }
 
         // GET: Bookings
@@ -133,6 +136,7 @@ namespace TutorBridge.Controllers
             {
                 _context.Add(booking);
                 await _context.SaveChangesAsync();
+                await _notificationService.NotifyBookingCreatedAsync(booking.Id);
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
             return View(booking);
@@ -159,6 +163,7 @@ namespace TutorBridge.Controllers
             {
                 _context.Add(booking);
                 await _context.SaveChangesAsync();
+                await _notificationService.NotifyBookingCreatedAsync(booking.Id);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -204,6 +209,12 @@ namespace TutorBridge.Controllers
 
             if (ModelState.IsValid)
             {
+                var previousStatus = await _context.Booking
+                    .AsNoTracking()
+                    .Where(b => b.Id == id)
+                    .Select(b => b.Status)
+                    .FirstOrDefaultAsync();
+
                 try
                 {
                     _context.Update(booking);
@@ -220,6 +231,12 @@ namespace TutorBridge.Controllers
                         throw;
                     }
                 }
+
+                if (previousStatus != BookingStatus.Cancelled && booking.Status == BookingStatus.Cancelled)
+                    await _notificationService.NotifyBookingCancelledAsync(booking.Id);
+                else
+                    await _notificationService.NotifyBookingEditedAsync(booking.Id);
+
                 return RedirectToAction(nameof(Index));
             }
 
@@ -266,6 +283,10 @@ namespace TutorBridge.Controllers
             }
 
             await _context.SaveChangesAsync();
+
+            if (booking != null)
+                await _notificationService.NotifyBookingCancelledAsync(id);
+
             return RedirectToAction(nameof(Index));
         }
 
