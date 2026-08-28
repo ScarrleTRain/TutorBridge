@@ -1,0 +1,31 @@
+﻿@model IEnumerable<TutorBridge.Models.Notification>
+
+<ul class="notification-list">
+    @if (!Model.Any())
+    {
+        <li class="notification-empty">No new notifications.</li>
+    }
+    else
+    {
+        @foreach (var n in Model)
+        {
+            <li class="notification-item">
+                @if (n.Link != null)
+                {
+                    <a href="/Notifications/GoTo/@n.Id" class="notification-link">
+                        <strong>@n.Title</strong>
+                        <p>@n.Message</p>
+                    </a>
+                }
+                else
+                {
+                    <div class="notification-content">
+                        <strong>@n.Title</strong>
+                        <p>@n.Message</p>
+                    </div>
+                }
+                <button type="button" class="mark-read-icon" data-id="@n.Id" title="Mark as read">✓</button>
+            </li>
+        }
+    }
+</ul>

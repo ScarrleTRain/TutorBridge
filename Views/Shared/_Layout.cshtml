@@ -65,8 +65,20 @@
                 </div>
             </div>
             <div class="login position-absolute top-0 d-inline-flex align-items-center shadow rounded-5 text-bg-primary fw-bold">
-                        <div class="floating-menu-inner  d-flex flex-row align-items-center g-4">
-
+                <div class="floating-menu-inner d-flex flex-row align-items-center g-4">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="dropdown">
+                            <button class="btn btn-link text-white position-relative" type="button"
+                                    id="notificationToggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-bell fs-5"></i>
+                                @await Component.InvokeAsync("NotificationBadge")
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end p-2" id="notificationDropdown">
+                            </div>
+                        </div>
+                    }
                     <partial name="_LoginPartial" />
                 </div>
             </div>
@@ -100,6 +112,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/notifications.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
