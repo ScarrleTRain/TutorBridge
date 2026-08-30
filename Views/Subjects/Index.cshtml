@@ -62,64 +62,37 @@
     </div>
 </div>
 
-<script>
-    // Filterign
-    (function () {
-        const search = document.getElementById('subjectSearch');
-        const rows = Array.from(document.querySelectorAll('#subjectsTable tbody tr'));
-        const countEl = document.getElementById('subjectCount');
+@section Scripts {
+    <script src="~/js/table-sort.js"></script>
+    <script>
+        makeSortableTable('subjectsTable', 'subjectsTableSort');
+    </script>
+    <script>
+        // Filterign
+        (function () {
+            const search = document.getElementById('subjectSearch');
+            const rows = Array.from(document.querySelectorAll('#subjectsTable tbody tr'));
+            const countEl = document.getElementById('subjectCount');
 
-        function applyFilter() {
-            const term = search.value.trim().toLowerCase();
-            let visible = 0;
+            function applyFilter() {
+                const term = search.value.trim().toLowerCase();
+                let visible = 0;
 
-            rows.forEach(row => {
-                const haystack = [
-                    row.dataset.name
-                ].join(' ').toLowerCase();
+                rows.forEach(row => {
+                    const haystack = [
+                        row.dataset.name
+                    ].join(' ').toLowerCase();
 
-                const show = haystack.includes(term);
+                    const show = haystack.includes(term);
 
-                row.style.display = show ? '' : 'none';
-                if (show) visible++;
-            });
+                    row.style.display = show ? '' : 'none';
+                    if (show) visible++;
+                });
 
-            countEl.textContent = `Showing ${visible} of ${rows.length} entries`;
-        }
+                countEl.textContent = `Showing ${visible} of ${rows.length} entries`;
+            }
 
-        search.addEventListener('input', applyFilter);
-    })();
-
-    // Sorting vvv
-    document.querySelectorAll('#subjectsTable th[data-sort]').forEach(th => {
-        th.addEventListener('click', () => {
-            const key = th.dataset.sort;
-            const tbody = document.querySelector('#subjectsTable tbody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            const asc = th.dataset.dir !== 'asc';
-
-            rows.sort((a, b) => {
-                let valA = a.dataset[key] ?? '';
-                let valB = b.dataset[key] ?? '';
-
-                if (key === 'id') {
-                    return asc ? Number(valA) - Number(valB) : Number(valB) - Number(valA);
-                }
-
-                return asc
-                    ? valA.localeCompare(valB)
-                    : valB.localeCompare(valA);
-            });
-
-            rows.forEach(row => tbody.appendChild(row));
-
-            // reset all icons, then mark the active one
-            document.querySelectorAll('#subjectsTable th[data-sort]').forEach(h => {
-                h.dataset.dir = '';
-                h.querySelector('i').className = 'bi bi-arrow-down-up sort-icon opacity-50';
-            });
-            th.dataset.dir = asc ? 'asc' : 'desc';
-            th.querySelector('i').className = (asc ? 'bi bi-arrow-up' : 'bi bi-arrow-down') + ' sort-icon opacity-50';
-        });
-    });
-</script>
+            search.addEventListener('input', applyFilter);
+        })();
+    </script>
+}

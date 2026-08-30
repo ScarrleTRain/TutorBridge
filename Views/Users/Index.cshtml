@@ -97,75 +97,49 @@
     </div>
 </div>
 
-<script>
-    // Filterign
-    (function () {
-        const search = document.getElementById('userSearch');
-        const role = document.getElementById('roleFilter');
-        const rows = Array.from(document.querySelectorAll('#usersTable tbody tr'));
-        const countEl = document.getElementById('userCount');
+@section Scripts {
+    <script src="~/js/table-sort.js"></script>
+    <script>
+        makeSortableTable('usersTable', 'usersTableSort');
+    </script>
 
-        function applyFilter() {
-            const term = search.value.trim().toLowerCase();
-            const roleVal = role.value;
-            let visible = 0;
+    <script>
+        // Filterign
+        (function () {
+            const search = document.getElementById('userSearch');
+            const role = document.getElementById('roleFilter');
+            const rows = Array.from(document.querySelectorAll('#usersTable tbody tr'));
+            const countEl = document.getElementById('userCount');
 
-            rows.forEach(row => {
-                const haystack = [
-                    row.dataset.name,
-                    row.dataset.id,
-                    row.dataset.email,
-                    row.dataset.phone
-                ].join(' ').toLowerCase();
+            function applyFilter() {
+                const term = search.value.trim().toLowerCase();
+                const roleVal = role.value;
+                let visible = 0;
 
-                console.log(row.dataset);
+                rows.forEach(row => {
+                    const haystack = [
+                        row.dataset.name,
+                        row.dataset.id,
+                        row.dataset.email,
+                        row.dataset.phone
+                    ].join(' ').toLowerCase();
 
-                const matchesText = haystack.includes(term);
-                const matchesRole = !roleVal || row.dataset.role === roleVal;
-                const show = matchesText && matchesRole;
+                    console.log(row.dataset);
 
-                row.style.display = show ? '' : 'none';
-                if (show) visible++;
-            });
+                    const matchesText = haystack.includes(term);
+                    const matchesRole = !roleVal || row.dataset.role === roleVal;
+                    const show = matchesText && matchesRole;
 
-            countEl.textContent = `Showing ${visible} of ${rows.length} entries`;
-        }
+                    row.style.display = show ? '' : 'none';
+                    if (show) visible++;
+                });
 
-        role.addEventListener('change', applyFilter);
-        search.addEventListener('input', applyFilter);
-    })();
+                countEl.textContent = `Showing ${visible} of ${rows.length} entries`;
+            }
 
-    // Sorting vvv
-    document.querySelectorAll('#usersTable th[data-sort]').forEach(th => {
-        th.addEventListener('click', () => {
-            const key = th.dataset.sort;
-            const tbody = document.querySelector('#usersTable tbody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            const asc = th.dataset.dir !== 'asc';
-
-            rows.sort((a, b) => {
-                let valA = a.dataset[key] ?? '';
-                let valB = b.dataset[key] ?? '';
-
-                if (key === 'id') {
-                    return asc ? Number(valA) - Number(valB) : Number(valB) - Number(valA);
-                }
-
-                return asc
-                    ? valA.localeCompare(valB)
-                    : valB.localeCompare(valA);
-            });
-
-            rows.forEach(row => tbody.appendChild(row));
-
-            // reset all icons, then mark the active one
-            document.querySelectorAll('#usersTable th[data-sort]').forEach(h => {
-                h.dataset.dir = '';
-                h.querySelector('i').className = 'bi bi-arrow-down-up sort-icon opacity-50';
-            });
-            th.dataset.dir = asc ? 'asc' : 'desc';
-            th.querySelector('i').className = (asc ? 'bi bi-arrow-up' : 'bi bi-arrow-down') + ' sort-icon opacity-50';
-        });
-    });
-</script>
+            role.addEventListener('change', applyFilter);
+            search.addEventListener('input', applyFilter);
+        })();
+    </script>
+}
 
