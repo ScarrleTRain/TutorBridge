@@ -48,7 +48,9 @@ public class User : IdentityUser, ISoftDeletable
     [StringLength(500, ErrorMessage = "Max 500 characters")]
     public string? Blurb { get; set; }
 
-    public string? ProfilePhoto { get; set; }
+    public byte[]? ProfilePhoto { get; set; }
+
+    public string? ProfilePhotoContentType { get; set; }
 
     public DateTime CreatedAt { get; set; }
 

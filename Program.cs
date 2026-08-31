@@ -48,7 +48,7 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<TutorBridgeContext>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    await DbSeeder.SeedAsync(context, userManager, roleManager);
+    await DbSeeder.SeedAsync(context, userManager, roleManager, app.Environment);
 }
 
 app.Run();

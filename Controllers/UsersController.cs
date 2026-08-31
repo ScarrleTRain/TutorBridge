@@ -53,5 +53,18 @@ namespace TutorBridge.Controllers
 
             return View(model);
         }
+
+        [Authorize]
+        public async Task<IActionResult> Photo(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user?.ProfilePhoto == null)
+            {
+                return NotFound();
+            }
+
+            return File(user.ProfilePhoto, user.ProfilePhotoContentType ?? "application/octet-stream");
+        }
     }
 }

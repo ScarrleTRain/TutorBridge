@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using TutorBridge.Areas.Identity.Data;
 using TutorBridge.Models;
+using System.IO;
 
 namespace TutorBridge.Data
 {
@@ -9,7 +10,8 @@ namespace TutorBridge.Data
         public static async Task SeedAsync(
             TutorBridgeContext context,
             UserManager<User> userManager,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            IWebHostEnvironment env)
         {
             context.Database.EnsureCreated();
             context.IsSeeding = true;
@@ -99,7 +101,8 @@ namespace TutorBridge.Data
                     Phone = "0213456789",
                     BirthDate = new DateOnly(1992, 1, 5),
                     Blurb = "Passionate about helping students reach their potential.",
-                    ProfilePhoto = "liam_williams.jpg",
+                    ProfilePhoto = await LoadTutorPhotoAsync(env, "liam_williams.jpg"),
+                    ProfilePhotoContentType = "image/jpeg",
                     CreatedAt = seedTime.AddDays(-120),
                     EmailConfirmed = true
                 };
@@ -115,7 +118,8 @@ namespace TutorBridge.Data
                     Phone = "0214567890",
                     BirthDate = new DateOnly(1988, 11, 30),
                     Blurb = "5 years of tutoring experience across multiple Subject.",
-                    ProfilePhoto = "olivia_brown.jpg",
+                    ProfilePhoto = await LoadTutorPhotoAsync(env, "olivia_brown.jpg" ),
+					ProfilePhotoContentType = "image/jpeg",
                     CreatedAt = seedTime.AddDays(-118),
                     EmailConfirmed = true
                 };
@@ -131,7 +135,8 @@ namespace TutorBridge.Data
                     Phone = "0215678901",
                     BirthDate = new DateOnly(1995, 4, 18),
                     Blurb = "Patient and encouraging tutor with a love for teaching.",
-                    ProfilePhoto = "noah_jones.jpg",
+                    ProfilePhoto = await LoadTutorPhotoAsync(env, "noah_jones.jpg" ),
+					ProfilePhotoContentType = "image/jpeg",
                     CreatedAt = seedTime.AddDays(-116),
                     EmailConfirmed = true
                 };
@@ -147,7 +152,8 @@ namespace TutorBridge.Data
                     Phone = "0216789012",
                     BirthDate = new DateOnly(1993, 9, 25),
                     Blurb = "Former teacher with a focus on exam preparation.",
-                    ProfilePhoto = "ava_garcia.jpg",
+                    ProfilePhoto = await LoadTutorPhotoAsync(env, "ava_garcia.jpg" ),
+					ProfilePhotoContentType = "image/jpeg",
                     CreatedAt = seedTime.AddDays(-114),
                     EmailConfirmed = true
                 };
@@ -163,7 +169,8 @@ namespace TutorBridge.Data
                     Phone = "0217890123",
                     BirthDate = new DateOnly(1987, 6, 14),
                     Blurb = "Specialising in making difficult concepts easy to understand.",
-                    ProfilePhoto = "william_miller.jpg",
+                    ProfilePhoto = await LoadTutorPhotoAsync(env, "william_miller.jpg" ),
+					ProfilePhotoContentType = "image/jpeg",
                     CreatedAt = seedTime.AddDays(-112),
                     EmailConfirmed = true
                 };
@@ -179,7 +186,8 @@ namespace TutorBridge.Data
                     Phone = "0218901234",
                     BirthDate = new DateOnly(1996, 2, 8),
                     Blurb = "Passionate about helping students reach their potential.",
-                    ProfilePhoto = "sophia_davis.jpg",
+                    ProfilePhoto = await LoadTutorPhotoAsync(env, "sophia_davis.jpg" ),
+					ProfilePhotoContentType = "image/jpeg",
                     CreatedAt = seedTime.AddDays(-110),
                     EmailConfirmed = true
                 };
@@ -195,7 +203,8 @@ namespace TutorBridge.Data
                     Phone = "0219012345",
                     BirthDate = new DateOnly(1991, 8, 3),
                     Blurb = "5 years of tutoring experience across multiple Subject.",
-                    ProfilePhoto = "benjamin_wilson.jpg",
+                    ProfilePhoto = await LoadTutorPhotoAsync(env, "benjamin_wilson.jpg" ),
+					ProfilePhotoContentType = "image/jpeg",
                     CreatedAt = seedTime.AddDays(-108),
                     EmailConfirmed = true
                 };
@@ -211,7 +220,8 @@ namespace TutorBridge.Data
                     Phone = "0210123456",
                     BirthDate = new DateOnly(1994, 12, 19),
                     Blurb = "Former teacher with a focus on exam preparation.",
-                    ProfilePhoto = "isabella_taylor.jpg",
+                    ProfilePhoto = await LoadTutorPhotoAsync(env, "isabella_taylor.jpg" ),
+					ProfilePhotoContentType = "image/jpeg",
                     CreatedAt = seedTime.AddDays(-106),
                     EmailConfirmed = true
                 };
@@ -623,5 +633,12 @@ namespace TutorBridge.Data
                 context.IsSeeding = false;
             }
         }
+
+        private static async Task<byte[]> LoadTutorPhotoAsync(IWebHostEnvironment env, string fileName)
+        {
+            var path = Path.Combine(env.WebRootPath, "images", "tutors", fileName);
+            return await File.ReadAllBytesAsync(path);
+        }
+
     }
 }
