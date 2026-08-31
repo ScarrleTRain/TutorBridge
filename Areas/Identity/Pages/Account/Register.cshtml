@@ -4,34 +4,116 @@
     ViewData["Title"] = "Register";
 }
 
+<style>
+    .step-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 50%;
+        margin: 0 0.4rem;
+        background-color: #6c757d;
+        color: #fff;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .step-pill.active {
+        background-color: #0d6efd;
+        font-weight: bold;
+    }
+
+    .step-pill.locked {
+        background-color: #e9ecef;
+        color: #6c757d;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+</style>
 
 <div class="row">
     <div class="col-md-4 mx-auto">
-        <h1>@ViewData["Title"]</h1> 
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h2 class="text-secondary">Create a new account.</h2>
-            <hr />
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Input.Email">Email</label>
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
+        <h1>@ViewData["Title"]</h1>
+        <hr />
+
+        <div class="d-flex justify-content-center mb-4" id="stepPills">
+            <span class="step-pill active" data-step="1">1</span>
+            <span class="step-pill locked" data-step="2">2</span>
+            <span class="step-pill locked" data-step="3">3</span>
+        </div>
+
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" enctype="multipart/form-data" novalidate>
+
+            <div class="reg-step" data-step="1">
+                <h2 class="text-secondary">Create a new account.</h2>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                    <label asp-for="Input.Email" class="form-label">Email</label>
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                    <label asp-for="Input.Password" class="form-label">Password</label>
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                    <label asp-for="Input.ConfirmPassword" class="form-label">Confirm Password</label>
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.NameFirst" class="form-control" aria-required="true" placeholder="First name" />
+                    <label asp-for="Input.NameFirst" class="form-label">First name</label>
+                    <span asp-validation-for="Input.NameFirst" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.NameLast" class="form-control" aria-required="true" placeholder="Last name" />
+                    <label asp-for="Input.NameLast" class="form-label">Last name</label>
+                    <span asp-validation-for="Input.NameLast" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.Phone" class="form-control" placeholder="Phone" />
+                    <label asp-for="Input.Phone" class="form-label">Phone</label>
+                    <span asp-validation-for="Input.Phone" class="text-danger"></span>
+                </div>
+                <button type="button" class="w-100 btn btn-lg btn-primary step-next">Next</button>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.Password">Password</label>
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
+
+            <div class="reg-step d-none" data-step="2">
+                <h2 class="text-secondary">Tell us about yourself.</h2>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.BirthDate" class="form-control" aria-required="true" />
+                    <label asp-for="Input.BirthDate" class="form-label">Date of birth</label>
+                    <span asp-validation-for="Input.BirthDate" class="text-danger"></span>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="w-50 btn btn-lg btn-secondary step-back">Back</button>
+                    <button type="button" class="w-50 btn btn-lg btn-primary step-next">Next</button>
+                </div>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+
+            <div class="reg-step d-none" data-step="3">
+                <h2 class="text-secondary">Add a profile photo <small class="text-muted">(optional)</small></h2>
+                <img id="photoPreview" class="d-none img-thumbnail mb-2" style="max-width: 150px;" alt="Photo preview" />
+                <div class="mb-3">
+                    <input asp-for="Input.ProfilePhoto" class="form-control" />
+                    <span asp-validation-for="Input.ProfilePhoto" class="text-danger"></span>
+                    <div id="photoError" class="text-danger small d-none mt-1"></div>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="w-50 btn btn-lg btn-secondary step-back">Back</button>
+                    <button id="registerSubmit" type="submit" class="w-50 btn btn-lg btn-primary">Register</button>
+                </div>
             </div>
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+
         </form>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/register-wizard.js"></script>
 }

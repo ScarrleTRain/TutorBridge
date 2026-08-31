@@ -20,6 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TutorBridge.Areas.Identity.Data;
 using TutorBridge.Services;
+using TutorBridge.Validation;
 
 namespace TutorBridge.Areas.Identity.Pages.Account
 {
@@ -73,35 +74,51 @@ namespace TutorBridge.Areas.Identity.Pages.Account
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
+        
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
             public string Password { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            [Required(ErrorMessage = "First name is required")]
+            [StringLength(30, ErrorMessage = "Max 30 Characters")]
+            [RegularExpression(@"^[a-zA-Z\s-]+$", ErrorMessage = "First name can only contain letters")]
+            [Display(Name = "First name")]
+            public string NameFirst { get; set; }
+
+            [Required(ErrorMessage = "Last name is required")]
+            [StringLength(30, ErrorMessage = "Max 30 Characters")]
+            [RegularExpression(@"^[a-zA-Z\s-]+$", ErrorMessage = "Last name can only contain letters")]
+            [Display(Name = "Last name")]
+            public string NameLast { get; set; }
+
+            [Phone(ErrorMessage = "Invalid phone number")]
+            [RegularExpression(@"^02\d{7,9}$", ErrorMessage = "Enter a valid NZ mobile number")]
+            [Display(Name = "Phone")]
+            public string Phone { get; set; }
+
+            [Required(ErrorMessage = "Birth Date is required")]
+            [MinAge(5)]
+            [DataType(DataType.Date)]
+            [Display(Name = "Date of birth")]
+            public DateOnly BirthDate { get; set; }
+
+            [Display(Name = "Profile photo")]
+            [AllowedFile(20 * 1024 * 1024, "image/jpeg", "image/png")]
+            public IFormFile ProfilePhoto { get; set; }
         }
 
 
@@ -109,6 +126,18 @@ namespace TutorBridge.Areas.Identity.Pages.Account
         {
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+        }
+
+        public async Task<JsonResult> OnGetCheckEmailAsync(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                // let [Required]/[EmailAddress] own empty/malformed input
+                return new JsonResult(new { available = true });
+            }
+
+            var existingUser = await _userManager.FindByEmailAsync(email);
+            return new JsonResult(new { available = existingUser == null });
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
@@ -119,6 +148,18 @@ namespace TutorBridge.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
+                user.NameFirst = Input.NameFirst;
+                user.NameLast = Input.NameLast;
+                user.BirthDate = Input.BirthDate;
+                user.Phone = Input.Phone;
+
+                if (Input.ProfilePhoto != null)
+                {
+                    using var photoStream = Input.ProfilePhoto.OpenReadStream();
+                    user.ProfilePhoto = await ImageProcessing.ResizeAndEncodeAsync(photoStream);
+                    user.ProfilePhotoContentType = "image/jpeg";
+                }
+
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
@@ -126,6 +167,13 @@ namespace TutorBridge.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    var roleResult = await _userManager.AddToRoleAsync(user, "Student");
+                    if (!roleResult.Succeeded)
+                    {
+                        // Dont orphan the account if the role doesnt work.
+                        _logger.LogError("Failed to assign Student role to new user {UserId}.", user.Id);
+                    }
 
                     await _notificationService.NotifyUserSignedUpAsync(user);
 

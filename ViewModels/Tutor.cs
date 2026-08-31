@@ -16,11 +16,15 @@ namespace TutorBridge.ViewModels
 
         public string? Blurb { get; set; }
 
-        public string? ProfilePhoto { get; set; }
+        public byte[]? ProfilePhoto { get; set; }
+
+        public string? ProfilePhotoContentType { get; set; }
 
         public List<Timeslot> Timeslots { get; set; }
 
-        public Tutor(string nameFirst, string nameLast, string? phone, DateOnly birthDate, string? blurb, string? profilePhoto, List<Timeslot> timeslots)
+
+
+        public Tutor(string nameFirst, string nameLast, string? phone, DateOnly birthDate, string? blurb, byte[]? profilePhoto, string? profilePhotoContentType, List<Timeslot> timeslots)
         {
             NameFirst = nameFirst;
             NameLast = nameLast;
@@ -28,18 +32,12 @@ namespace TutorBridge.ViewModels
             BirthDate = birthDate;
             Blurb = blurb;
             ProfilePhoto = profilePhoto;
+            ProfilePhotoContentType = profilePhotoContentType;
             Timeslots = timeslots;
         }
 
-        public Tutor(User tutor, List<Timeslot> timeslots)
-        {
-            NameFirst = tutor.NameFirst;
-            NameLast = tutor.NameLast;
-            Phone = tutor.Phone;
-            BirthDate = tutor.BirthDate;
-            Blurb = tutor.Blurb;
-            ProfilePhoto = tutor.ProfilePhoto;
-            Timeslots = timeslots;
-        }
+
+
+
     }
 }

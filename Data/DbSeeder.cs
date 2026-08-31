@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.IO;
 using TutorBridge.Areas.Identity.Data;
 using TutorBridge.Models;
-using System.IO;
+using TutorBridge.Services;
 
 namespace TutorBridge.Data
 {
@@ -637,7 +638,8 @@ namespace TutorBridge.Data
         private static async Task<byte[]> LoadTutorPhotoAsync(IWebHostEnvironment env, string fileName)
         {
             var path = Path.Combine(env.WebRootPath, "images", "tutors", fileName);
-            return await File.ReadAllBytesAsync(path);
+            using var fileStream = File.OpenRead(path);
+            return await ImageProcessing.ResizeAndEncodeAsync(fileStream);
         }
 
     }
