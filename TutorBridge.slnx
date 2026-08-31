@@ -1,3 +1,6 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="sixlabors.lic" />
+  </Folder>
   <Project Path="TutorBridge.csproj" />
 </Solution>
