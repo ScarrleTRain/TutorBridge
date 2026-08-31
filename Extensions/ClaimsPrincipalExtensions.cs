@@ -16,5 +16,9 @@ namespace TutorBridge.Extensions
         {
             return user.FindFirst("LastName")?.Value;
         }
+        public static bool HasProfilePhoto(this ClaimsPrincipal user)
+        {
+            return bool.TryParse(user.FindFirst("HasProfilePhoto")?.Value, out var hasPhoto) && hasPhoto;
+        }
     }
 }

@@ -15,6 +15,7 @@ namespace TutorBridge.Areas.Identity.Data
             identity.AddClaim(new Claim("FirstName", $"{user.NameFirst}"));
             identity.AddClaim(new Claim("LastName", $"{user.NameLast}"));
             identity.AddClaim(new Claim("FullName", $"{user.NameFirst} {user.NameLast}"));
+            identity.AddClaim(new Claim("HasProfilePhoto", (user.ProfilePhoto != null).ToString()));
             return identity;
         }
     }
