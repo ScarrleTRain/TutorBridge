@@ -8,23 +8,71 @@
 <h3>@ViewData["Title"]</h3>
 <partial name="_StatusMessage" for="StatusMessage" />
 <div class="row">
-    <div class="col-md-6">
-        <form id="profile-form" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Username" class="form-control" placeholder="Please choose your username." disabled />
-                <label asp-for="Username" class="form-label"></label>
+    <form id="profile-form" method="post" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+        <div class="row">
+            <div class="col-6">
+                <div class="mb-3 ratio ratio-1x1">
+                    @if (Model.HasProfilePhoto)
+                    {
+                        <img class="w-100 object-fit-cover" id="photoPreview" src="@Url.Action("Photo", "Users", new { id = Model.UserId })" alt="" />
+                    }
+                    else
+                    {
+                        <img class="w-100 object-fit-cover" id="photoPreview" src="~/images/tutors/default.jpg" alt="" />
+                    }
+                </div>
+                <div class="mb-3 row">
+                    @if (Model.HasProfilePhoto)
+                    {
+                        <div class="col-9">
+                            <input asp-for="Input.ProfilePhoto" class="form-control" />
+                            <span asp-validation-for="Input.ProfilePhoto" class="text-danger"></span>
+                            <div id="photoError" class="text-danger small d-none mt-1"></div>
+                        </div>
+                        <div class="col-3">
+                            <button type="submit" asp-page-handler="RemovePhoto" class="btn btn-outline-danger btn-sm h-100 w-100"
+                                    onclick="return confirm('Remove your profile photo?');">
+                                Remove
+                            </button>
+                        </div>
+                    } else {
+                        <input asp-for="Input.ProfilePhoto" class="form-control" />
+                        <span asp-validation-for="Input.ProfilePhoto" class="text-danger"></span>
+                        <div id="photoError" class="text-danger small d-none mt-1"></div>
+                    }
+                </div>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number."/>
-                <label asp-for="Input.PhoneNumber" class="form-label"></label>
-                <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+            <div class="col-6">
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.NameFirst" class="form-control" placeholder="First name" />
+                    <label asp-for="Input.NameFirst" class="form-label"></label>
+                    <span asp-validation-for="Input.NameFirst" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.NameLast" class="form-control" placeholder="Last name" />
+                    <label asp-for="Input.NameLast" class="form-label"></label>
+                    <span asp-validation-for="Input.NameLast" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.BirthDate" class="form-control" />
+                    <label asp-for="Input.BirthDate" class="form-label"></label>
+                    <span asp-validation-for="Input.BirthDate" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <textarea asp-for="Input.Blurb" class="form-control" placeholder="Tell others about yourself" style="height: 100px"></textarea>
+                    <label asp-for="Input.Blurb" class="form-label"></label>
+                    <span asp-validation-for="Input.Blurb" class="text-danger"></span>
+                </div>
             </div>
-            <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
-        </form>
-    </div>
+        </div>
+            
+        <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
+    </form>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/photo-upload-helpers.js"></script>
+    <script src="~/js/manage-photo-preview.js"></script>
 }

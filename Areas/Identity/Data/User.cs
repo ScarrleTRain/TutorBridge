@@ -23,7 +23,7 @@ public class User : IdentityUser, ISoftDeletable
     // Makes sure there is a Last name, and that it is less than 30 chars, and only letters, spaces or hyphens.
     [Required(ErrorMessage = "Last name is required")]
     [StringLength(30, ErrorMessage = "Max 30 Characters")]
-    [RegularExpression(@"^[a-zA-Z\s-]+$", ErrorMessage = "First name can only contain letters")]
+    [RegularExpression(@"^[a-zA-Z\s-]+$", ErrorMessage = "Last name can only contain letters")]
     public required string NameLast { get; set; }
 
     public string FullName

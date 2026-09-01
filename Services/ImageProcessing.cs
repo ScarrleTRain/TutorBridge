@@ -15,7 +15,8 @@ namespace TutorBridge.Services
 
             image.Mutate(x => x.Resize(new ResizeOptions
             {
-                Mode = ResizeMode.Max, // fits within the box, preserves aspect ratio, never upscales
+                Mode = ResizeMode.Crop,
+                Position = AnchorPositionMode.Center,
                 Size = new Size(MaxDimension, MaxDimension)
             }));
 

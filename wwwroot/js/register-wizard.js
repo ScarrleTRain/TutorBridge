@@ -1,8 +1,6 @@
 ﻿(function () {
     "use strict";
 
-    const MAX_PHOTO_BYTES = 20 * 1024 * 1024; // mirrors AllowedFileAttribute server-side
-    const ALLOWED_PHOTO_TYPES = ["image/jpeg", "image/png"];
     const MIN_AGE_YEARS = 5; // mirrors MinAgeAttribute server-side
 
     const $form = $("#registerForm");
@@ -103,29 +101,13 @@
         const $preview = $("#photoPreview");
         const $error = $("#photoError");
 
-        $error.text("").addClass("d-none");
-
         if (!file) {
             $preview.addClass("d-none").attr("src", "");
-            return;
         }
 
-        if (file.size > MAX_PHOTO_BYTES) {
-            $error.text("File must be smaller than 5MB.").removeClass("d-none");
+        if (!window.PhotoUpload.validateAndPreview(file, $preview, $error)) {
             e.target.value = "";
-            $preview.addClass("d-none").attr("src", "");
-            return;
         }
-        if (!ALLOWED_PHOTO_TYPES.includes(file.type)) {
-            $error.text("Only JPEG and PNG images are allowed.").removeClass("d-none");
-            e.target.value = "";
-            $preview.addClass("d-none").attr("src", "");
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = ev => $preview.attr("src", ev.target.result).removeClass("d-none");
-        reader.readAsDataURL(file);
     }
 
     $(document).ready(function () {
