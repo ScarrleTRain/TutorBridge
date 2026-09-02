@@ -9,6 +9,12 @@
     <div class="col-md-4 mx-auto">
         <h1>@ViewData["Title"]</h1>
         <hr />
+        @if (!string.IsNullOrEmpty(Model.StatusMessage))
+        {
+            <div class="alert alert-success" role="alert">
+                @Model.StatusMessage
+            </div>
+        }
         <form id="account" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <div class="form-floating mb-3">
@@ -29,6 +35,10 @@
                     </label>
                 </div>
                 <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
+            </div>
+
+            <div class="mb-3">
+                <a asp-page="./ResendEmailConfirmation">Didn't get a confirmation email?</a>
             </div>
 
             <div class="row d-flex g-2">

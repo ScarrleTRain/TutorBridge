@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using TutorBridge.Areas.Identity.Data;
 using TutorBridge.Data;
@@ -12,6 +13,18 @@ builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.Requi
     .AddEntityFrameworkStores<TutorBridgeContext>()
     .AddDefaultTokenProviders()
     .AddDefaultUI();
+
+var brevoApiKey = builder.Configuration["Brevo:ApiKey"];
+if (string.IsNullOrWhiteSpace(brevoApiKey))
+{
+    builder.Services.AddTransient<IEmailSender, TutorBridge.Services.NoOpEmailSender>();
+}
+else
+{
+    builder.Services.Configure<BrevoOptions>(builder.Configuration.GetSection(BrevoOptions.SectionName));
+    builder.Services.AddHttpClient<BrevoEmailSender>();
+    builder.Services.AddTransient<IEmailSender, BrevoEmailSender>();
+}
 
 builder.Services.AddScoped<IUserClaimsPrincipalFactory<User>, AppClaimsPrincipalFactory>();
 builder.Services.AddScoped<INotificationService, NotificationService>();

@@ -55,6 +55,9 @@ namespace TutorBridge.Areas.Identity.Pages.Account
         [TempData]
         public string ErrorMessage { get; set; }
 
+        [TempData]
+        public string StatusMessage { get; set; }
+
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
@@ -127,6 +130,12 @@ namespace TutorBridge.Areas.Identity.Pages.Account
                 if (result.RequiresTwoFactor)
                 {
                     return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+                }
+                if (result.IsNotAllowed)
+                {
+                    ModelState.AddModelError(string.Empty,
+                        "You need to confirm your email before you can log in. Check your inbox, or request a new confirmation link below.");
+                    return Page();
                 }
                 if (result.IsLockedOut)
                 {

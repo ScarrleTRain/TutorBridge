@@ -20,11 +20,13 @@ namespace TutorBridge.Areas.Identity.Pages.Account
     {
         private readonly UserManager<User> _userManager;
         private readonly IEmailSender _sender;
+        private readonly IConfiguration _configuration;
 
-        public RegisterConfirmationModel(UserManager<User> userManager, IEmailSender sender)
+        public RegisterConfirmationModel(UserManager<User> userManager, IEmailSender sender, IConfiguration configuration)
         {
             _userManager = userManager;
             _sender = sender;
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -60,8 +62,11 @@ namespace TutorBridge.Areas.Identity.Pages.Account
             }
 
             Email = email;
-            // Once you add a real email sender, you should remove this code that lets you confirm the account
-            DisplayConfirmAccountLink = true;
+
+            // Show the raw link only when no real sender is configured (mirrors the
+            // same check Program.cs uses to pick BrevoEmailSender vs the NoOp fallback).
+            DisplayConfirmAccountLink = string.IsNullOrWhiteSpace(_configuration["Brevo:ApiKey"]);
+
             if (DisplayConfirmAccountLink)
             {
                 var userId = await _userManager.GetUserIdAsync(user);
@@ -76,5 +81,6 @@ namespace TutorBridge.Areas.Identity.Pages.Account
 
             return Page();
         }
+
     }
 }
