@@ -89,8 +89,8 @@ body {
 
 .navbar-collapse.floating-menu {
     left: calc(100% + 8px);
-/*    width: fit-content;*/
-    max-width: 80vw;
+/*    width: fit-content;/*/
+/*    max-width: 80vw;*/
     overflow: hidden;
 }
 

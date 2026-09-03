@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TutorBridge.Areas.Identity.Data;
@@ -19,18 +20,21 @@ namespace TutorBridge.Models
         [Display(Name = "Student")]
         public required string UserId { get; set; }
         [ForeignKey("UserId")]
+        [ValidateNever]
         public User User { get; set; } = null!;
 
         public int TimeslotId { get; set; }
         [ForeignKey("TimeslotId")]
+        [ValidateNever]
         public Timeslot Timeslot { get; set; } = null!;
 
         public int SubjectId { get; set; }
         [ForeignKey("SubjectId")]
+        [ValidateNever]
         public Subject Subject { get; set; } = null!;
 
         [Required(ErrorMessage = "Booking Status is required")]
-        [RegularExpression(@"^(Pending|Confirmed|Cancelled)$", ErrorMessage = "Invalid status")]
+        [EnumDataType(typeof(BookingStatus), ErrorMessage = "Invalid status")]
         public BookingStatus Status { get; set; }
 
         public DateTime CreatedAt { get; set; }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations.Schema;
 using TutorBridge.Areas.Identity.Data;
 
 namespace TutorBridge.Models
@@ -9,6 +10,7 @@ namespace TutorBridge.Models
 
         public required string UserId { get; set; }
         [ForeignKey("UserId")]
+        [ValidateNever]
         public User User { get; set; } = null!;
 
         public NotificationType Type { get; set; }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TutorBridge.Areas.Identity.Data;
 
@@ -10,6 +11,7 @@ namespace TutorBridge.Models
 
         public required string TutorId { get; set; }
         [ForeignKey("TutorId")]
+        [ValidateNever]
         public User Tutor { get; set; } = null!;
         public DateTime DateTimeStart { get; set; }
         public DateTime DateTimeEnd { get; set; }
