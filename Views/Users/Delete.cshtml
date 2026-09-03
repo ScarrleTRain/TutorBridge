@@ -1,0 +1,56 @@
+﻿@model TutorBridge.ViewModels.UserViewModel
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<div class="card shadow-lg">
+    <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Delete User</h2>
+        <a asp-action="Index" class="btn btn-primary bg-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Back to List
+        </a>
+    </div>
+
+    <div class="card-body">
+        <p class="mb-3">
+            Are you sure you want to delete this User? Their account will be
+            deactivated and hidden from the system, but the record is kept.
+        </p>
+
+        <dl class="row mb-0">
+            <dt class="col-md-3">
+                <i class="bi bi-person me-1 text-primary"></i>Name
+            </dt>
+            <dd class="col-md-9">
+                @Model.NameFirst @Model.NameLast <span class="text-secondary">(@Model.Id)</span>
+            </dd>
+
+            <dt class="col-md-3">
+                <i class="bi bi-envelope me-1 text-primary"></i>Email
+            </dt>
+            <dd class="col-md-9">
+                @Model.Email
+            </dd>
+
+            <dt class="col-md-3">
+                <i class="bi bi-flag me-1 text-primary"></i>Role
+            </dt>
+            <dd class="col-md-9">
+                @Model.Role
+            </dd>
+        </dl>
+
+        <form asp-action="Delete" class="col-12 pt-2 border-top mt-3">
+            <input type="hidden" asp-for="Id" />
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash3 me-1"></i>Delete
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

@@ -28,7 +28,33 @@ public class NotificationService : INotificationService
             Type = Notification.NotificationType.UserSignedUp,
             Title = "New user registered",
             Message = $"{newUser.Email} just signed up.",
-            Link = "/Users" // Views/Users only has Index.cshtml right now — point me elsewhere if you add a details page
+            Link = $"/Users/Details/{newUser.Id}"
+        });
+
+        _context.Notification.AddRange(notifications);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task NotifyAccountCreatedByAdminAsync(User newUser)
+    {
+        var admins = await _userManager.GetUsersInRoleAsync(AdminRole);
+
+        var notifications = admins.Select(admin => new Notification
+        {
+            UserId = admin.Id,
+            Type = Notification.NotificationType.UserSignedUp,
+            Title = "New user registered",
+            Message = $"{newUser.Email} just signed up.",
+            Link = $"/Users/Details/{newUser.Id}"
+        });
+
+        notifications = notifications.Append(new Notification
+        {
+            UserId = newUser.Id,
+            Type = Notification.NotificationType.UserSignedUp,
+            Title = "Set Password",
+            Message = $"Set your own password here",
+            Link = $"/Identity/Account/Manage/ChangePassword"
         });
 
         _context.Notification.AddRange(notifications);

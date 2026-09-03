@@ -1,0 +1,114 @@
+﻿@model TutorBridge.ViewModels.CreateUserViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="card shadow-lg">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0"><i class="bi bi-person-plus me-2"></i>Create User</h2>
+        <a asp-action="Index" class="btn btn-primary bg-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Back to List
+        </a>
+    </div>
+
+    <div class="card-body">
+        <form asp-action="Create" class="row g-3">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="col-md-6">
+                <label asp-for="NameFirst" class="form-label">
+                    <i class="bi bi-person me-1 text-primary"></i>First Name
+                </label>
+                <input asp-for="NameFirst" class="form-control" />
+                <span asp-validation-for="NameFirst" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="NameLast" class="form-label">
+                    <i class="bi bi-person me-1 text-primary"></i>Last Name
+                </label>
+                <input asp-for="NameLast" class="form-control" />
+                <span asp-validation-for="NameLast" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Email" class="form-label">
+                    <i class="bi bi-envelope me-1 text-primary"></i>Email
+                </label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Phone" class="form-label">
+                    <i class="bi bi-telephone me-1 text-primary"></i>Phone
+                </label>
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="BirthDate" class="form-label">
+                    <i class="bi bi-calendar-heart me-1 text-primary"></i>Birth Date
+                </label>
+                <input asp-for="BirthDate" class="form-control" />
+                <span asp-validation-for="BirthDate" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Role" class="form-label">
+                    <i class="bi bi-flag me-1 text-primary"></i>Role
+                </label>
+                <select asp-for="Role" class="form-control" asp-items="ViewBag.Roles">
+                    <option value="">-- Select Role --</option>
+                </select>
+                <span asp-validation-for="Role" class="text-danger small"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="Blurb" class="form-label">
+                    <i class="bi bi-chat-left-text me-1 text-primary"></i>Blurb
+                </label>
+                <textarea asp-for="Blurb" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Blurb" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Password" class="form-label">
+                    <i class="bi bi-lock me-1 text-primary"></i>Password
+                </label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="ConfirmPassword" class="form-label">
+                    <i class="bi bi-lock-fill me-1 text-primary"></i>Confirm Password
+                </label>
+                <input asp-for="ConfirmPassword" class="form-control" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+            </div>
+
+            <div class="col-12">
+                <div class="form-text">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Since this account isn't created through self-registration, the user
+                    will get a notification prompting them to change this password.
+                </div>
+            </div>
+
+            <div class="col-12 pt-2 border-top mt-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg me-1"></i>Create
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
