@@ -1,0 +1,46 @@
+﻿@model IEnumerable<SelectListItem>
+
+@{
+    // Parameters passed in via ViewData
+    string fieldName = ViewData["FieldName"]?.ToString() ?? "SelectedValues";
+    string labelText = ViewData["LabelText"]?.ToString() ?? "";
+    string iconClass = ViewData["IconClass"]?.ToString() ?? "";
+    string searchPlaceholder = ViewData["SearchPlaceholder"]?.ToString() ?? "Search...";
+}
+
+<div class="mb-3">
+    @if (!string.IsNullOrEmpty(labelText))
+    {
+        <label class="form-label">
+            @if (!string.IsNullOrEmpty(iconClass))
+            {
+                <i class="@iconClass me-1 text-primary"></i>
+            }
+            @labelText
+        </label>
+    }
+
+    <div class="checklist-multiselect border rounded" data-field="@fieldName">
+        <div class="p-2 border-bottom bg-light">
+            <input type="text" class="form-control form-control-sm checklist-search"
+                   placeholder="@searchPlaceholder" autocomplete="off" />
+        </div>
+
+        <ul class="list-unstyled mb-0 checklist-option-list" style="max-height: 260px; overflow-y: auto;">
+            @foreach (var item in Model)
+            {
+                var checkedAttr = item.Selected ? "checked" : null;
+                <li class="checklist-option">
+                    <label class="d-flex align-items-center gap-2 px-3 py-2 mb-0 checklist-item">
+                        <input class="form-check-input mt-0" type="checkbox"
+                               name="@fieldName" value="@item.Value" checked="@checkedAttr" />
+                        <span class="checklist-item-text">@item.Text</span>
+                    </label>
+                </li>
+            }
+            <li class="no-results-msg text-muted small px-3 py-2 d-none">No results found</li>
+        </ul>
+    </div>
+
+    <span asp-validation-for="@fieldName" class="text-danger small"></span>
+</div>
