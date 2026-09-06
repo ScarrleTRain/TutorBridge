@@ -96,6 +96,11 @@ namespace TutorBridge.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TimeslotId,TutorId,DateTimeStart,DateTimeEnd")] Timeslot timeslot)
         {
+            if (User.IsInRole("Tutor"))
+            {
+                timeslot.TutorId = _userManager.GetUserId(User);
+            }
+
             if (ModelState.IsValid)
             {
                 bool overlaps = await _context.Timeslot.AnyAsync(t =>

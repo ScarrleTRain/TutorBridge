@@ -15,6 +15,7 @@ namespace TutorBridge.Models
         public User Tutor { get; set; } = null!;
         public DateTime DateTimeStart { get; set; }
         public DateTime DateTimeEnd { get; set; }
+        [ValidateNever]
         public ICollection<Booking> Bookings { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
