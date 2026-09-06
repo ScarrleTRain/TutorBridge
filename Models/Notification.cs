@@ -32,7 +32,10 @@ namespace TutorBridge.Models
             UserSignedUp,
             BookingCreated,
             BookingCancelled,
-            BookingEdited
+            BookingEdited,
+            TutorApplicationSubmitted,
+            TutorApplicationApproved,
+            TutorApplicationDenied
         }
     }
 }

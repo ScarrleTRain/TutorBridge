@@ -1,0 +1,100 @@
+@model TutorBridge.ViewModels.TutorApplicationViewModel
+
+@{
+    ViewData["Title"] = "Application Details";
+}
+
+<div class="card shadow-lg">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0"><i class="bi bi-info-circle me-2"></i>Tutor Application</h2>
+        <a asp-action="Index" class="btn btn-primary bg-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Back to List
+        </a>
+    </div>
+
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-md-3">
+                <i class="bi bi-person me-1 text-primary"></i>Applicant
+            </dt>
+            <dd class="col-md-9">
+                @Model.ApplicantName <span class="text-secondary">(@Model.ApplicantId)</span>
+            </dd>
+
+            <dt class="col-md-3">
+                <i class="bi bi-envelope me-1 text-primary"></i>Email
+            </dt>
+            <dd class="col-md-9">
+                @Model.ApplicantEmail
+            </dd>
+
+            <dt class="col-md-3">
+                <i class="bi bi-flag me-1 text-primary"></i>Status
+            </dt>
+            <dd class="col-md-9">
+                @Model.Status
+            </dd>
+
+            <dt class="col-md-3">
+                <i class="bi bi-chat-left-text me-1 text-primary"></i>Blurb
+            </dt>
+            <dd class="col-md-9">
+                @(string.IsNullOrEmpty(Model.Blurb) ? "—" : Model.Blurb)
+            </dd>
+
+            <dt class="col-md-3">
+                <i class="bi bi-calendar-event me-1 text-primary"></i>Submitted
+            </dt>
+            <dd class="col-md-9">
+                @Model.SubmittedAt.ToString("d")
+            </dd>
+
+            @if (Model.ReviewedAt.HasValue)
+            {
+                <dt class="col-md-3">
+                    <i class="bi bi-calendar-check me-1 text-primary"></i>Reviewed
+                </dt>
+                <dd class="col-md-9">
+                    @Model.ReviewedAt.Value.ToString("d") @(string.IsNullOrEmpty(Model.ReviewerName) ? "" : $"by {Model.ReviewerName}")
+                </dd>
+            }
+
+            @if (Model.Status == "Denied" && !string.IsNullOrEmpty(Model.DenialReason))
+            {
+                <dt class="col-md-3">
+                    <i class="bi bi-x-circle me-1 text-primary"></i>Denial Reason
+                </dt>
+                <dd class="col-md-9">
+                    @Model.DenialReason
+                </dd>
+            }
+        </dl>
+
+        @if (Model.Status == "Pending")
+        {
+            <div class="col-12 pt-3 border-top mt-3">
+                <div class="d-flex gap-2 flex-wrap">
+                    <form asp-action="Approve" asp-route-id="@Model.Id" method="post">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle me-1"></i>Approve
+                        </button>
+                    </form>
+
+                    <form asp-action="Deny" asp-route-id="@Model.Id" method="post" class="d-flex gap-2 align-items-start flex-wrap">
+                        <textarea name="denialReason" class="form-control form-control-sm" style="width:260px"
+                                  rows="1" placeholder="Reason (optional)"></textarea>
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="bi bi-x-circle me-1"></i>Deny
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-12 pt-3 border-top mt-3">
+                <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+            </div>
+        }
+    </div>
+</div>

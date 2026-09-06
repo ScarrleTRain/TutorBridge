@@ -1,0 +1,41 @@
+@model TutorBridge.ViewModels.ApplyTutorViewModel
+
+@{
+    ViewData["Title"] = "Become a Tutor";
+}
+
+<div class="card shadow-lg">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0"><i class="bi bi-mortarboard me-2"></i>Become a Tutor</h2>
+    </div>
+
+    <div class="card-body">
+        @if (Model.HasPendingApplication)
+        {
+            <p class="mb-0">
+                <i class="bi bi-hourglass-split me-1 text-primary"></i>
+                Your application is under review@(Model.PendingSubmittedAt.HasValue ? $" (submitted {Model.PendingSubmittedAt.Value:d})" : "").
+                We'll notify you once an admin has made a decision.
+            </p>
+        }
+        else
+        {
+            <form asp-action="Apply" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Blurb" class="form-label"></label>
+                    <textarea asp-for="Blurb" class="form-control" rows="4"
+                              placeholder="Tell us about your teaching experience and what you'd like to teach."></textarea>
+                    <span asp-validation-for="Blurb" class="text-danger small"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit Application</button>
+            </form>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,123 @@
+@model IEnumerable<TutorBridge.ViewModels.TutorApplicationViewModel>
+
+@{
+    ViewData["Title"] = "Tutor Applications";
+}
+
+<div class="card shadow-lg">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">Tutor Applications</h2>
+    </div>
+
+    <div class="card-body">
+        <div class="d-flex gap-3 align-items-center flex-wrap pb-3 mb-2 border-bottom">
+            <input type="text" id="applicationSearch" class="form-control form-control-sm" style="width:220px"
+                   placeholder="Search by name or email...">
+
+            <select id="statusFilter" class="form-control form-control-sm" style="width:150px">
+                <option value="">All Statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Denied">Denied</option>
+            </select>
+        </div>
+
+        <div class="overflow-auto" style="max-height: 60vh; min-height: 200px;">
+            <table class="table table-hover" id="applicationsTable">
+                <thead style="position: sticky; top: 0;">
+                    <tr>
+                        <th data-sort="id" style="cursor: pointer;">
+                            Id <i class="bi bi-arrow-down-up sort-icon opacity-50"></i>
+                        </th>
+                        <th data-sort="name" style="cursor: pointer;">
+                            Applicant <i class="bi bi-arrow-down-up sort-icon opacity-50"></i>
+                        </th>
+                        <th data-sort="email" style="cursor: pointer;">
+                            Email <i class="bi bi-arrow-down-up sort-icon opacity-50"></i>
+                        </th>
+                        <th data-sort="status" style="cursor: pointer;">
+                            Status <i class="bi bi-arrow-down-up sort-icon opacity-50"></i>
+                        </th>
+                        <th data-sort="submitted" style="cursor: pointer;">
+                            Submitted <i class="bi bi-arrow-down-up sort-icon opacity-50"></i>
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                    <tr class="@(item.Status switch
+                        {
+                            "Pending" => "bg-warning bg-opacity-25",
+                            "Approved" => "bg-success bg-opacity-25",
+                            "Denied" => "bg-danger bg-opacity-25",
+                            _ => ""
+                        })"
+                        style="--bs-table-bg: transparent;"
+                        data-id="@item.Id"
+                        data-name="@item.ApplicantName"
+                        data-email="@item.ApplicantEmail"
+                        data-status="@item.Status"
+                        data-submitted="@item.SubmittedAt.ToString("o")">
+                        <td>@item.Id</td>
+                        <td>@item.ApplicantName</td>
+                        <td>@item.ApplicantEmail</td>
+                        <td>@item.Status</td>
+                        <td>@item.SubmittedAt.ToString("d")</td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none">
+                                <i class="bi bi-file-text"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-muted small" id="applicationCount">Showing @Model.Count() entries</div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/table-sort.js"></script>
+    <script>
+        makeSortableTable('applicationsTable', 'applicationsTableSort');
+    </script>
+
+    <script>
+        (function () {
+            const search = document.getElementById('applicationSearch');
+            const status = document.getElementById('statusFilter');
+            const rows = Array.from(document.querySelectorAll('#applicationsTable tbody tr'));
+            const countEl = document.getElementById('applicationCount');
+
+            function applyFilter() {
+                const term = search.value.trim().toLowerCase();
+                const statusVal = status.value;
+                let visible = 0;
+
+                rows.forEach(row => {
+                    const haystack = [
+                        row.dataset.name,
+                        row.dataset.id,
+                        row.dataset.email
+                    ].join(' ').toLowerCase();
+
+                    const matchesText = haystack.includes(term);
+                    const matchesStatus = !statusVal || row.dataset.status === statusVal;
+                    const show = matchesText && matchesStatus;
+
+                    row.style.display = show ? '' : 'none';
+                    if (show) visible++;
+                });
+
+                countEl.textContent = `Showing ${visible} of ${rows.length} entries`;
+            }
+
+            status.addEventListener('change', applyFilter);
+            search.addEventListener('input', applyFilter);
+        })();
+    </script>
+}

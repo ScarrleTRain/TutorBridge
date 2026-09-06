@@ -7,7 +7,7 @@ namespace TutorBridge.Services;
 
 public class NotificationService : INotificationService
 {
-    private const string AdminRole = "Admin"; // confirm this matches your actual seeded role name
+    private const string AdminRole = "Admin";
 
     private readonly TutorBridgeContext _context;
     private readonly UserManager<User> _userManager;
@@ -97,6 +97,63 @@ public class NotificationService : INotificationService
         });
 
         _context.Notification.AddRange(notifications);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task NotifyTutorApplicationSubmittedAsync(int applicationId)
+    {
+        var application = await _context.TutorApplication
+            .IgnoreQueryFilters()
+            .Include(a => a.User)
+            .FirstOrDefaultAsync(a => a.Id == applicationId);
+
+        if (application is null)
+            return; // shouldn't happen if it was just saved, but guard rather than throw mid-request
+
+        var admins = await _userManager.GetUsersInRoleAsync(AdminRole);
+
+        var notifications = admins.Select(admin => new Notification
+        {
+            UserId = admin.Id,
+            Type = Notification.NotificationType.TutorApplicationSubmitted,
+            Title = "New tutor application",
+            Message = $"{application.User.Email} applied to become a tutor.",
+            Link = $"/TutorApplications/Details/{application.Id}"
+        });
+
+        _context.Notification.AddRange(notifications);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task NotifyTutorApplicationApprovedAsync(User approvedUser)
+    {
+        var notification = new Notification
+        {
+            UserId = approvedUser.Id,
+            Type = Notification.NotificationType.TutorApplicationApproved,
+            Title = "Application approved",
+            Message = "Your tutor application was approved. Add the subjects you'd like to teach to get started.",
+            Link = "/Identity/Account/Manage/Subjects"
+        };
+
+        _context.Notification.Add(notification);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task NotifyTutorApplicationDeniedAsync(User deniedUser, string? reason)
+    {
+        var notification = new Notification
+        {
+            UserId = deniedUser.Id,
+            Type = Notification.NotificationType.TutorApplicationDenied,
+            Title = "Application not approved",
+            Message = string.IsNullOrWhiteSpace(reason)
+                ? "Your tutor application was not approved."
+                : $"Your tutor application was not approved. Reason: {reason}",
+            Link = null
+        };
+
+        _context.Notification.Add(notification);
         await _context.SaveChangesAsync();
     }
 }
