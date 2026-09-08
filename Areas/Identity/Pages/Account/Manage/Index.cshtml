@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model IndexModel
 @{
     ViewData["Title"] = "Profile";
@@ -53,6 +53,11 @@
                     <input asp-for="Input.NameLast" class="form-control" placeholder="Last name" />
                     <label asp-for="Input.NameLast" class="form-label"></label>
                     <span asp-validation-for="Input.NameLast" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Phone number" />
+                    <label asp-for="Input.PhoneNumber" class="form-label"></label>
+                    <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
                 </div>
                 <div class="form-floating mb-3">
                     <input asp-for="Input.BirthDate" class="form-control" />

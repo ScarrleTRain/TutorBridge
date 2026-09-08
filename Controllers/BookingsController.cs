@@ -80,6 +80,17 @@ namespace TutorBridge.Controllers
                 return NotFound();
             }
 
+            // Only the student who made the booking, the tutor whose timeslot it belongs to,
+            // or an Admin may view its details.
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            bool isOwningStudent = booking.UserId == currentUserId;
+            bool isBookingsTutor = booking.Timeslot.TutorId == currentUserId;
+
+            if (!User.IsInRole("Admin") && !isOwningStudent && !isBookingsTutor)
+            {
+                return Forbid();
+            }
+
             return View(booking);
         }
 
@@ -91,55 +102,45 @@ namespace TutorBridge.Controllers
             if (tutor == null)
                 return NotFound();
 
-            var availableTimeslots = await _context.Timeslot
-                .Where(t => t.TutorId == tutor.Id)
-                //.Where(t => t.DateTimeStart > DateTime.Now) Disable for debug TODO remove this.
-                .OrderBy(t => t.DateTimeStart)
-                .Select(t => new
-                {
-                    id = t.TimeslotId,
-                    start = t.DateTimeStart,
-                    end = t.DateTimeEnd,
-                    title = $"{t.DateTimeStart:h:mm tt}–{t.DateTimeEnd:h:mm tt}"
-                })
-                .ToListAsync();
+            await PopulateBookViewBag(tutor);
 
-            var availableSubjects = await _context.TutorSubject
-                .Where(t => t.TutorId == tutor.Id)
-                .Join(_context.Subject, ts => ts.SubjectId, s => s.SubjectId, (ts, s) => new SelectListItem
-                {
-                    Value = s.SubjectId.ToString(),
-                    Text = s.Name
-                })
-                .ToListAsync();
-
-            ViewBag.Tutor = tutor;
-            ViewBag.Timeslots = availableTimeslots;
-            ViewBag.Subjects = availableSubjects;
-
-            var booking = new Booking
-            {
-                UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
-            };
-
-            return View(booking);
+            return View(new BookingCreateViewModel());
         }
 
         [HttpPost, Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Book([Bind("TimeslotId,SubjectId")] Booking booking)
+        public async Task<IActionResult> Book(BookingCreateViewModel model)
         {
-            booking.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            booking.Status = BookingStatus.Pending;
-
             if (ModelState.IsValid)
             {
+                var booking = new Booking
+                {
+                    TimeslotId = model.TimeslotId!.Value,
+                    SubjectId = model.SubjectId!.Value,
+                    UserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!,
+                    Status = BookingStatus.Pending
+                };
+
                 _context.Add(booking);
                 await _context.SaveChangesAsync();
                 await _notificationService.NotifyBookingCreatedAsync(booking.Id);
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
-            return View(booking);
+
+            // Re-derive the tutor from the submitted timeslot so the view can render.
+            var timeslot = await _context.Timeslot
+                .Include(t => t.Tutor)
+                .FirstOrDefaultAsync(t => t.TimeslotId == model.TimeslotId);
+
+            if (timeslot == null)
+            {
+                // No valid timeslot to recover the tutor from — can't redisplay this view sensibly.
+                return NotFound();
+            }
+
+            await PopulateBookViewBag(timeslot.Tutor);
+
+            return View(model);
         }
 
         // GET: Bookings/Create
@@ -182,10 +183,24 @@ namespace TutorBridge.Controllers
                 return NotFound();
             }
 
-            var booking = await _context.Booking.FindAsync(id);
+            var booking = await _context.Booking
+                .Include(b => b.User)
+                .Include(b => b.Subject)
+                .Include(b => b.Timeslot)
+                .ThenInclude(t => t.Tutor)
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (booking == null)
             {
                 return NotFound();
+            }
+
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            bool isOwningStudent = booking.UserId == currentUserId;
+            bool isBookingsTutor = booking.Timeslot.TutorId == currentUserId;
+
+            if (!User.IsInRole("Admin") && !isOwningStudent && !isBookingsTutor)
+            {
+                return Forbid();
             }
 
             ViewBag.Users = await UserDropdown();
@@ -293,6 +308,32 @@ namespace TutorBridge.Controllers
         private bool BookingExists(int id)
         {
             return _context.Booking.Any(e => e.Id == id);
+        }
+
+        private async Task PopulateBookViewBag(User tutor)
+        {
+            ViewBag.Tutor = tutor;
+
+            ViewBag.Timeslots = await _context.Timeslot
+                .Where(t => t.TutorId == tutor.Id)
+                .OrderBy(t => t.DateTimeStart)
+                .Select(t => new
+                {
+                    id = t.TimeslotId,
+                    start = t.DateTimeStart,
+                    end = t.DateTimeEnd,
+                    title = $"{t.DateTimeStart:h:mm tt}–{t.DateTimeEnd:h:mm tt}"
+                })
+                .ToListAsync();
+
+            ViewBag.Subjects = await _context.TutorSubject
+                .Where(t => t.TutorId == tutor.Id)
+                .Join(_context.Subject, ts => ts.SubjectId, s => s.SubjectId, (ts, s) => new SelectListItem
+                {
+                    Value = s.SubjectId.ToString(),
+                    Text = s.Name
+                })
+                .ToListAsync();
         }
 
         public async Task<IEnumerable<SelectListItem>> UserDropdown()

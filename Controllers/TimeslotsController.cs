@@ -58,7 +58,7 @@ namespace TutorBridge.Controllers
             }
             else
             {
-                return Forbid(); 
+                return Forbid();
             }
         }
 
@@ -103,10 +103,7 @@ namespace TutorBridge.Controllers
 
             if (ModelState.IsValid)
             {
-                bool overlaps = await _context.Timeslot.AnyAsync(t =>
-                    t.TutorId == timeslot.TutorId &&
-                    t.DateTimeStart < timeslot.DateTimeEnd &&
-                    t.DateTimeEnd > timeslot.DateTimeStart);
+                bool overlaps = await HasOverlappingTimeslotAsync(timeslot.TutorId, timeslot.DateTimeStart, timeslot.DateTimeEnd);
 
                 if (overlaps)
                 {
@@ -166,8 +163,14 @@ namespace TutorBridge.Controllers
                 ModelState.AddModelError("", "This timeslot has already started and can no longer be edited.");
                 return View("Edit", timeslot);
             }
-            
-            if (timeslot.Bookings.Any(b => b.Status != Booking.BookingStatus.Cancelled))
+
+            // Query bookings directly rather than relying on timeslot.Bookings: the posted model
+            // is only bound to TimeslotId/TutorId/DateTimeStart/DateTimeEnd, so its Bookings
+            // navigation is never populated by model binding.
+            bool hasActiveBooking = await _context.Booking
+                .AnyAsync(b => b.TimeslotId == id && b.Status != Booking.BookingStatus.Cancelled);
+
+            if (hasActiveBooking)
             {
                 ModelState.AddModelError("", "This timeslot has an active booking. Please cancel it first.");
                 return View("Delete", timeslot); // explicit view name since action is "DeleteConfirmed"
@@ -175,10 +178,7 @@ namespace TutorBridge.Controllers
 
             if (ModelState.IsValid)
             {
-                bool overlaps = await _context.Timeslot.AnyAsync(t =>
-                    t.TutorId == timeslot.TutorId &&
-                    t.DateTimeStart < timeslot.DateTimeEnd &&
-                    t.DateTimeEnd > timeslot.DateTimeStart);
+                bool overlaps = await HasOverlappingTimeslotAsync(timeslot.TutorId, timeslot.DateTimeStart, timeslot.DateTimeEnd, excludeTimeslotId: id);
 
                 if (overlaps)
                 {
@@ -252,15 +252,29 @@ namespace TutorBridge.Controllers
             return _context.Timeslot.Any(e => e.TimeslotId == id);
         }
 
+        /// <summary>
+        /// Checks whether the given tutor already has a timeslot overlapping [start, end).
+        /// Pass excludeTimeslotId when editing an existing timeslot so it doesn't count as
+        /// overlapping itself.
+        /// </summary>
+        private async Task<bool> HasOverlappingTimeslotAsync(string tutorId, DateTime start, DateTime end, int? excludeTimeslotId = null)
+        {
+            return await _context.Timeslot.AnyAsync(t =>
+                t.TutorId == tutorId &&
+                t.DateTimeStart < end &&
+                t.DateTimeEnd > start &&
+                (!excludeTimeslotId.HasValue || t.TimeslotId != excludeTimeslotId.Value));
+        }
+
         public async Task<IEnumerable<SelectListItem>> TutorDropdown()
         {
-             return (await _userManager.GetUsersInRoleAsync("Tutor"))
-                .Select(u => new SelectListItem
-                {
-                    Value = u.Id,
-                    Text = $"{u.NameFirst} {u.NameLast}"
-                })
-                .ToList().OrderBy(u => u.Text);
+            return (await _userManager.GetUsersInRoleAsync("Tutor"))
+               .Select(u => new SelectListItem
+               {
+                   Value = u.Id,
+                   Text = $"{u.NameFirst} {u.NameLast}"
+               })
+               .ToList().OrderBy(u => u.Text);
         }
     }
 }

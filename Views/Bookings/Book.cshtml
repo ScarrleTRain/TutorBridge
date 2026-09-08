@@ -1,18 +1,7 @@
-﻿@model TutorBridge.Models.Booking
-@using Microsoft.AspNetCore.Identity
-@using System.Security.Claims
-@inject IWebHostEnvironment Env
-@using System.Text.Json
+﻿@model TutorBridge.ViewModels.BookingCreateViewModel
 
 @{
     ViewData["Title"] = "Book";
-
-    string? photoPath = ViewBag.Tutor.ProfilePhoto != null
-        ? System.IO.Path.Combine(Env.WebRootPath, "images", "tutors", ViewBag.Tutor.ProfilePhoto)
-        : null;
-    bool photoExists = photoPath != null && System.IO.File.Exists(photoPath);
-    var timeslotJson = JsonSerializer.Serialize(ViewBag.Timeslots);
-    
 }
 
 <style>
@@ -22,10 +11,10 @@
         border-radius: 0.375rem; /* matches bs-border-radius */
     }
 
-    .fc-event:hover {
-        filter: brightness(0.92);
-        cursor: pointer;
-    }
+        .fc-event:hover {
+            filter: brightness(0.92);
+            cursor: pointer;
+        }
 
     .fc-event-selected {
         outline: 2px solid var(--bs-secondary);
@@ -44,13 +33,17 @@
     }
 </style>
 
+<div asp-validation-summary="All" class="text-danger"></div>
+
 <h1>Book</h1>
 <hr />
 <div class="row">
     <div class="row">
         <div class="col-md-3">
             <div class="card">
-                <img class="card-img-top" src="~/images/tutors/@(photoExists ? ViewBag.Tutor.ProfilePhoto : "default.jpg")" alt="@ViewBag.Tutor.NameFirst @ViewBag.Tutor.NameLast">
+                <img class="card-img-top"
+                     src="@(ViewBag.Tutor.ProfilePhoto != null ? Url.Action("Photo", "Users", new { id = ViewBag.Tutor.Id }) : Url.Content("~/images/tutors/default.jpg"))"
+                     alt="@ViewBag.Tutor.NameFirst @ViewBag.Tutor.NameLast">
                 <div class="card-body">
                     <h5 class="card-title">@ViewBag.Tutor.NameFirst @ViewBag.Tutor.NameLast</h5>
                     <p class="card-text">@ViewBag.Tutor.Blurb</p>
