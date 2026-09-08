@@ -46,10 +46,13 @@
             </dd>
         </dl>
 
-        <div class="col-12 pt-2 border-top mt-3">
-            <a asp-action="Edit" asp-route-id="@Model?.TimeslotId" class="btn btn-primary">
-                <i class="bi bi-pencil-square me-1"></i>Edit
-            </a>
-        </div>
+        @if (!Model.IsPast())
+        {
+            <div class="col-12 pt-2 border-top mt-3">
+                <a asp-action="Edit" asp-route-id="@Model?.TimeslotId" class="btn btn-primary">
+                    <i class="bi bi-pencil-square me-1"></i>Edit
+                </a>
+            </div>
+        }
     </div>
 </div>

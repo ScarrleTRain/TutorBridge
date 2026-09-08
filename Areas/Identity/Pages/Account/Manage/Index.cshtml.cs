@@ -93,7 +93,6 @@ namespace TutorBridge.Areas.Identity.Pages.Account.Manage
         private async Task LoadAsync(User user)
         {
             var userName = await _userManager.GetUserNameAsync(user);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
             Username = userName;
             UserId = user.Id;
@@ -101,7 +100,7 @@ namespace TutorBridge.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber,
+                PhoneNumber = user.Phone,
                 NameFirst = user.NameFirst,
                 NameLast = user.NameLast,
                 BirthDate = user.BirthDate,

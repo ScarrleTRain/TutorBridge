@@ -138,6 +138,11 @@ namespace TutorBridge.Controllers
                 return NotFound();
             }
 
+            if (timeslot.IsPast())
+            {
+                return Forbid();
+            }
+
             ViewBag.Tutors = await TutorDropdown();
 
             return View(timeslot);
@@ -229,6 +234,11 @@ namespace TutorBridge.Controllers
                 return NotFound();
             }
 
+            if (!timeslot.CanBeModified())
+            {
+                return Forbid();
+            }
+
             return View(timeslot);
         }
 
@@ -238,8 +248,14 @@ namespace TutorBridge.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var timeslot = await _context.Timeslot.FindAsync(id);
+            
             if (timeslot != null)
             {
+                if (!timeslot.CanBeModified())
+                {
+                    return Forbid();
+                }
+
                 _context.Timeslot.Remove(timeslot);
             }
 

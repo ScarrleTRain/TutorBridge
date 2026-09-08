@@ -18,15 +18,25 @@
             <input type="hidden" asp-for="TimeslotId" />
 
             <div class="col-md-6">
-                @{
+                @if (User.IsInRole("Admin"))
+                {
                     ViewData["FieldName"] = "TutorId";
                     ViewData["LabelText"] = "Tutor";
                     ViewData["IconClass"] = "bi bi-person-badge";
                     ViewData["Placeholder"] = "-- Select Tutor --";
                     ViewData["SearchPlaceholder"] = "Search tutors...";
                     ViewData["CurrentValue"] = Model.TutorId?.ToString();
+                
+                    <partial name="_CustomSelectPartial" model="ViewBag.Tutors" />
                 }
-                <partial name="_CustomSelectPartial" model="ViewBag.Tutors" />
+                else
+                {
+                    <label class="form-label">
+                        <i class="bi bi-person-badge me-1 text-primary"></i>Tutor
+                    </label>
+                    <input type="text" class="form-control" value="@Model.Tutor.FullName" disabled />
+                    <input type="hidden" asp-for="TutorId" />
+                }
             </div>
 
             <div class="col-md-3">
