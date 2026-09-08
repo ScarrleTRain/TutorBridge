@@ -144,6 +144,7 @@ namespace TutorBridge.Controllers
         }
 
         // GET: Bookings/Create
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
             ViewBag.Users = await UserDropdown();
@@ -157,6 +158,7 @@ namespace TutorBridge.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,UserId,TimeslotId,SubjectId,Status")] Booking booking)
         {
@@ -176,6 +178,7 @@ namespace TutorBridge.Controllers
         }
 
         // GET: Bookings/Edit/5
+        [Authorize(Roles = "Admin,Tutor")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -195,17 +198,23 @@ namespace TutorBridge.Controllers
             }
 
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            bool isOwningStudent = booking.UserId == currentUserId;
             bool isBookingsTutor = booking.Timeslot.TutorId == currentUserId;
 
-            if (!User.IsInRole("Admin") && !isOwningStudent && !isBookingsTutor)
+            if (!User.IsInRole("Admin") && !isBookingsTutor)
             {
                 return Forbid();
             }
 
-            ViewBag.Users = await UserDropdown();
-            ViewBag.Timeslots = await TimeslotDropdown();
-            ViewBag.Subjects = await SubjectDropdown();
+            if (User.IsInRole("Admin"))
+            {
+                ViewBag.Users = await UserDropdown();
+                ViewBag.Timeslots = await TimeslotDropdown();
+            }
+            else
+            {
+                ViewBag.Timeslots = await TimeslotDropdown(currentUserId);
+            }
+            ViewBag.Subjects = await SubjectDropdown(booking.Timeslot.TutorId);
 
             return View(booking);
         }
@@ -214,6 +223,7 @@ namespace TutorBridge.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Authorize(Roles = "Admin,Tutor")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,TimeslotId,SubjectId,Status")] Booking booking)
         {
@@ -222,13 +232,76 @@ namespace TutorBridge.Controllers
                 return NotFound();
             }
 
+            // Ownership must be checked against the booking's existing timeslot, not the
+            // posted one — otherwise a Tutor could point TimeslotId at someone else's slot
+            // and have the check pass.
+            var existing = await _context.Booking
+                .AsNoTracking()
+                .Include(b => b.Timeslot)
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (existing == null)
+            {
+                return NotFound();
+            }
+
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            bool isAdmin = User.IsInRole("Admin");
+            bool isBookingsTutor = existing.Timeslot.TutorId == currentUserId;
+
+            if (!isAdmin && !isBookingsTutor)
+            {
+                return Forbid();
+            }
+
+            // The tutor whose timeslot this booking will end up on once saved — used to
+            // validate the Subject choice below, and as the redisplay context on failure.
+            string targetTutorId;
+
+            if (!isAdmin)
+            {
+                // Tutors can't reassign a booking to a different student, whatever the form posted.
+                booking.UserId = existing.UserId;
+
+                var timeslot = await _context.Timeslot
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(t => t.TimeslotId == booking.TimeslotId);
+
+                if (timeslot == null || timeslot.TutorId != currentUserId)
+                {
+                    ModelState.AddModelError(nameof(booking.TimeslotId), "Select one of your own timeslots.");
+                }
+
+                targetTutorId = currentUserId!;
+            }
+            else
+            {
+                var timeslot = await _context.Timeslot
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(t => t.TimeslotId == booking.TimeslotId);
+
+                if (timeslot == null)
+                {
+                    ModelState.AddModelError(nameof(booking.TimeslotId), "Select a valid timeslot.");
+                    targetTutorId = existing.Timeslot.TutorId;
+                }
+                else
+                {
+                    targetTutorId = timeslot.TutorId;
+                }
+            }
+
+            bool subjectValid = await _context.TutorSubject
+                .AnyAsync(ts => ts.TutorId == targetTutorId && ts.SubjectId == booking.SubjectId);
+
+            if (!subjectValid)
+            {
+                ModelState.AddModelError(nameof(booking.SubjectId), "That tutor doesn't teach the selected subject.");
+            }
+
             if (ModelState.IsValid)
             {
-                var previousStatus = await _context.Booking
-                    .AsNoTracking()
-                    .Where(b => b.Id == id)
-                    .Select(b => b.Status)
-                    .FirstOrDefaultAsync();
+                var previousStatus = existing.Status;
 
                 try
                 {
@@ -255,14 +328,23 @@ namespace TutorBridge.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewBag.Users = await UserDropdown();
-            ViewBag.Timeslots = await TimeslotDropdown();
-            ViewBag.Subjects = await SubjectDropdown();
+            if (isAdmin)
+            {
+                ViewBag.Users = await UserDropdown();
+                ViewBag.Timeslots = await TimeslotDropdown();
+                ViewBag.Subjects = await SubjectDropdown();
+            }
+            else
+            {
+                ViewBag.Timeslots = await TimeslotDropdown(currentUserId);
+                ViewBag.Subjects = await SubjectDropdown(targetTutorId);
+            }
 
             return View(booking);
         }
 
         // GET: Bookings/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -288,6 +370,7 @@ namespace TutorBridge.Controllers
 
         // POST: Bookings/Delete/5
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -348,10 +431,16 @@ namespace TutorBridge.Controllers
                 .OrderBy(u => u.Text);
         }
 
-        public async Task<IEnumerable<SelectListItem>> TimeslotDropdown()
+        public async Task<IEnumerable<SelectListItem>> TimeslotDropdown(string? tutorId = null)
         {
-            return (await _context.Timeslot
-                .Include(t => t.Tutor)
+            var query = _context.Timeslot.Include(t => t.Tutor).AsQueryable();
+
+            if (tutorId != null)
+            {
+                query = query.Where(t => t.TutorId == tutorId);
+            }
+
+            return (await query
                 .Select(t => new SelectListItem
                 {
                     Value = t.TimeslotId.ToString(),
@@ -361,17 +450,32 @@ namespace TutorBridge.Controllers
                 .OrderBy(t => t.Text);
         }
 
-        public async Task<IEnumerable<SelectListItem>> SubjectDropdown()
+        public async Task<IEnumerable<SelectListItem>> SubjectDropdown(string? tutorId = null)
         {
-            return (await _context.Subject
-                .Select(s => new SelectListItem
+            if (tutorId == null)
+            {
+                return (await _context.Subject
+                    .Select(s => new SelectListItem
+                    {
+                        Value = s.SubjectId.ToString(),
+                        Text = $"{s.Name}"
+                    })
+                    .ToListAsync())
+                    .OrderBy(s => s.Text);
+            }
+
+            return (await _context.TutorSubject
+            .Where(ts => ts.TutorId == tutorId)
+            .Join(_context.Subject,
+                ts => ts.SubjectId,
+                s => s.SubjectId,
+                (ts, s) => new SelectListItem
                 {
                     Value = s.SubjectId.ToString(),
-                    Text = $"{s.Name}"
+                    Text = s.Name
                 })
-                .ToListAsync())
-                .OrderBy(s => s.Text);
-            ;
+            .ToListAsync())
+            .OrderBy(s => s.Text);
         }
     }
 }

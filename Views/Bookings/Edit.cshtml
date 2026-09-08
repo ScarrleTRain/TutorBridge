@@ -18,15 +18,25 @@
             <input type="hidden" asp-for="Id" />
 
             <div class="col-md-6">
-                @{
+                @if (User.IsInRole("Admin"))
+                {
                     ViewData["FieldName"] = "UserId";
                     ViewData["LabelText"] = "User";
                     ViewData["IconClass"] = "bi bi-person-badge";
                     ViewData["Placeholder"] = "-- Select User --";
                     ViewData["SearchPlaceholder"] = "Search users...";
                     ViewData["CurrentValue"] = Model.UserId?.ToString();
+
+                    <partial name="_CustomSelectPartial" model="ViewBag.Users" />
                 }
-                <partial name="_CustomSelectPartial" model="ViewBag.Users" />
+                else
+                {
+                    <label class="form-label">
+                        <i class="bi bi-person-badge me-1 text-primary"></i>User
+                    </label>
+                    <input type="text" class="form-control" value="@Model.User.NameFirst @Model.User.NameLast" disabled />
+                    <input type="hidden" asp-for="UserId" />
+                }
             </div>
 
             <div class="col-md-6">
