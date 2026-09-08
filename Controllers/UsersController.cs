@@ -57,12 +57,18 @@ namespace TutorBridge.Controllers
             return View(model);
         }
 
-        [Authorize]
         public async Task<IActionResult> Photo(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
 
             if (user?.ProfilePhoto == null)
+            {
+                return NotFound();
+            }
+
+            var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+
+            if (!isAuthenticated && !await _userManager.IsInRoleAsync(user, "Tutor"))
             {
                 return NotFound();
             }

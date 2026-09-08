@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using TutorBridge.Areas.Identity.Data;
@@ -22,8 +23,37 @@ namespace TutorBridge.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var tutors = await _userManager.GetUsersInRoleAsync("Tutor");
-            return View(tutors);
+            var tutorUsers = await _userManager.GetUsersInRoleAsync("Tutor");
+            var tutorIds = tutorUsers.Select(u => u.Id).ToList();
+
+            var tutorSubjects = await _context.TutorSubject
+                .Where(ts => tutorIds.Contains(ts.TutorId))
+                .Include(ts => ts.Subject)
+                .ToListAsync();
+
+            var featuredTutors = tutorUsers
+                .OrderByDescending(u => u.ProfilePhoto != null)
+                .Take(3)
+                .Select(u => new Tutor(
+                    u.Id,
+                    u.NameFirst,
+                    u.NameLast,
+                    u.Phone,
+                    u.BirthDate,
+                    u.Blurb,
+                    u.ProfilePhoto,
+                    u.ProfilePhotoContentType,
+                    tutorSubjects.Where(ts => ts.TutorId == u.Id).Select(ts => ts.Subject).ToList(),
+                    new List<Timeslot>()))
+                .ToList();
+
+            var subjects = (await _context.Subject.ToListAsync())
+                .OrderBy(s => s.Name)
+                .Select(s => new SelectListItem { Value = s.SubjectId.ToString(), Text = s.Name });
+
+            var vm = new HomeViewModel(featuredTutors, subjects);
+
+            return View(vm);
         }
 
         [Authorize(Roles = "Admin")]
@@ -53,7 +83,7 @@ namespace TutorBridge.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-        
+
         private async Task<ChartDataDto> GetUsersByRoleAsync()
         {
             var data = await (
