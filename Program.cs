@@ -1,6 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.CodeAnalysis.Elfie.Model.Structures;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Shared;
+using System.Security.Principal;
 using TutorBridge.Areas.Identity.Data;
 using TutorBridge.Data;
 using TutorBridge.Services;
@@ -11,8 +16,7 @@ builder.Services.AddDbContext<TutorBridgeContext>(options => options.UseSqlServe
 
 builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<TutorBridgeContext>()
-    .AddDefaultTokenProviders()
-    .AddDefaultUI();
+    .AddDefaultTokenProviders();
 
 var brevoApiKey = builder.Configuration["Brevo:ApiKey"];
 if (string.IsNullOrWhiteSpace(brevoApiKey))
@@ -29,16 +33,17 @@ else
 builder.Services.AddScoped<IUserClaimsPrincipalFactory<User>, AppClaimsPrincipalFactory>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
-// Add services to the container.
+//Add services to the container.
+builder.Services.AddRazorPages();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+//Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+   //The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
