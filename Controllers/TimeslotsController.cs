@@ -30,36 +30,23 @@ namespace TutorBridge.Controllers
         // GET: Timeslots
         public async Task<IActionResult> Index()
         {
-            if (User.IsInRole("Admin"))
+            var bookedIds = await _context.Booking
+                .Where(b => b.Status != Booking.BookingStatus.Cancelled)
+                .Select(b => b.TimeslotId)
+                .ToHashSetAsync();
+
+            ViewBag.BookedIds = bookedIds;
+
+            var timeslotsQuery = _context.Timeslot.Include(t => t.Tutor).AsQueryable();
+
+            if (!User.IsInRole("Admin"))
             {
-                var timeslots = await _context.Timeslot.Include(t => t.Tutor).ToListAsync();
-
-                var bookedIds = await _context.Booking
-                    .Select(b => b.TimeslotId)
-                    .ToHashSetAsync();
-
-                ViewBag.BookedIds = bookedIds;
-
-                return View(timeslots);
+                timeslotsQuery = timeslotsQuery.Where(t => t.TutorId == User.FindFirstValue(ClaimTypes.NameIdentifier));
             }
-            else if (User.IsInRole("Tutor"))
-            {
-                var timeslots = await _context.Timeslot.Where(t => t.TutorId == User.FindFirstValue(ClaimTypes.NameIdentifier))
-                                                       .Include(t => t.Tutor)
-                                                       .ToListAsync();
 
-                var bookedIds = await _context.Booking
-                    .Select(b => b.TimeslotId)
-                    .ToHashSetAsync();
+            var timeslots = await timeslotsQuery.ToListAsync();
 
-                ViewBag.BookedIds = bookedIds;
-
-                return View(timeslots);
-            }
-            else
-            {
-                return Forbid();
-            }
+            return View(timeslots);
         }
 
         // GET: Timeslots/Details/5
@@ -248,7 +235,7 @@ namespace TutorBridge.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var timeslot = await _context.Timeslot.FindAsync(id);
-            
+
             if (timeslot != null)
             {
                 if (!timeslot.CanBeModified())

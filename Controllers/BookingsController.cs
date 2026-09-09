@@ -111,6 +111,34 @@ namespace TutorBridge.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Book(BookingCreateViewModel model)
         {
+            // Fetched up front — needed for validation below, and to recover the tutor for
+            // redisplay if anything fails.
+            var timeslot = await _context.Timeslot
+                .Include(t => t.Tutor)
+                .FirstOrDefaultAsync(t => t.TimeslotId == model.TimeslotId);
+
+            if (ModelState.IsValid)
+            {
+                if (timeslot == null)
+                {
+                    ModelState.AddModelError(nameof(model.TimeslotId), "Select a valid timeslot.");
+                }
+                else if (timeslot.DateTimeStart <= DateTime.Now)
+                {
+                    ModelState.AddModelError(nameof(model.TimeslotId), "That timeslot has already passed.");
+                }
+                else
+                {
+                    bool timeslotTaken = await _context.Booking
+                        .AnyAsync(b => b.TimeslotId == model.TimeslotId && b.Status != BookingStatus.Cancelled);
+
+                    if (timeslotTaken)
+                    {
+                        ModelState.AddModelError(nameof(model.TimeslotId), "That timeslot is already booked.");
+                    }
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 var booking = new Booking
@@ -126,11 +154,6 @@ namespace TutorBridge.Controllers
                 await _notificationService.NotifyBookingCreatedAsync(booking.Id);
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
-
-            // Re-derive the tutor from the submitted timeslot so the view can render.
-            var timeslot = await _context.Timeslot
-                .Include(t => t.Tutor)
-                .FirstOrDefaultAsync(t => t.TimeslotId == model.TimeslotId);
 
             if (timeslot == null)
             {
@@ -208,11 +231,11 @@ namespace TutorBridge.Controllers
             if (User.IsInRole("Admin"))
             {
                 ViewBag.Users = await UserDropdown();
-                ViewBag.Timeslots = await TimeslotDropdown();
+                ViewBag.Timeslots = await BookableTimeslotDropdown(booking.TimeslotId);
             }
             else
             {
-                ViewBag.Timeslots = await TimeslotDropdown(currentUserId);
+                ViewBag.Timeslots = await BookableTimeslotDropdown(booking.TimeslotId, currentUserId);
             }
             ViewBag.Subjects = await SubjectDropdown(booking.Timeslot.TutorId);
 
@@ -254,6 +277,12 @@ namespace TutorBridge.Controllers
                 return Forbid();
             }
 
+            // Fetched once up front — both branches below need it for ownership/existence
+            // checks, and it's also needed for the past-date/already-booked checks further down.
+            var timeslot = await _context.Timeslot
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.TimeslotId == booking.TimeslotId);
+
             // The tutor whose timeslot this booking will end up on once saved — used to
             // validate the Subject choice below, and as the redisplay context on failure.
             string targetTutorId;
@@ -262,10 +291,6 @@ namespace TutorBridge.Controllers
             {
                 // Tutors can't reassign a booking to a different student, whatever the form posted.
                 booking.UserId = existing.UserId;
-
-                var timeslot = await _context.Timeslot
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(t => t.TimeslotId == booking.TimeslotId);
 
                 if (timeslot == null || timeslot.TutorId != currentUserId)
                 {
@@ -276,10 +301,6 @@ namespace TutorBridge.Controllers
             }
             else
             {
-                var timeslot = await _context.Timeslot
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(t => t.TimeslotId == booking.TimeslotId);
-
                 if (timeslot == null)
                 {
                     ModelState.AddModelError(nameof(booking.TimeslotId), "Select a valid timeslot.");
@@ -288,6 +309,25 @@ namespace TutorBridge.Controllers
                 else
                 {
                     targetTutorId = timeslot.TutorId;
+                }
+            }
+
+            // Only enforce future-dated/not-already-booked when the timeslot is actually
+            // changing — keeping the booking's existing timeslot must always be allowed, even
+            // if it's since passed or is (naturally) "booked" by this very booking.
+            if (timeslot != null && booking.TimeslotId != existing.TimeslotId)
+            {
+                if (timeslot.DateTimeStart <= DateTime.Now)
+                {
+                    ModelState.AddModelError(nameof(booking.TimeslotId), "That timeslot has already passed.");
+                }
+
+                bool timeslotTaken = await _context.Booking
+                    .AnyAsync(b => b.TimeslotId == booking.TimeslotId && b.Status != BookingStatus.Cancelled);
+
+                if (timeslotTaken)
+                {
+                    ModelState.AddModelError(nameof(booking.TimeslotId), "That timeslot is already booked.");
                 }
             }
 
@@ -331,12 +371,12 @@ namespace TutorBridge.Controllers
             if (isAdmin)
             {
                 ViewBag.Users = await UserDropdown();
-                ViewBag.Timeslots = await TimeslotDropdown();
+                ViewBag.Timeslots = await BookableTimeslotDropdown(booking.TimeslotId);
                 ViewBag.Subjects = await SubjectDropdown();
             }
             else
             {
-                ViewBag.Timeslots = await TimeslotDropdown(currentUserId);
+                ViewBag.Timeslots = await BookableTimeslotDropdown(booking.TimeslotId, currentUserId);
                 ViewBag.Subjects = await SubjectDropdown(targetTutorId);
             }
 
@@ -397,8 +437,16 @@ namespace TutorBridge.Controllers
         {
             ViewBag.Tutor = tutor;
 
+            // Timeslots that already have a non-cancelled booking must not be offered again.
+            var bookedIds = await _context.Booking
+                .Where(b => b.Status != BookingStatus.Cancelled)
+                .Select(b => b.TimeslotId)
+                .ToHashSetAsync();
+
             ViewBag.Timeslots = await _context.Timeslot
                 .Where(t => t.TutorId == tutor.Id)
+                .Where(t => t.DateTimeStart > DateTime.Now)
+                .Where(t => !bookedIds.Contains(t.TimeslotId))
                 .OrderBy(t => t.DateTimeStart)
                 .Select(t => new
                 {
@@ -439,6 +487,40 @@ namespace TutorBridge.Controllers
             {
                 query = query.Where(t => t.TutorId == tutorId);
             }
+
+            return (await query
+                .Select(t => new SelectListItem
+                {
+                    Value = t.TimeslotId.ToString(),
+                    Text = $"{t.Tutor.NameFirst} {t.Tutor.NameLast} // {t.DateTimeStart:d} {t.DateTimeStart:t} - {t.DateTimeEnd:t}"
+                })
+                .ToListAsync())
+                .OrderBy(t => t.Text);
+        }
+
+        /// <summary>
+        /// Same shape as <see cref="TimeslotDropdown"/>, but for editing an existing booking:
+        /// excludes past and already-(actively-)booked timeslots, while always keeping
+        /// currentTimeslotId itself selectable so the booking's existing choice never
+        /// disappears from its own edit form.
+        /// </summary>
+        public async Task<IEnumerable<SelectListItem>> BookableTimeslotDropdown(int currentTimeslotId, string? tutorId = null)
+        {
+            var bookedIds = await _context.Booking
+                .Where(b => b.TimeslotId != currentTimeslotId && b.Status != BookingStatus.Cancelled)
+                .Select(b => b.TimeslotId)
+                .ToHashSetAsync();
+
+            var query = _context.Timeslot.Include(t => t.Tutor).AsQueryable();
+
+            if (tutorId != null)
+            {
+                query = query.Where(t => t.TutorId == tutorId);
+            }
+
+            query = query.Where(t =>
+                t.TimeslotId == currentTimeslotId ||
+                (t.DateTimeStart > DateTime.Now && !bookedIds.Contains(t.TimeslotId)));
 
             return (await query
                 .Select(t => new SelectListItem
