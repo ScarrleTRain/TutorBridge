@@ -97,7 +97,8 @@ body {
 .floating-menu-inner {
     padding: 0.5rem 1.25rem;
     white-space: nowrap;
-    height: 44px; /* match toggler button height so it lines up */
+    height: 44px;
+    width: max-content;
 }
 
 .floating-menu-inner .navbar-brand {
