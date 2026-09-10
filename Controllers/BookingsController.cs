@@ -1,13 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Data;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using TutorBridge.Areas.Identity.Data;
 using TutorBridge.Models;
 using TutorBridge.Services;
@@ -111,57 +108,50 @@ namespace TutorBridge.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Book(BookingCreateViewModel model)
         {
-            // Fetched up front — needed for validation below, and to recover the tutor for
-            // redisplay if anything fails.
-            var timeslot = await _context.Timeslot
+            // for redisplay on fail
+            var timeslotForRedisplay = await _context.Timeslot
                 .Include(t => t.Tutor)
                 .FirstOrDefaultAsync(t => t.TimeslotId == model.TimeslotId);
 
             if (ModelState.IsValid)
             {
-                if (timeslot == null)
-                {
-                    ModelState.AddModelError(nameof(model.TimeslotId), "Select a valid timeslot.");
-                }
-                else if (timeslot.DateTimeStart <= DateTime.Now)
-                {
-                    ModelState.AddModelError(nameof(model.TimeslotId), "That timeslot has already passed.");
-                }
-                else
-                {
-                    bool timeslotTaken = await _context.Booking
-                        .AnyAsync(b => b.TimeslotId == model.TimeslotId && b.Status != BookingStatus.Cancelled);
+                using var transaction = await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable);
 
-                    if (timeslotTaken)
+                if (await ValidateBookingRelationshipsAsync(model.TimeslotId!.Value, model.SubjectId!.Value))
+                {
+                    var booking = new Booking
                     {
+                        TimeslotId = model.TimeslotId!.Value,
+                        SubjectId = model.SubjectId!.Value,
+                        UserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!,
+                        Status = BookingStatus.Pending
+                    };
+
+                    try
+                    {
+                        _context.Add(booking);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+                        await _notificationService.NotifyBookingCreatedAsync(booking.Id);
+                        return RedirectToAction(nameof(HomeController.Index), "Home");
+                    }
+                    catch (DbUpdateException ex) when (IsActiveTimeslotUniqueViolation(ex))
+                    {
+                        // server backup
                         ModelState.AddModelError(nameof(model.TimeslotId), "That timeslot is already booked.");
                     }
                 }
+
+                await transaction.RollbackAsync();
             }
 
-            if (ModelState.IsValid)
-            {
-                var booking = new Booking
-                {
-                    TimeslotId = model.TimeslotId!.Value,
-                    SubjectId = model.SubjectId!.Value,
-                    UserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!,
-                    Status = BookingStatus.Pending
-                };
-
-                _context.Add(booking);
-                await _context.SaveChangesAsync();
-                await _notificationService.NotifyBookingCreatedAsync(booking.Id);
-                return RedirectToAction(nameof(HomeController.Index), "Home");
-            }
-
-            if (timeslot == null)
+            if (timeslotForRedisplay == null)
             {
                 // No valid timeslot to recover the tutor from — can't redisplay this view sensibly.
                 return NotFound();
             }
 
-            await PopulateBookViewBag(timeslot.Tutor);
+            await PopulateBookViewBag(timeslotForRedisplay.Tutor);
 
             return View(model);
         }
@@ -187,10 +177,25 @@ namespace TutorBridge.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(booking);
-                await _context.SaveChangesAsync();
-                await _notificationService.NotifyBookingCreatedAsync(booking.Id);
-                return RedirectToAction(nameof(Index));
+                using var transaction = await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+
+                if (await ValidateBookingRelationshipsAsync(booking.TimeslotId, booking.SubjectId))
+                {
+                    try
+                    {
+                        _context.Add(booking);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+                        await _notificationService.NotifyBookingCreatedAsync(booking.Id);
+                        return RedirectToAction(nameof(Index));
+                    }
+                    catch (DbUpdateException ex) when (IsActiveTimeslotUniqueViolation(ex))
+                    {
+                        ModelState.AddModelError(nameof(booking.TimeslotId), "That timeslot is already booked.");
+                    }
+                }
+
+                await transaction.RollbackAsync();
             }
 
             ViewBag.Users = await UserDropdown();
@@ -255,9 +260,7 @@ namespace TutorBridge.Controllers
                 return NotFound();
             }
 
-            // Ownership must be checked against the booking's existing timeslot, not the
-            // posted one — otherwise a Tutor could point TimeslotId at someone else's slot
-            // and have the check pass.
+            // Check ownership against previous record
             var existing = await _context.Booking
                 .AsNoTracking()
                 .Include(b => b.Timeslot)
@@ -277,95 +280,79 @@ namespace TutorBridge.Controllers
                 return Forbid();
             }
 
-            // Fetched once up front — both branches below need it for ownership/existence
-            // checks, and it's also needed for the past-date/already-booked checks further down.
-            var timeslot = await _context.Timeslot
+            // Force no user change
+            if (!isAdmin)
+            {
+                booking.UserId = existing.UserId;
+            }
+
+            // 
+            var timeslotForContext = await _context.Timeslot
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.TimeslotId == booking.TimeslotId);
 
-            // The tutor whose timeslot this booking will end up on once saved — used to
-            // validate the Subject choice below, and as the redisplay context on failure.
-            string targetTutorId;
+            // If admin, TutorId from timeslot, else own ID
+            string targetTutorId = isAdmin
+                ? (timeslotForContext?.TutorId ?? existing.Timeslot.TutorId)
+                : currentUserId!;
 
-            if (!isAdmin)
-            {
-                // Tutors can't reassign a booking to a different student, whatever the form posted.
-                booking.UserId = existing.UserId;
-
-                if (timeslot == null || timeslot.TutorId != currentUserId)
-                {
-                    ModelState.AddModelError(nameof(booking.TimeslotId), "Select one of your own timeslots.");
-                }
-
-                targetTutorId = currentUserId!;
-            }
-            else
-            {
-                if (timeslot == null)
-                {
-                    ModelState.AddModelError(nameof(booking.TimeslotId), "Select a valid timeslot.");
-                    targetTutorId = existing.Timeslot.TutorId;
-                }
-                else
-                {
-                    targetTutorId = timeslot.TutorId;
-                }
-            }
-
-            // Only enforce future-dated/not-already-booked when the timeslot is actually
-            // changing — keeping the booking's existing timeslot must always be allowed, even
-            // if it's since passed or is (naturally) "booked" by this very booking.
-            if (timeslot != null && booking.TimeslotId != existing.TimeslotId)
-            {
-                if (timeslot.DateTimeStart <= DateTime.Now)
-                {
-                    ModelState.AddModelError(nameof(booking.TimeslotId), "That timeslot has already passed.");
-                }
-
-                bool timeslotTaken = await _context.Booking
-                    .AnyAsync(b => b.TimeslotId == booking.TimeslotId && b.Status != BookingStatus.Cancelled);
-
-                if (timeslotTaken)
-                {
-                    ModelState.AddModelError(nameof(booking.TimeslotId), "That timeslot is already booked.");
-                }
-            }
-
-            bool subjectValid = await _context.TutorSubject
-                .AnyAsync(ts => ts.TutorId == targetTutorId && ts.SubjectId == booking.SubjectId);
-
-            if (!subjectValid)
-            {
-                ModelState.AddModelError(nameof(booking.SubjectId), "That tutor doesn't teach the selected subject.");
-            }
+            bool timeslotUnchanged = booking.TimeslotId == existing.TimeslotId;
 
             if (ModelState.IsValid)
             {
-                var previousStatus = existing.Status;
+                // isolated changes
+                using var transaction = await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable);
 
-                try
+                // validate
+                bool relationshipsValid = await ValidateBookingRelationshipsAsync(
+                    booking.TimeslotId,
+                    booking.SubjectId,
+                    excludingBookingId: booking.Id,
+                    skipFutureCheck: timeslotUnchanged,
+                    requiredTutorId: isAdmin ? null : currentUserId);
+
+                if (relationshipsValid)
                 {
-                    _context.Update(booking);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BookingExists(booking.Id))
+                    var previousStatus = existing.Status;
+
+                    try
                     {
-                        return NotFound();
+                        _context.Update(booking);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
                     }
-                    else
+                    // 
+                    catch (DbUpdateConcurrencyException)
                     {
+                        await transaction.RollbackAsync();
+                        if (!BookingExists(booking.Id))
+                        {
+                            return NotFound();
+                        }
                         throw;
                     }
+                    catch (DbUpdateException ex) when (IsActiveTimeslotUniqueViolation(ex))
+                    {
+                        ModelState.AddModelError(nameof(booking.TimeslotId), "That timeslot is already booked.");
+                        await transaction.RollbackAsync();
+                        relationshipsValid = false;
+                    }
+
+                    // Notify
+                    if (relationshipsValid)
+                    {
+                        if (previousStatus != BookingStatus.Cancelled && booking.Status == BookingStatus.Cancelled)
+                            await _notificationService.NotifyBookingCancelledAsync(booking.Id);
+                        else
+                            await _notificationService.NotifyBookingEditedAsync(booking.Id);
+
+                        return RedirectToAction(nameof(Index));
+                    }
                 }
-
-                if (previousStatus != BookingStatus.Cancelled && booking.Status == BookingStatus.Cancelled)
-                    await _notificationService.NotifyBookingCancelledAsync(booking.Id);
                 else
-                    await _notificationService.NotifyBookingEditedAsync(booking.Id);
-
-                return RedirectToAction(nameof(Index));
+                {
+                    await transaction.RollbackAsync();
+                }
             }
 
             if (isAdmin)
@@ -431,6 +418,85 @@ namespace TutorBridge.Controllers
         private bool BookingExists(int id)
         {
             return _context.Booking.Any(e => e.Id == id);
+        }
+
+        /// <summary>
+        /// Re-validates a booking's relationships against the current database state: the
+        /// timeslot exists, is in the future (unless skipFutureCheck), isn't already actively
+        /// booked by a different booking, and its tutor actually teaches the chosen subject.
+        /// When requiredTutorId is given (non-admin Book/Edit), also enforces the timeslot
+        /// belongs to that tutor. Adds ModelState errors for any failures.
+        ///
+        /// Must be called from inside a Serializable transaction that goes on to perform the
+        /// insert/update — the SELECT here is what takes the range locks that make "no two
+        /// requests can book the same timeslot" actually hold under concurrency. Called outside
+        /// a transaction, or at a lower isolation level, it's just a point-in-time check with
+        /// the same race window the audit finding described.
+        /// </summary>
+        private async Task<bool> ValidateBookingRelationshipsAsync(
+            int timeslotId,
+            int subjectId,
+            int? excludingBookingId = null,
+            bool skipFutureCheck = false,
+            string? requiredTutorId = null)
+        {
+            var timeslot = await _context.Timeslot
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.TimeslotId == timeslotId);
+
+            if (timeslot == null)
+            {
+                ModelState.AddModelError(nameof(Booking.TimeslotId), "Select a valid timeslot.");
+                return false;
+            }
+
+            bool isValid = true;
+
+            // Check if it belongs to them / Are admin
+            if (requiredTutorId != null && timeslot.TutorId != requiredTutorId)
+            {
+                ModelState.AddModelError(nameof(Booking.TimeslotId), "Select one of your own timeslots.");
+                isValid = false;
+            }
+
+            // Past-lock
+            if (!skipFutureCheck && timeslot.DateTimeStart <= DateTime.Now)
+            {
+                ModelState.AddModelError(nameof(Booking.TimeslotId), "That timeslot has already passed.");
+                isValid = false;
+            }
+
+            // Check if it has any non cancelled bookings
+            bool timeslotTaken = await _context.Booking
+                .AnyAsync(b => b.TimeslotId == timeslotId
+                    && b.Status != BookingStatus.Cancelled
+                    && (excludingBookingId == null || b.Id != excludingBookingId.Value));
+
+            if (timeslotTaken)
+            {
+                ModelState.AddModelError(nameof(Booking.TimeslotId), "That timeslot is already booked.");
+                isValid = false;
+            }
+
+            // Check if tutor actually teaches subject
+            bool subjectValid = await _context.TutorSubject
+                .AnyAsync(ts => ts.TutorId == timeslot.TutorId && ts.SubjectId == subjectId);
+
+            if (!subjectValid)
+            {
+                ModelState.AddModelError(nameof(Booking.SubjectId), "That tutor doesn't teach the selected subject.");
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        // true of the exception was made by the IX_Booking_TimeslotId_ActiveUnique constraint
+        private static bool IsActiveTimeslotUniqueViolation(DbUpdateException ex)
+        {
+            return ex.InnerException is SqlException sqlEx
+                && (sqlEx.Number == 2601 || sqlEx.Number == 2627)
+                && sqlEx.Message.Contains("IX_Booking_TimeslotId_ActiveUnique");
         }
 
         private async Task PopulateBookViewBag(User tutor)

@@ -23,6 +23,18 @@ public class TutorBridgeContext : IdentityDbContext<User>
             .Property(b => b.Status)
             .HasConversion<string>();
 
+        // Backstop for "at most one active booking per timeslot", enforced at the database
+        // level in case the Serializable-transaction check in BookingsController is ever
+        // bypassed or wrong. Filtered to exclude cancelled and soft-deleted bookings — a
+        // cancelled or (soft-)deleted booking must not block re-booking that timeslot. Status
+        // is stored as a string via HasConversion<string>() above, so the filter compares
+        // against the enum member's name, not its numeric value.
+        builder.Entity<Booking>()
+            .HasIndex(b => b.TimeslotId)
+            .IsUnique()
+            .HasFilter("[Status] <> 'Cancelled' AND [DeletedAt] IS NULL")
+            .HasDatabaseName("IX_Booking_TimeslotId_ActiveUnique");
+
         builder.Entity<Booking>()
             .HasOne(b => b.User)
             .WithMany()
