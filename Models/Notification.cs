@@ -31,6 +31,7 @@ namespace TutorBridge.Models
         {
             UserSignedUp,
             BookingCreated,
+            BookingConfirmed,
             BookingCancelled,
             BookingEdited,
             TutorApplicationSubmitted,

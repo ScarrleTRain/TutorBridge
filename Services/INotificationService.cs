@@ -7,6 +7,7 @@ public interface INotificationService
     Task NotifyUserSignedUpAsync(User newUser);
     Task NotifyAccountCreatedByAdminAsync(User newUser);
     Task NotifyBookingCreatedAsync(int bookingId);
+    Task NotifyBookingConfirmedAsync(int bookingId);
     Task NotifyBookingCancelledAsync(int bookingId);
     Task NotifyBookingEditedAsync(int bookingId);
     Task NotifyTutorApplicationSubmittedAsync(int applicationId);

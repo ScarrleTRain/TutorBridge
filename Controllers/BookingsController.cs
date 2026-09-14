@@ -370,6 +370,70 @@ namespace TutorBridge.Controllers
             return View(booking);
         }
 
+        // POST: Bookings/Confirm/5
+        [HttpPost]
+        [Authorize(Roles = "Tutor")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Confirm(int id)
+        {
+            var booking = await _context.Booking
+                .Include(b => b.Timeslot)
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (booking == null)
+            {
+                return NotFound();
+            }
+
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (booking.Timeslot.TutorId != currentUserId)
+            {
+                return Forbid();
+            }
+
+            // Ignore stale/duplicate clicks rather than erroring — only a Pending booking can be confirmed.
+            if (booking.Status == BookingStatus.Pending)
+            {
+                booking.Status = BookingStatus.Confirmed;
+                await _context.SaveChangesAsync();
+                await _notificationService.NotifyBookingConfirmedAsync(booking.Id);
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // POST: Bookings/Deny/5
+        [HttpPost]
+        [Authorize(Roles = "Tutor")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Deny(int id)
+        {
+            var booking = await _context.Booking
+                .Include(b => b.Timeslot)
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (booking == null)
+            {
+                return NotFound();
+            }
+
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (booking.Timeslot.TutorId != currentUserId)
+            {
+                return Forbid();
+            }
+
+            // Ignore stale/duplicate clicks rather than erroring — only a Pending booking can be denied.
+            if (booking.Status == BookingStatus.Pending)
+            {
+                booking.Status = BookingStatus.Cancelled;
+                await _context.SaveChangesAsync();
+                await _notificationService.NotifyBookingCancelledAsync(booking.Id);
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
         // GET: Bookings/Delete/5
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)

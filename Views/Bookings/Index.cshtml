@@ -1,7 +1,9 @@
-﻿@model IEnumerable<TutorBridge.Models.Booking>
+﻿@using System.Security.Claims
+@model IEnumerable<TutorBridge.Models.Booking>
 
 @{
     ViewData["Title"] = "Bookings";
+    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 }
 
 <div class="card shadow-lg">
@@ -76,6 +78,23 @@
                         <td>@item.Subject.Name</td>
                         <td>@item.Status</td>
                         <td>
+                            @if (item.Status == Booking.BookingStatus.Pending && item.Timeslot.TutorId == currentUserId)
+                            {
+                                <form asp-action="Confirm" asp-route-id="@item.Id" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-link p-0 border-0 align-baseline text-success" title="Confirm booking">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                </form> 
+                                <span> | </span>
+                                <form asp-action="Deny" asp-route-id="@item.Id" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-link p-0 border-0 align-baseline text-danger" title="Deny booking">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </form> 
+                                <span> | </span>
+                            }
                             <a asp-action="Edit" asp-route-id="@item.Id" class="text-decoration-none">
                                 <i class="bi bi-pencil-square"></i>
                             </a> |

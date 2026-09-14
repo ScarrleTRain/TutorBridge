@@ -65,6 +65,10 @@ public class NotificationService : INotificationService
         CreateForBookingAsync(bookingId, Notification.NotificationType.BookingCreated,
             "Booking created", "Your booking has been created.");
 
+    public Task NotifyBookingConfirmedAsync(int bookingId) =>
+        CreateForBookingAsync(bookingId, Notification.NotificationType.BookingConfirmed,
+            "Booking confirmed", "Your booking has been confirmed.");
+
     public Task NotifyBookingCancelledAsync(int bookingId) =>
         CreateForBookingAsync(bookingId, Notification.NotificationType.BookingCancelled,
             "Booking cancelled", "A booking has been cancelled.");
