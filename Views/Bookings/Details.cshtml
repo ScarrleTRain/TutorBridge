@@ -24,7 +24,10 @@
                     <i class="bi bi-person-badge me-1 text-primary"></i>User Name
                 </dt>
                 <dd class="col-md-9">
-                    @Model.User.NameFirst @Model.User.NameLast <span class="text-secondary">(@Model.UserId)</span>
+                    @Model.User.NameFirst @Model.User.NameLast @if (User.IsInRole("Admin") || User.IsInRole("Tutor"))
+                    {
+                        <span class="text-secondary">(@Model.UserId)</span>
+                    }
                 </dd>
             }
             else
@@ -45,7 +48,10 @@
                         <i class="bi-person-badge me-1 text-primary"></i>Tutor
                     </dt>
                     <dd class="col-md-9">
-                        @Model.Timeslot.Tutor.NameFirst @Model.Timeslot.Tutor.NameLast <span class="text-secondary">(@Model.Timeslot.Tutor.Id)</span>
+                        @Model.Timeslot.Tutor.NameFirst @Model.Timeslot.Tutor.NameLast @if (User.IsInRole("Admin") || User.IsInRole("Tutor"))
+                        {
+                            <span class="text-secondary">(@Model.Timeslot.Tutor.Id)</span>
+                        }
                     </dd>
                 }
                 else
@@ -65,7 +71,11 @@
                     @{
                         var time = $"{Model.Timeslot.DateTimeStart:d}, {Model.Timeslot.DateTimeStart:t} - {Model.Timeslot.DateTimeEnd:t}";
                     }
-                    @time <span class="text-secondary">(@Model.TimeslotId)</span>
+                    @time 
+                    @if (User.IsInRole("Admin") || User.IsInRole("Tutor"))
+                    {
+                        <span class="text-secondary">(@Model.TimeslotId)</span>
+                    }
                 </dd>
             }
             else
@@ -84,7 +94,10 @@
                     <i class="bi bi-book me-1 text-primary"></i>Subject
                 </dt>
                 <dd class="col-md-9">
-                    @Model.Subject.Name <span class="text-secondary">(@Model.SubjectId)</span>
+                    @Model.Subject.Name @if (User.IsInRole("Admin") || User.IsInRole("Tutor"))
+                    {
+                        <span class="text-secondary">(@Model.SubjectId)</span>
+                    }
                 </dd>
             }
             else
@@ -104,29 +117,31 @@
                 @Html.DisplayFor(model => model.Status)
             </dd>
         </dl>
-
-        <div class="col-12 pt-2 border-top mt-3 d-flex gap-2">
-            @if (canRespond)
-            {
-                <form asp-action="Confirm" asp-route-id="@Model.Id" class="d-inline">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-success">
-                        <i class="bi bi-check-lg me-1"></i>Confirm
-                    </button>
-                </form>
-                <form asp-action="Deny" asp-route-id="@Model.Id" class="d-inline">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-danger">
-                        <i class="bi bi-x-lg me-1"></i>Deny
-                    </button>
-                </form>
-            }
-            <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">
-                <i class="bi bi-pencil-square me-1"></i>Edit
-            </a>
-            <a asp-action="Index" class="btn btn-outline-secondary">
-                Cancel
-            </a>
-        </div>
+        @if (User.IsInRole("Admin") || User.IsInRole("Tutor"))
+        {
+            <div class="col-12 pt-2 border-top mt-3 d-flex gap-2">
+                @if (canRespond)
+                {
+                    <form asp-action="Confirm" asp-route-id="@Model.Id" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-lg me-1"></i>Confirm
+                        </button>
+                    </form>
+                    <form asp-action="Deny" asp-route-id="@Model.Id" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-x-lg me-1"></i>Deny
+                        </button>
+                    </form>
+                }
+                <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">
+                    <i class="bi bi-pencil-square me-1"></i>Edit
+                </a>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+            </div>            
+        }
     </div>
 </div>
