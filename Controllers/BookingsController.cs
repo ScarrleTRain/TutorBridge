@@ -133,7 +133,9 @@ namespace TutorBridge.Controllers
                         await _context.SaveChangesAsync();
                         await transaction.CommitAsync();
                         await _notificationService.NotifyBookingCreatedAsync(booking.Id);
-                        return RedirectToAction(nameof(HomeController.Index), "Home");
+                        TempData["StatusMessage"] = "Your booking request has been sent. " +
+                            "You'll be notified once the tutor responds.";
+                        return RedirectToAction(nameof(Details), new { id = booking.Id });
                     }
                     catch (DbUpdateException ex) when (IsActiveTimeslotUniqueViolation(ex))
                     {
@@ -397,6 +399,7 @@ namespace TutorBridge.Controllers
                 booking.Status = BookingStatus.Confirmed;
                 await _context.SaveChangesAsync();
                 await _notificationService.NotifyBookingConfirmedAsync(booking.Id);
+                TempData["StatusMessage"] = "Booking confirmed.";
             }
 
             return RedirectToAction(nameof(Index));
@@ -429,6 +432,7 @@ namespace TutorBridge.Controllers
                 booking.Status = BookingStatus.Cancelled;
                 await _context.SaveChangesAsync();
                 await _notificationService.NotifyBookingCancelledAsync(booking.Id);
+                TempData["StatusMessage"] = "Booking denied.";
             }
 
             return RedirectToAction(nameof(Index));

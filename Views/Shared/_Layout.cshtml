@@ -29,7 +29,6 @@
                         aria-label="Toggle navigation">
                     <span class="navbar-brand">TutorBridge</span><i class="bi bi-list" style="font-size: 24px;"></i>
                 </button>
-                @* FIX SNAP *@
                 <div class="navbar-collapse collapse collapse-horizontal floating-menu position-absolute top-0 bg-primary-subtle rounded-5 shadow">
                     <div class="floating-menu-inner d-flex flex-row align-items-center g-4 ">
                         <ul class="navbar-nav fw-bold">
@@ -87,6 +86,16 @@
             </div>
         </nav>
     </header>
+
+    @if (TempData["StatusMessage"] is string statusMessage)
+    {
+        <div class="container mt-3">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @statusMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    }
 
     @{
         bool useContainer = ViewData["NoContainer"] as bool? != true;
