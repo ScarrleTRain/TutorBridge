@@ -23,10 +23,15 @@ namespace TutorBridge.Validation
             if (value is DateOnly birthDate)
             {
                 var minDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-_years));
-                var maxDate = new DateOnly(1900, 1, 1);
-                if (birthDate > minDate || birthDate < maxDate)
+                var maxDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-100));
+                if (birthDate > minDate)
                 {
                     var message = ErrorMessage ?? $"Must be at least {_years} years old";
+                    return new ValidationResult(message, new[] { vc.MemberName ?? string.Empty });
+                }
+                else if (birthDate < maxDate)
+                {
+                    var message = ErrorMessage ?? $"Must be at less than 100 years old";
                     return new ValidationResult(message, new[] { vc.MemberName ?? string.Empty });
                 }
             }

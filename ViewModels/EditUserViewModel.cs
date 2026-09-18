@@ -9,13 +9,13 @@ namespace TutorBridge.ViewModels
 
         [Required(ErrorMessage = "First name is required")]
         [StringLength(30, ErrorMessage = "Max 30 Characters")]
-        [RegularExpression(@"^[a-zA-Z\s-]+$", ErrorMessage = "First name can only contain letters")]
+        [RegularExpression(@"^[a-zA-Z]+(?:[ -][a-zA-Z]+)*$", ErrorMessage = "First name can only contain letters")]
         [Display(Name = "First Name")]
         public string NameFirst { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Last name is required")]
         [StringLength(30, ErrorMessage = "Max 30 Characters")]
-        [RegularExpression(@"^[a-zA-Z\s-]+$", ErrorMessage = "Last name can only contain letters")]
+        [RegularExpression(@"^[a-zA-Z]+(?:[ -][a-zA-Z]+)*$", ErrorMessage = "Last name can only contain letters")]
         [Display(Name = "Last Name")]
         public string NameLast { get; set; } = string.Empty;
 
@@ -34,11 +34,13 @@ namespace TutorBridge.ViewModels
         [DataType(DataType.Date)]
         public DateOnly BirthDate { get; set; }
 
+        [Trim]
         [StringLength(500, ErrorMessage = "Max 500 characters")]
         [Display(Name = "Blurb")]
         public string? Blurb { get; set; }
 
         [Required(ErrorMessage = "Role is required")]
+        [AllowedValues(["Admin","Tutor", "Student"], ErrorMessage = "Role must be of: Admin/Tutor/Student")]
         public string Role { get; set; } = string.Empty;
     }
 }

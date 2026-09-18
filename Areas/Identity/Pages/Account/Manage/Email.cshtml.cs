@@ -70,6 +70,7 @@ namespace TutorBridge.Areas.Identity.Pages.Account.Manage
             /// </summary>
             [Required]
             [EmailAddress]
+            [StringLength(256)]
             [Display(Name = "New email")]
             public string NewEmail { get; set; }
         }

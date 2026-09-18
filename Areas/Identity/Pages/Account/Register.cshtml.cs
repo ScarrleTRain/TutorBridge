@@ -79,6 +79,7 @@ namespace TutorBridge.Areas.Identity.Pages.Account
         {
             [Required]
             [EmailAddress]
+            [StringLength(256)]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
@@ -95,13 +96,13 @@ namespace TutorBridge.Areas.Identity.Pages.Account
 
             [Required(ErrorMessage = "First name is required")]
             [StringLength(30, ErrorMessage = "Max 30 Characters")]
-            [RegularExpression(@"^[a-zA-Z\s-]+$", ErrorMessage = "First name can only contain letters")]
+            [RegularExpression(@"^[a-zA-Z]+(?:[ -][a-zA-Z]+)*$", ErrorMessage = "First name can only contain letters")]
             [Display(Name = "First name")]
             public string NameFirst { get; set; }
 
             [Required(ErrorMessage = "Last name is required")]
             [StringLength(30, ErrorMessage = "Max 30 Characters")]
-            [RegularExpression(@"^[a-zA-Z\s-]+$", ErrorMessage = "Last name can only contain letters")]
+            [RegularExpression(@"^[a-zA-Z]+(?:[ -][a-zA-Z]+)*$", ErrorMessage = "Last name can only contain letters")]
             [Display(Name = "Last name")]
             public string NameLast { get; set; }
 

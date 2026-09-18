@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using TutorBridge.Validation;
 
 namespace TutorBridge.ViewModels
 {
@@ -9,6 +10,7 @@ namespace TutorBridge.ViewModels
         public DateTime? PendingSubmittedAt { get; set; }
 
         [Required(ErrorMessage = "Tell us a bit about yourself")]
+        [Trim]
         [StringLength(500, ErrorMessage = "Max 500 characters")]
         [Display(Name = "Why would you be a good tutor?")]
         public string? Blurb { get; set; }

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TutorBridge.Areas.Identity.Data;
+using TutorBridge.Validation;
 
 namespace TutorBridge.Models
 {
@@ -19,6 +20,7 @@ namespace TutorBridge.Models
 
         // The applicant's pitch, shown to Admin when reviewing. Copied onto
         // User.Blurb if/when the application is approved.
+        [Trim]
         [StringLength(500, ErrorMessage = "Max 500 characters")]
         public string? Blurb { get; set; }
 

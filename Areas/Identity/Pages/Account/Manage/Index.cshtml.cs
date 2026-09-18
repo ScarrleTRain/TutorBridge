@@ -61,13 +61,13 @@ namespace TutorBridge.Areas.Identity.Pages.Account.Manage
         {
             [Required(ErrorMessage = "First name is required")]
             [StringLength(30, ErrorMessage = "Max 30 Characters")]
-            [RegularExpression(@"^[a-zA-Z\s-]+$", ErrorMessage = "First name can only contain letters")]
+            [RegularExpression(@"^[a-zA-Z]+(?:[ -][a-zA-Z]+)*$", ErrorMessage = "First name can only contain letters")]
             [Display(Name = "First name")]
             public string NameFirst { get; set; }
 
             [Required(ErrorMessage = "Last name is required")]
             [StringLength(30, ErrorMessage = "Max 30 Characters")]
-            [RegularExpression(@"^[a-zA-Z\s-]+$", ErrorMessage = "Last name can only contain letters")]
+            [RegularExpression(@"^[a-zA-Z]+(?:[ -][a-zA-Z]+)*$", ErrorMessage = "Last name can only contain letters")]
             [Display(Name = "Last name")]
             public string NameLast { get; set; }
 
@@ -81,6 +81,7 @@ namespace TutorBridge.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Date of birth")]
             public DateOnly BirthDate { get; set; }
 
+            [Trim]
             [StringLength(500, ErrorMessage = "Max 500 characters")]
             [Display(Name = "Bio")]
             public string Blurb { get; set; }
