@@ -31,8 +31,21 @@ namespace TutorBridge.Controllers
                 .Include(ts => ts.Subject)
                 .ToListAsync();
 
+            var now = DateTime.UtcNow;
+
+            var tutorIdsWithFreeSlots = (await _context.Timeslot
+                .AsNoTracking()
+                .Where(t => tutorIds.Contains(t.TutorId)
+                            && t.DateTimeStart >= now
+                            && !t.Bookings.Any(b => b.Status != Booking.BookingStatus.Cancelled))
+                .Select(t => t.TutorId)
+                .Distinct()
+                .ToListAsync())
+                .ToHashSet();
+
             var featuredTutors = tutorUsers
-                .OrderByDescending(u => u.ProfilePhoto != null)
+                .OrderByDescending(u => tutorIdsWithFreeSlots.Contains(u.Id))
+                .ThenByDescending(u => u.ProfilePhoto != null)
                 .Take(3)
                 .Select(u => new Tutor(
                     u.Id,
