@@ -18,6 +18,12 @@ builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.Requi
     .AddEntityFrameworkStores<TutorBridgeContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+});
+
 var brevoApiKey = builder.Configuration["Brevo:ApiKey"];
 if (string.IsNullOrWhiteSpace(brevoApiKey))
 {
