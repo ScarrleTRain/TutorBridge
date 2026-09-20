@@ -4,6 +4,8 @@ namespace TutorBridge.Validation
 {
     public class MinAgeAttribute : ValidationAttribute
     {
+        private const int MaxYears = 100;
+
         private readonly int _years;
 
         public MinAgeAttribute(int years)
@@ -23,7 +25,7 @@ namespace TutorBridge.Validation
             if (value is DateOnly birthDate)
             {
                 var minDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-_years));
-                var maxDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-100));
+                var maxDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-MaxYears));
                 if (birthDate > minDate)
                 {
                     var message = ErrorMessage ?? $"Must be at least {_years} years old";
@@ -31,7 +33,9 @@ namespace TutorBridge.Validation
                 }
                 else if (birthDate < maxDate)
                 {
-                    var message = ErrorMessage ?? $"Must be at less than 100 years old";
+                    // Fixed message: ErrorMessage is always set by the constructors and describes the
+                    // too-young case, so reusing it here would show the wrong text for an over-100 birth date.
+                    var message = $"Must be {MaxYears} years old or younger";
                     return new ValidationResult(message, new[] { vc.MemberName ?? string.Empty });
                 }
             }

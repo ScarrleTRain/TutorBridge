@@ -47,7 +47,9 @@ namespace TutorBridge.Validation
 
             if (!_allowedContentTypes.Contains(file.ContentType, StringComparer.OrdinalIgnoreCase))
             {
-                return new ValidationResult("Only JPEG and PNG images are allowed.");
+                // Built from the allowed types so the message always matches what the attribute was given
+                var names = string.Join(", ", _allowedContentTypes.Select(t => t.Replace("image/", "").ToUpperInvariant()));
+                return new ValidationResult($"Only {names} images are allowed.");
             }
 
             if (!HasValidSignature(file))
@@ -64,7 +66,7 @@ namespace TutorBridge.Validation
             using var stream = file.OpenReadStream();
             var header = new byte[HeaderBytesToRead];
             var bytesRead = stream.Read(header, 0, header.Length);
-            stream.Position = 0; 
+            stream.Position = 0;
 
             // WEBP is a RIFF container: "RIFF" at offset 0, "WEBP" at offset 8.
             if (file.ContentType.Equals("image/webp", StringComparison.OrdinalIgnoreCase))
