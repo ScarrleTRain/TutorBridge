@@ -2,9 +2,73 @@
 
 @{
     ViewData["Title"] = "Book";
+
+    var tutor = ViewBag.Tutor;
+    string tutorId = tutor.Id;
+    string tutorName = $"{tutor.NameFirst} {tutor.NameLast}";
+    string? blurb = tutor.Blurb;
+    bool hasPhoto = tutor.ProfilePhoto != null;
+    string photoUrl = hasPhoto
+        ? Url.Action("Photo", "Users", new { id = tutorId })!
+        : Url.Content("~/images/tutors/default.jpg");
 }
 
 <style>
+    /* Layout: tutor + form in a left sidebar, calendar gets the wide column.
+       On small screens the order is tutor -> calendar -> form. */
+    .booking-layout {
+        display: grid;
+        gap: 1.5rem;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            "tutor"
+            "calendar"
+            "form";
+    }
+
+    @@media (min-width: 992px) {
+        .booking-layout {
+            grid-template-columns: 320px minmax(0, 1fr);
+            grid-template-areas:
+                "tutor calendar"
+                "form  calendar";
+            grid-template-rows: auto 1fr;
+        }
+    }
+
+    .booking-tutor { grid-area: tutor; }
+    .booking-calendar { grid-area: calendar; min-width: 0; }
+    .booking-form { grid-area: form; align-self: start; }
+
+    .booking-panel {
+        border: 1px solid var(--bs-border-color);
+        border-radius: var(--bs-border-radius);
+        padding: 1rem;
+    }
+
+    .booking-tutor-photo {
+        width: 72px;
+        height: 72px;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    /* FullCalendar: pick up the site's Bootstrap theme colours */
+    .fc {
+        --fc-button-bg-color: var(--bs-primary);
+        --fc-button-border-color: var(--bs-primary);
+        --fc-button-hover-bg-color: color-mix(in srgb, var(--bs-primary) 85%, black);
+        --fc-button-hover-border-color: color-mix(in srgb, var(--bs-primary) 85%, black);
+        --fc-button-active-bg-color: color-mix(in srgb, var(--bs-primary) 75%, black);
+        --fc-button-active-border-color: color-mix(in srgb, var(--bs-primary) 75%, black);
+        --fc-today-bg-color: rgba(var(--bs-primary-rgb), 0.08);
+    }
+
+    .fc .fc-toolbar {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
     .fc-event {
         background-color: var(--bs-primary);
         border-color: var(--bs-primary);
@@ -33,49 +97,69 @@
     }
 </style>
 
-<div asp-validation-summary="All" class="text-danger"></div>
+<div class="card shadow-lg">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0"><i class="bi bi-calendar-plus me-2"></i>Book a Session</h2>
+        <a asp-controller="Tutors" asp-action="Details" asp-route-id="@tutorId" class="btn btn-primary bg-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Back to Tutor
+        </a>
+    </div>
 
-<h1>Book</h1>
-<hr />
-<div class="row">
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card">
-                <img class="card-img-top"
-                     src="@(ViewBag.Tutor.ProfilePhoto != null ? Url.Action("Photo", "Users", new { id = ViewBag.Tutor.Id }) : Url.Content("~/images/tutors/default.jpg"))"
-                     alt="@ViewBag.Tutor.NameFirst @ViewBag.Tutor.NameLast">
-                <div class="card-body">
-                    <h5 class="card-title">@ViewBag.Tutor.NameFirst @ViewBag.Tutor.NameLast</h5>
-                    <p class="card-text">@ViewBag.Tutor.Blurb</p>
+    <div class="card-body">
+        <div class="booking-layout">
+
+            <div class="booking-tutor booking-panel d-flex flex-column gap-2">
+                <div class="d-flex align-items-center gap-3">
+                    <img class="booking-tutor-photo rounded-circle border"
+                         src="@photoUrl"
+                         alt="@tutorName" />
+                    <div>
+                        <div class="fw-semibold">@tutorName</div>
+                        <div class="text-muted small"><i class="bi bi-mortarboard me-1 text-primary"></i>Tutor</div>
+                    </div>
                 </div>
+                @if (!string.IsNullOrWhiteSpace(blurb))
+                {
+                    <p class="small mb-0">@blurb</p>
+                }
             </div>
-        </div>
 
-        <div class="col-md-6">
-            <div id="calendar" class="mb-3"></div>
-            <div id="slot-feedback" class="alert alert-info d-none mb-3">
-                No timeslot selected.
+            <div class="booking-calendar">
+                <p class="text-muted small mb-2">
+                    <i class="bi bi-info-circle me-1"></i>Pick an available timeslot on the calendar, then choose a subject and confirm.
+                </p>
+                <div id="calendar"></div>
             </div>
-        </div>
 
-        <div class="col-md-3">
-            <form asp-action="Book">
-                @Html.AntiForgeryToken()
-                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                <input type="hidden" asp-for="TimeslotId" id="TimeslotId" />
-                <div class="form-group mb-3">
-                    <label asp-for="SubjectId" class="control-label">Subject</label>
-                    <select asp-for="SubjectId" asp-items="ViewBag.Subjects" class="form-control">
-                        <option value="">-- Select a subject --</option>
-                    </select>
-                    <span asp-validation-for="SubjectId" class="text-danger"></span>
+            <div class="booking-form booking-panel">
+                <div id="slot-feedback" class="alert alert-info d-none mb-3">
+                    No timeslot selected.
                 </div>
-                <div class="form-group">
-                    <button type="submit" id="submit-btn" class="btn btn-primary w-100" disabled>
-                        Confirm Booking
-                    </button>
-                </div>
-            </form>
+
+                <form asp-action="Book">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="TimeslotId" id="TimeslotId" />
+                    <span asp-validation-for="TimeslotId" class="text-danger small d-block mb-3"></span>
+
+                    <div class="mb-3">
+                        <label asp-for="SubjectId" class="form-label">
+                            <i class="bi bi-book me-1 text-primary"></i>Subject
+                        </label>
+                        <select asp-for="SubjectId" asp-items="ViewBag.Subjects" class="form-control">
+                            <option value="">-- Select a subject --</option>
+                        </select>
+                        <span asp-validation-for="SubjectId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="pt-2 border-top">
+                        <button type="submit" id="submit-btn" class="btn btn-primary w-100" disabled>
+                            <i class="bi bi-check-lg me-1"></i>Confirm Booking
+                        </button>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
 </div>
