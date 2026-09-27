@@ -613,19 +613,18 @@ namespace TutorBridge.Controllers
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<SelectListItem>> UserDropdown()
+        public async Task<IEnumerable<DropdownOption>> UserDropdown()
         {
             return (await _context.Users
-                .Select(u => new SelectListItem
-                {
-                    Value = u.Id,
-                    Text = $"{u.NameFirst} {u.NameLast}"
-                })
+                .Select(u => new DropdownOption(
+                    u.Id,
+                    $"{u.NameFirst} {u.NameLast}",
+                    u.Email))
                 .ToListAsync())
-                .OrderBy(u => u.Text);
+                .OrderBy(o => o.Text);
         }
 
-        public async Task<IEnumerable<SelectListItem>> TimeslotDropdown(string? tutorId = null)
+        public async Task<IEnumerable<DropdownOption>> TimeslotDropdown(string? tutorId = null)
         {
             var query = _context.Timeslot.Include(t => t.Tutor).AsQueryable();
 
@@ -635,11 +634,11 @@ namespace TutorBridge.Controllers
             }
 
             return (await query
-                .Select(t => new SelectListItem
-                {
-                    Value = t.TimeslotId.ToString(),
-                    Text = $"{t.Tutor.NameFirst} {t.Tutor.NameLast} // {t.DateTimeStart:d} {t.DateTimeStart:t} - {t.DateTimeEnd:t}"
-                })
+                .Select(t => new DropdownOption
+                (
+                    t.TimeslotId.ToString(),
+                    $"{t.Tutor.NameFirst} {t.Tutor.NameLast} // {t.DateTimeStart:d} {t.DateTimeStart:t} - {t.DateTimeEnd:t}"
+                ))
                 .ToListAsync())
                 .OrderBy(t => t.Text);
         }
@@ -650,7 +649,7 @@ namespace TutorBridge.Controllers
         /// currentTimeslotId itself selectable so the booking's existing choice never
         /// disappears from its own edit form.
         /// </summary>
-        public async Task<IEnumerable<SelectListItem>> BookableTimeslotDropdown(int currentTimeslotId, string? tutorId = null)
+        public async Task<IEnumerable<DropdownOption>> BookableTimeslotDropdown(int currentTimeslotId, string? tutorId = null)
         {
             var bookedIds = await _context.Booking
                 .Where(b => b.TimeslotId != currentTimeslotId && b.Status != BookingStatus.Cancelled)
@@ -669,25 +668,25 @@ namespace TutorBridge.Controllers
                 (t.DateTimeStart > DateTime.Now && !bookedIds.Contains(t.TimeslotId)));
 
             return (await query
-                .Select(t => new SelectListItem
-                {
-                    Value = t.TimeslotId.ToString(),
-                    Text = $"{t.Tutor.NameFirst} {t.Tutor.NameLast} // {t.DateTimeStart:d} {t.DateTimeStart:t} - {t.DateTimeEnd:t}"
-                })
+                .Select(t => new DropdownOption
+                (
+                    t.TimeslotId.ToString(),
+                    $"{t.Tutor.NameFirst} {t.Tutor.NameLast} // {t.DateTimeStart:d} {t.DateTimeStart:t} - {t.DateTimeEnd:t}"
+                ))
                 .ToListAsync())
                 .OrderBy(t => t.Text);
         }
 
-        public async Task<IEnumerable<SelectListItem>> SubjectDropdown(string? tutorId = null)
+        public async Task<IEnumerable<DropdownOption>> SubjectDropdown(string? tutorId = null)
         {
             if (tutorId == null)
             {
                 return (await _context.Subject
-                    .Select(s => new SelectListItem
-                    {
-                        Value = s.SubjectId.ToString(),
-                        Text = $"{s.Name}"
-                    })
+                    .Select(s => new DropdownOption
+                    (
+                        s.SubjectId.ToString(),
+                        $"{s.Name}"
+                    ))
                     .ToListAsync())
                     .OrderBy(s => s.Text);
             }
@@ -697,11 +696,11 @@ namespace TutorBridge.Controllers
             .Join(_context.Subject,
                 ts => ts.SubjectId,
                 s => s.SubjectId,
-                (ts, s) => new SelectListItem
-                {
-                    Value = s.SubjectId.ToString(),
-                    Text = s.Name
-                })
+                (ts, s) => new DropdownOption
+                (
+                    s.SubjectId.ToString(),
+                    s.Name
+                ))
             .ToListAsync())
             .OrderBy(s => s.Text);
         }

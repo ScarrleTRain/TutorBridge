@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using TutorBridge.Areas.Identity.Data;
 using TutorBridge.Models;
+using TutorBridge.ViewModels;
 
 namespace TutorBridge.Controllers
 {
@@ -119,7 +120,9 @@ namespace TutorBridge.Controllers
                 return NotFound();
             }
 
-            var timeslot = await _context.Timeslot.FindAsync(id);
+            var timeslot = await _context.Timeslot
+                .Include(t => t.Tutor)
+                .FirstOrDefaultAsync(m => m.TimeslotId == id);
             if (timeslot == null)
             {
                 return NotFound();
@@ -147,7 +150,9 @@ namespace TutorBridge.Controllers
                 return NotFound();
             }
 
-            var existing = await _context.Timeslot.FindAsync(id);
+            var existing = await _context.Timeslot
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.TimeslotId == id);
             if (existing == null) return NotFound();
 
             if (existing.IsPast())
@@ -186,7 +191,7 @@ namespace TutorBridge.Controllers
             {
                 try
                 {
-                    _context.Update(timeslot);
+                    _context.Update(timeslot); //here
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -205,7 +210,6 @@ namespace TutorBridge.Controllers
 
             await PopulateTutorForView(timeslot);
             ViewBag.Tutors = await TutorDropdown();
-
             return View(timeslot);
         }
 
@@ -276,14 +280,15 @@ namespace TutorBridge.Controllers
                 (!excludeTimeslotId.HasValue || t.TimeslotId != excludeTimeslotId.Value));
         }
 
-        public async Task<IEnumerable<SelectListItem>> TutorDropdown()
+        public async Task<IEnumerable<DropdownOption>> TutorDropdown()
         {
             return (await _userManager.GetUsersInRoleAsync("Tutor"))
-               .Select(u => new SelectListItem
-               {
-                   Value = u.Id,
-                   Text = $"{u.NameFirst} {u.NameLast}"
-               })
+               .Select(u => new DropdownOption
+               (
+                   u.Id,
+                   $"{u.NameFirst} {u.NameLast}",
+                   u.Email
+               ))
                .ToList().OrderBy(u => u.Text);
         }
 

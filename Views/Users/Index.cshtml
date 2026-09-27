@@ -32,9 +32,6 @@
             <table class="table table-hover" id="usersTable">
                 <thead style="position: sticky; top: 0;">
                     <tr>
-                        <th data-sort="id" style="cursor: pointer;">
-                            Id <i class="bi bi-arrow-down-up sort-icon opacity-50"></i>
-                        </th>
                         <th data-sort="name" style="cursor: pointer;">
                             Name <i class="bi bi-arrow-down-up sort-icon opacity-50"></i>
                         </th>
@@ -70,7 +67,6 @@
                         data-phone="@item.Phone"
                         data-birthdate="@item.BirthDate.ToString("o")"
                         data-role="@item.Role">
-                        <td>@item.Id</td>
                         <td>@item.NameFirst @item.NameLast</td>
                         <td>@item.Email</td>
                         <td>@item.Phone</td>

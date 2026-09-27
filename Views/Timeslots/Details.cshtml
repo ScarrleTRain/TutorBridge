@@ -14,13 +14,6 @@
 
     <div class="card-body">
         <dl class="row mb-0">
-            <dt class="col-md-3">
-                <i class="bi bi-person-badge me-1 text-primary"></i>Tutor Id
-            </dt>
-            <dd class="col-md-9">
-                @Html.DisplayFor(model => model.TutorId)
-            </dd>
-
             @if (Model.Tutor != null)
             {
                 <dt class="col-md-3">
@@ -28,6 +21,13 @@
                 </dt>
                 <dd class="col-md-9">
                     @Model.Tutor.NameFirst @Model.Tutor.NameLast
+                </dd>
+
+                <dt class="col-md-3">
+                    <i class="bi bi-envelope me-1 text-primary"></i>Tutor Email
+                </dt>
+                <dd class="col-md-9">
+                    @Model.Tutor.Email
                 </dd>
             }
 

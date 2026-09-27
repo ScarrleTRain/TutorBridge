@@ -26,17 +26,8 @@
                 <dd class="col-md-9">
                     @Model.User.NameFirst @Model.User.NameLast @if (User.IsInRole("Admin") || User.IsInRole("Tutor"))
                     {
-                        <span class="text-secondary">(@Model.UserId)</span>
+                        <span class="text-secondary">(@Model.User.Email)</span>
                     }
-                </dd>
-            }
-            else
-            {
-                <dt class="col-md-3">
-                    <i class="bi bi-person-badge me-1 text-primary"></i>User Id
-                </dt>
-                <dd class="col-md-9">
-                    @Html.DisplayFor(model => model.UserId)
                 </dd>
             }
 
@@ -50,17 +41,8 @@
                     <dd class="col-md-9">
                         @Model.Timeslot.Tutor.NameFirst @Model.Timeslot.Tutor.NameLast @if (User.IsInRole("Admin") || User.IsInRole("Tutor"))
                         {
-                            <span class="text-secondary">(@Model.Timeslot.Tutor.Id)</span>
+                            <span class="text-secondary">(@Model.Timeslot.Tutor.Email)</span>
                         }
-                    </dd>
-                }
-                else
-                {
-                    <dt class="col-md-3">
-                        <i class="bi-person-badge me-1 text-primary"></i>Tutor
-                    </dt>
-                    <dd class="col-md-9">
-                        @Model.Timeslot.TutorId
                     </dd>
                 }
 

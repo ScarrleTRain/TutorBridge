@@ -290,14 +290,14 @@ namespace TutorBridge.Controllers
             };
         }
 
-        public async Task<IEnumerable<SelectListItem>> RoleDropdown()
+        public async Task<IEnumerable<DropdownOption>> RoleDropdown()
         {
             return (await _roleManager.Roles
-                .Select(r => new SelectListItem
-                {
-                    Value = r.Name,
-                    Text = r.Name
-                })
+                .Select(r => new DropdownOption
+                (
+                    r.Name,
+                    r.Name
+                ))
                 .ToListAsync())
                 .OrderBy(r => r.Text);
         }
