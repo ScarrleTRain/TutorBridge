@@ -7,19 +7,25 @@
     const calendar = new FullCalendar.Calendar(calendarEl, createBaseCalendarOptions(window.__timeslotEvents, {
         eventClick: function (info) {
             const id = info.event.id;
-            const isPast = info.event.extendedProps.isPast
+            const isPast = info.event.extendedProps.isPast;
+            const isBooked = info.event.extendedProps.isBooked;
 
             const editUrl = `${window.__timeslotUrls.edit}/${id}`;
             const detailsUrl = `${window.__timeslotUrls.details}/${id}`;
             const deleteUrl = `${window.__timeslotUrls.delete}/${id}`;
 
             const editIcon = isPast
-                ? ''
+                ? '<i class="bi bi-pencil-square text-muted" style="opacity:0.5; cursor:not-allowed;" title="Past timeslots can\'t be edited"></i>'
                 : `<a href="${editUrl}" class="text-decoration-none"><i class="bi bi-pencil-square"></i></a>`;
 
-            const deleteIcon = isPast
-                ? ''
-                : `<a href="${deleteUrl}" class="text-decoration-none"><i class="bi bi-trash3"></i></a>`;
+            const canDelete = !isPast && !isBooked;
+            const deleteDisabledReason = isPast
+                ? 'Past timeslots can\'t be deleted'
+                : 'This timeslot has an active booking. Cancel the booking first to delete it.';
+
+            const deleteIcon = canDelete
+                ? `<a href="${deleteUrl}" class="text-decoration-none"><i class="bi bi-trash3"></i></a>`
+                : `<i class="bi bi-trash3 text-muted" style="opacity:0.5; cursor:not-allowed;" title="${deleteDisabledReason}"></i>`;
 
             activeTippy = tippy(info.el, {
                 appendTo: () => document.body,

@@ -153,6 +153,7 @@ namespace TutorBridge.Controllers
             if (existing.IsPast())
             {
                 ModelState.AddModelError("", "This timeslot has already started and can no longer be edited.");
+                await PopulateTutorForView(timeslot);
                 return View("Edit", timeslot);
             }
 
@@ -165,7 +166,9 @@ namespace TutorBridge.Controllers
             if (hasActiveBooking)
             {
                 ModelState.AddModelError("", "This timeslot has an active booking. Please cancel it first.");
-                return View("Delete", timeslot); // explicit view name since action is "DeleteConfirmed"
+                await PopulateTutorForView(timeslot);
+                ViewBag.Tutors = await TutorDropdown();
+                return View(timeslot);
             }
 
             if (ModelState.IsValid)
@@ -200,6 +203,7 @@ namespace TutorBridge.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            await PopulateTutorForView(timeslot);
             ViewBag.Tutors = await TutorDropdown();
 
             return View(timeslot);
@@ -214,6 +218,7 @@ namespace TutorBridge.Controllers
             }
 
             var timeslot = await _context.Timeslot
+                .Include(t => t.Bookings)
                 .Include(t => t.Tutor)
                 .FirstOrDefaultAsync(m => m.TimeslotId == id);
             if (timeslot == null)
@@ -234,7 +239,9 @@ namespace TutorBridge.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var timeslot = await _context.Timeslot.FindAsync(id);
+            var timeslot = await _context.Timeslot
+                .Include(t => t.Bookings)
+                .FirstOrDefaultAsync(t => t.TimeslotId == id);
 
             if (timeslot != null)
             {
@@ -278,6 +285,14 @@ namespace TutorBridge.Controllers
                    Text = $"{u.NameFirst} {u.NameLast}"
                })
                .ToList().OrderBy(u => u.Text);
+        }
+
+        private async Task PopulateTutorForView(Timeslot timeslot)
+        {
+            if (timeslot.Tutor == null)
+            {
+                timeslot.Tutor = await _userManager.FindByIdAsync(timeslot.TutorId);
+            }
         }
     }
 }

@@ -33,8 +33,6 @@ namespace TutorBridge.Validation
                 }
                 else if (birthDate < maxDate)
                 {
-                    // Fixed message: ErrorMessage is always set by the constructors and describes the
-                    // too-young case, so reusing it here would show the wrong text for an over-100 birth date.
                     var message = $"Must be {MaxYears} years old or younger";
                     return new ValidationResult(message, new[] { vc.MemberName ?? string.Empty });
                 }
